@@ -87,8 +87,15 @@ def _ev_color(ev: float) -> str:
     return GREEN if ev > 0.02 else (RED if ev < -0.02 else GREY)
 
 
+def _implied_pct(american) -> str:
+    """Break-even % implied by the OFFERED (vigged) price — what the model must beat."""
+    from src.data.odds import american_to_decimal, decimal_to_prob
+    p = decimal_to_prob(american_to_decimal(american))
+    return _pct(p)
+
+
 def market_table(title: str, bets: list, key_note: str | None = None):
-    """Render one market's selections with model%, Vegas%, price, EV, stake."""
+    """Render one market's selections with model%, fair%, price, break-even, EV, stake."""
     st.markdown(f"**{title}**")
     rows = []
     for b in bets:
@@ -96,8 +103,9 @@ def market_table(title: str, bets: list, key_note: str | None = None):
         rows.append({
             "Selection": b.selection,
             "Model": _pct(b.model_p),
-            "Vegas": _pct(b.fair_p),
+            "Fair (no-vig)": _pct(b.fair_p),
             "Price": _am(b.american),
+            "Break-even": _implied_pct(b.american),
             "EV": f"{b.ev*100:+.0f}%",
             "Stake": f"{units:.1f}u" if units > 0.05 else "—",
         })
@@ -219,10 +227,23 @@ def best_bet_block(m: dict, min_ev: float = 0.03):
                "the Tracker page shows how these picks are actually doing.")
 
 
+def _display_probs(m: dict) -> dict:
+    """The model's W/D/L probabilities for display — the SAME anchored+recentered
+    `model_p` used in the Match Result table (so the header bar and table agree).
+    Falls back to the raw forecast if there are no Match Result bets (no odds)."""
+    a = m["analysis"]
+    mr = {b.selection: b.model_p for b in m["bets"] if b.market == "Match Result"}
+    p = {"H": mr.get(m["home"]), "D": mr.get("Draw"), "A": mr.get(m["away"])}
+    if any(v is None for v in p.values()):
+        return dict(a["probs"])
+    s = sum(p.values()) or 1.0
+    return {k: v / s for k, v in p.items()}
+
+
 def render_match(m: dict, live: dict | None = None, min_ev: float = 0.03):
     a = m["analysis"]
     t = pd.to_datetime(m["date"]).strftime("%a %d %b %H:%M UTC")
-    probs = a["probs"]
+    probs = _display_probs(m)
     pick = OUTCOMES[int(np.argmax([probs["H"], probs["D"], probs["A"]]))]
     pick_name = {"H": m["home"], "D": "Draw", "A": m["away"]}[pick]
     n_value = sum(1 for b in m["bets"] if b.ev > 0.02)
@@ -261,6 +282,9 @@ def render_match(m: dict, live: dict | None = None, min_ev: float = 0.03):
             for mk in ["Match Result", "Total Goals", "Spread"]:
                 if mk in by_market:
                     market_table(mk, by_market[mk])
+            st.caption("**Model** = market-anchored probability (drives EV, matches the bar "
+                       "above) · **Fair** = de-vigged market · **Break-even** = the offered "
+                       "price's implied %. EV is positive only when **Model > Break-even**.")
             st.markdown(f"**Both Teams To Score** — model **{_pct(a['btts'])}** "
                         f"(no Vegas line — info only)")
         with right:
