@@ -115,6 +115,104 @@ def snapshot(start: str | None = None, days: int = 3, min_ev: float = 0.03,
     return len(rows)
 
 
+def _code_str(code) -> str:
+    """Candidate grade-code -> CLV ledger code string ('H', 'over@2.5', ...)."""
+    if isinstance(code, str):
+        return code
+    kind, line = code
+    return f"{kind}@{line}"
+
+
+def backfill(start: str = "2026-06-11", end: str | None = None, min_ev: float = 0.03,
+             cfg: dict | None = None, now: str | None = None) -> int:
+    """Record the model's +EV bets on **already-played** 2026 WC games into the ledger.
+
+    Leak-free: the predictor is trained only on data before ``start`` (kickoff), and
+    each game is priced at its retained ESPN historical line. Uses the **same**
+    pipeline as the live tracker — as-of calibration + market anchoring + the deployed
+    market-bias recentering, spreads (and any disabled segment) excluded — so the
+    backfilled bets are consistent with the forward ones. Kelly units are derived from
+    ``model_p``/``decimal`` at display time, identical to live.
+
+    Honest note: CLV is left blank for backfilled bets — we only have one historical
+    price per game, so there's no separate decision-vs-close to measure. They count for
+    W/L, ROI and units, but not for 'beat the close'."""
+    cfg = cfg or load_config()
+    ensure_dirs(cfg)
+    end = end or datetime.utcnow().strftime("%Y-%m-%d")
+    now = now or datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
+    from .odds_backtest import _AsOfPredictor
+    from .bet_grade import _candidates, _grade, _grade_type
+    from .anchor import DEFAULT_W
+    from ..models.market_calibration import fit_calibrators
+    from ..models.market_bias import load_default
+    from ..models.segment_gate import disabled_set
+    from ..simulate.bracket_2026 import HOST_TEAMS
+
+    pred = _AsOfPredictor(start, cfg)
+    cal = fit_calibrators(cfg, as_of=start, save=False)
+    bias = load_default(cfg)
+    disabled = disabled_set(cfg)
+    events = [e for e in fetch_espn_range(start, end, league="fifa.world", cfg=cfg, use_cache=True)
+              if e["status"] == "post" and e["home_score"] is not None and e.get("game_id")]
+
+    rows = []
+    for ev in events:
+        home, away = ev["home_team"], ev["away_team"]
+        if home not in pred.known or away not in pred.known:
+            continue
+        od = fetch_summary_odds(str(ev["game_id"]), league="fifa.world", cfg=cfg)
+        if not od or od.get("ml_home") is None:
+            continue
+        neutral = home not in HOST_TEAMS
+        probs = pred.predict(home, away, neutral)
+        if probs is None:
+            continue
+        lam, mu = pred.dc.expected_goals(home, away, neutral)
+        mat = pred.dc.scoreline_matrix(lam, mu)
+        hs, as_ = int(ev["home_score"]), int(ev["away_score"])
+        mdate = pd.to_datetime(ev["date"])
+        for market, sel, code, am, mp, fair in _candidates(home, away, probs, mat, od, cal, DEFAULT_W):
+            if am is None or mp is None:
+                continue
+            seg = _grade_type(code)
+            if seg in disabled:                       # spreads off, etc.
+                continue
+            mp_adj = bias.recenter(seg, mp)           # deployed recentering (live parity)
+            dec = american_to_decimal(am)
+            if dec is None:
+                continue
+            ev_val = mp_adj * (dec - 1) - (1 - mp_adj)
+            if ev_val < min_ev:
+                continue
+            res = _grade(code, hs, as_)
+            pnl = 0.0 if res == "push" else (dec - 1 if res == "win" else -1.0)
+            rows.append({
+                "game_id": ev["game_id"], "match_date": mdate.strftime("%Y-%m-%d"),
+                "match": f"{home} v {away}", "market": market, "code": _code_str(code),
+                "segment": seg, "system": _system_tag(market, dec), "selection": sel,
+                "american": am, "decimal": round(dec, 4),
+                "model_p": round(float(mp_adj), 4), "fair_p": round(fair, 4) if fair else None,
+                "ev": round(float(ev_val), 4), "snapshot_time": mdate.strftime("%Y-%m-%dT%H:%M:%SZ"),
+                "score": f"{hs}-{as_}", "closing_decimal": round(dec, 3), "clv": None,
+                "result": res, "pnl": round(pnl, 3), "graded_time": now, "backfilled": True,
+            })
+
+    if not rows:
+        print("[clv] backfill: no gradable +EV bets on played games")
+        return 0
+    new = pd.DataFrame(rows)
+    led = pd.read_csv(_ledger_path(cfg)) if _ledger_path(cfg).exists() else pd.DataFrame()
+    before = len(led)
+    combined = pd.concat([led, new], ignore_index=True) if before else new
+    combined = combined.drop_duplicates(subset=["game_id", "market", "selection"], keep="first")
+    combined.to_csv(_ledger_path(cfg), index=False)
+    added = len(combined) - before
+    print(f"[clv] backfill: +{added} bets across {len(events)} played games "
+          f"(ledger now {len(combined)})")
+    return added
+
+
 def _closing_price(code: str, od: dict):
     """Closing decimal odds for a ticket code from summary odds."""
     if code in ("H", "D", "A"):
@@ -245,6 +343,9 @@ if __name__ == "__main__":
         snapshot()
     elif cmd == "grade":
         grade()
+    elif cmd == "backfill":
+        start = sys.argv[2] if len(sys.argv) > 2 else "2026-06-11"
+        backfill(start)
     elif cmd == "kill":
         from ..models.segment_gate import evaluate_kill_switches
         g = evaluate_kill_switches(now=datetime.utcnow().strftime("%Y-%m-%d"))

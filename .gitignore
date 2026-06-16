@@ -12,9 +12,10 @@ secrets/
 data/raw/fifa_players/
 data/raw/odds/
 
-# Runtime tracker state — start the hosted app with a clean forward record
+# Tracker: COMMIT the settled ledger (the backfilled tournament record persists on
+# the hosted site, which has an ephemeral filesystem). Open/pending tickets stay
+# local — they accumulate live per-session on the site.
 reports/clv_open.csv
-reports/clv_ledger.csv
 
 # python
 __pycache__/
