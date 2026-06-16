@@ -1,0 +1,115 @@
+# =============================================================================
+# Badass Soccer Model — central configuration
+# =============================================================================
+
+paths:
+  data_raw: data/raw
+  data_processed: data/processed
+  models: data/models
+  reports: reports
+
+# -----------------------------------------------------------------------------
+# Data sources. GitHub spine needs no auth. Others have graceful fallbacks.
+# -----------------------------------------------------------------------------
+sources:
+  results_base_url: https://raw.githubusercontent.com/martj42/international_results/master
+  results_files:
+    - results.csv
+    - shootouts.csv
+    - goalscorers.csv
+    - former_names.csv
+  # Kaggle slugs (used only if the `kaggle` CLI + token are available)
+  kaggle_elo: saifalnimri/international-football-elo-ratings
+  kaggle_wc2026_elo: afonsofernandescruz/2026-fifa-world-cup-historical-elo-ratings
+  # Current EA Sports FC player ratings (replaces the stale 2018 FIFA snapshot).
+  # Downloader tries these in order and uses the first that succeeds.
+  kaggle_fifa_players: stefanoleone992/ea-sports-fc-25-complete-player-dataset
+  kaggle_fifa_players_fallbacks:
+    - stefanoleone992/ea-sports-fc-24-complete-player-dataset
+    - bryanb/fifa-player-stats-database
+  # Transfermarkt 2026 WC participants (best-effort scrape)
+  transfermarkt_wc2026: https://www.transfermarkt.com/world-cup/teilnehmer/pokalwettbewerb/FIWC
+
+# -----------------------------------------------------------------------------
+# Filtering: which matches feed the models
+# -----------------------------------------------------------------------------
+data:
+  min_date: "1990-01-01"        # modern era; older data is noisy / different game
+  drop_tournaments: []          # e.g. ["Friendly"] to exclude friendlies entirely
+  # Match-importance weights (relative information value of a result)
+  importance_weights:
+    "FIFA World Cup": 1.00
+    "FIFA World Cup qualification": 0.85
+    "UEFA Euro": 0.95
+    "UEFA Euro qualification": 0.80
+    "Copa América": 0.95
+    "African Cup of Nations": 0.85
+    "AFC Asian Cup": 0.85
+    "CONCACAF Gold Cup": 0.80
+    "UEFA Nations League": 0.80
+    "Confederations Cup": 0.85
+    "Friendly": 0.45
+    "_default": 0.65
+
+# -----------------------------------------------------------------------------
+# Elo engine
+# -----------------------------------------------------------------------------
+elo:
+  base_rating: 1500.0
+  k_factor: 40.0                # base K; scaled by importance + goal-diff multiplier
+  home_advantage: 65.0          # rating points added to the home side
+  regression_to_mean: 0.0       # optional per-year shrink toward base (0 = off)
+
+# -----------------------------------------------------------------------------
+# Dixon-Coles bivariate Poisson
+# -----------------------------------------------------------------------------
+dixon_coles:
+  xi: 0.0018                    # time-decay rate per day (half-life ~1.05 yr)
+  home_advantage_init: 0.25     # initial log home advantage
+  max_goals: 10                 # truncation of the scoreline matrix
+  fit_window_days: 2920         # ~8 years of matches per fit
+  l2_penalty: 0.0001            # ridge on attack/defense for stability
+
+# -----------------------------------------------------------------------------
+# xG-informed Dixon-Coles
+# -----------------------------------------------------------------------------
+xg:
+  blend_weight: 0.6        # target = (1-w)*goals + w*xG, where xG is available
+
+# -----------------------------------------------------------------------------
+# Feature engineering
+# -----------------------------------------------------------------------------
+features:
+  form_windows: [5, 10, 20]
+  form_decay_days: 365          # half-weight age for rolling form
+  h2h_decay_days: 1825
+
+# -----------------------------------------------------------------------------
+# Ensemble
+# -----------------------------------------------------------------------------
+ensemble:
+  # Ablation-driven default. Add `xg_dixon_coles` if richer xG data is available
+  # (with WC/Euro-only StatsBomb xG it was neutral-to-noise, so it's excluded).
+  members: [dixon_coles, elo, gbm]
+  meta_learner: logistic        # logistic | average
+  calibration: isotonic         # isotonic | sigmoid | none
+
+# -----------------------------------------------------------------------------
+# Backtest
+# -----------------------------------------------------------------------------
+backtest:
+  world_cups:                   # (year, start_date) — data frozen at start_date
+    - [2010, "2010-06-11"]
+    - [2014, "2014-06-12"]
+    - [2018, "2018-06-14"]
+    - [2022, "2022-11-20"]
+  walkforward_start: "2006-01-01"
+
+# -----------------------------------------------------------------------------
+# Tournament simulation (2026)
+# -----------------------------------------------------------------------------
+simulation:
+  n_iterations: 50000
+  seed: 1234
+  knockout_extra_time: true
+  draw_inflation_knockout: 0.0  # knockouts must produce a winner

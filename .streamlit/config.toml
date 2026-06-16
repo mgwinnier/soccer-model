@@ -1,0 +1,9 @@
+# Streamlit configuration for the hosted dashboard.
+[theme]
+base = "dark"
+primaryColor = "#2e7d32"          # green accent (matches the app's EV/qualify color)
+
+[server]
+# Streamlit Community Cloud manages the server; these are safe defaults.
+enableXsrfProtection = true
+enableCORS = false

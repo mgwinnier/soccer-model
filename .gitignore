@@ -1,0 +1,30 @@
+# secrets — never commit credentials
+.env
+*.env
+secrets/
+**/kaggle.json
+
+# Large data NOT needed by the hosted dashboard (must stay out of the repo):
+#   - FIFA player CSV ~92 MB (availability degrades to a no-op without it)
+#   - ESPN summary/scoreboard cache ~1.1 GB (re-fetched live at runtime)
+# Everything else under data/ IS committed so the deployed app has its inputs
+# (matches/features parquet, elo_ratings.json, models, results spine, shootouts).
+data/raw/fifa_players/
+data/raw/odds/
+
+# Runtime tracker state — start the hosted app with a clean forward record
+reports/clv_open.csv
+reports/clv_ledger.csv
+
+# python
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.ipynb_checkpoints/
+.venv/
+venv/
+
+# misc
+*.log
+.DS_Store
