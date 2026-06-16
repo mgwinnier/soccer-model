@@ -76,6 +76,13 @@ class TournamentSimulator:
         c = self.dc.intercept_
         # lam_neutral[a, b] = expected goals of a vs b at a neutral venue
         self.lam = np.exp(c + atk[:, None] + dfn[None, :])
+        # World-Cup scoring-environment correction: the model under-projects WC goals
+        # vs actual results (see backtest/wc_goals_backtest.py); scale every expected-goal
+        # rate to the real WC environment so group goal-difference tiebreakers and
+        # knockout scorelines reflect how WC matches actually score. Same constant the
+        # deployed match predictor uses (single source of truth).
+        from ..predict.predict_match import MatchPredictor
+        self.lam = self.lam * MatchPredictor.WC_GOALS_SCALE
         self.home_mult = float(np.exp(self.dc.home_adv_))
         # Knockout advance prob: win in 90'/ET, else win the shootout.
         # WP[a, b] = P(a wins) + P(draw) * P(a wins shootout | Elo gap)

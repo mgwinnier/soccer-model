@@ -115,12 +115,21 @@ def build_predictions(cfg: dict | None = None, anchor_w: float = 0.5,
         # the off-consensus split below asks whether our book beating the market
         # actually predicts winning bets. Exclude our own book so it can't anchor.
         cons = match_consensus(r.game_id, r.league, exclude="bet365", cfg=cfg)
-        # nudge expected goals toward the market total line (corrects the model's
-        # under-projection), then rebuild the matrix used for totals/spread
-        line_t = od.get("total_line")
-        if line_t is not None and line_t == line_t and (lam + mu) > 0:
-            s = ((1 - 0.6) * (lam + mu) + 0.6 * float(line_t)) / (lam + mu)
-            mat = dc.scoreline_matrix(lam * s, mu * s)
+        # World-Cup scoring-environment correction (mirrors the deployed predictor):
+        # the model under-projects WC goals vs ACTUAL results, so for WC matches scale
+        # expected goals by the historical actual/model ratio and rebuild the matrix.
+        # Non-WC internationals are left untouched. Calibrated to scores, not the line.
+        if r.league == "fifa.world" and (lam + mu) > 0:
+            from ..predict.predict_match import MatchPredictor
+            lam, mu = lam * MatchPredictor.WC_GOALS_SCALE, mu * MatchPredictor.WC_GOALS_SCALE
+            mat = dc.scoreline_matrix(lam, mu)
+            dc_p = np.array(scoreline_to_outcome_probs(mat))
+            blend = (dc_p + elo_p) / 2
+            blend /= blend.sum()
+            if calibrators.models.get("mr") is not None:
+                c3 = np.array([calibrators.calibrate("mr", float(x)) for x in blend])
+                if c3.sum() > 0:
+                    blend = c3 / c3.sum()
         for market, sel, code, am, mp, fair in _candidates(
                 home, away, blend, mat, od, calibrators, anchor_w):
             if am is None or mp is None:
