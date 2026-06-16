@@ -1,0 +1,6 @@
+factor,n,coverage,oos_mae_improvement,oos_rps_improvement,verdict
+recent_form: total gf_5 (both),448,1.0,0.0107,0.0001,reject
+cross-confederation flag,448,1.0,-0.0027,0.0001,reject
+recent_form: total ga_5 (both),448,1.0,0.0006,-0.0,reject
+recent_form: favorite gf_5,448,1.0,0.0059,-0.0002,reject
+"xG: total xgf (both, sparse)",106,0.24,0.0056,-0.0006,reject

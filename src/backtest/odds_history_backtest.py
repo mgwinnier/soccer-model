@@ -120,8 +120,8 @@ def build_predictions(cfg: dict | None = None, anchor_w: float = 0.5,
         # expected goals by the historical actual/model ratio and rebuild the matrix.
         # Non-WC internationals are left untouched. Calibrated to scores, not the line.
         if r.league == "fifa.world" and (lam + mu) > 0:
-            from ..predict.predict_match import MatchPredictor
-            lam, mu = lam * MatchPredictor.WC_GOALS_SCALE, mu * MatchPredictor.WC_GOALS_SCALE
+            from ..models.wc_goals import correct as _wc_correct
+            lam, mu = _wc_correct(lam, mu)
             mat = dc.scoreline_matrix(lam, mu)
             dc_p = np.array(scoreline_to_outcome_probs(mat))
             blend = (dc_p + elo_p) / 2

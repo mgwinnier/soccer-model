@@ -20,6 +20,7 @@ from ..data.team_names import normalize_team
 from ..models.dixon_coles import DixonColesModel
 from ..models.elo_model import EloModel
 from ..models.base import OUTCOMES
+from ..models import wc_goals
 
 
 class MatchPredictor:
@@ -46,6 +47,8 @@ class MatchPredictor:
         # Per-market calibrators (de-bias Totals/Spread/BTTS). Empty -> no-op.
         from ..models.market_calibration import load_default as _load_cal
         self.calibrators = _load_cal(self.cfg)
+        # World-Cup goals correction (favorite/underdog scales). See models/wc_goals.py.
+        self._wc_fav, self._wc_dog = wc_goals.load_scales(self.cfg)
 
     def _validate(self, name: str) -> str:
         """Normalize and confirm the team is real; else raise with suggestions."""
@@ -63,13 +66,14 @@ class MatchPredictor:
         from ..models.base import scoreline_to_outcome_probs
         lam, mu = self.dc.expected_goals(home, away, neutral)
         lam, mu = lam * home_avail, mu * away_avail
-        # World-Cup scoring environment: the model is trained on all internationals
-        # (qualifiers/friendlies included) and measurably under-projects WC goals vs
-        # ACTUAL results — backtested across 7 World Cups (1998-2022) it averages 2.18
-        # expected vs 2.54 scored, low in every single tournament. Scaling lam,mu by the
-        # historical actual/model ratio zeroes that bias and *improves* pooled WC RPS
-        # (0.2007 -> 0.1995, walk-forward). Calibrated to real scores, not the Vegas line.
-        lam, mu = lam * self.WC_GOALS_SCALE, mu * self.WC_GOALS_SCALE
+        # World-Cup scoring-environment correction. The model is trained on all
+        # internationals (qualifiers/friendlies included) and under-projects WC goals vs
+        # ACTUAL results — and not uniformly: the FAVORITE is under-projected more than
+        # the underdog (backtest across 7 WCs). Scaling the favored/underdog sides by
+        # their separate historical actual/model ratios zeroes the bias AND improves
+        # pooled WC RPS over a flat scale. Calibrated to real scores, not the Vegas line.
+        # See src/models/wc_goals.py + src/backtest/wc_goals_backtest.py.
+        lam, mu = wc_goals.correct(lam, mu, self._wc_fav, self._wc_dog)
         mat = self.dc.scoreline_matrix(lam, mu)
         dc_p = np.array(scoreline_to_outcome_probs(mat))
         elo_diff = self.ratings.get(home, 1500) - self.ratings.get(away, 1500)
@@ -104,14 +108,6 @@ class MatchPredictor:
             "over_2_5": round(float(_over_prob(mat, 2.5)), 3),
             "btts": round(float(mat[1:, 1:].sum()), 3),
         }
-
-    # Multiplier on the model's expected goals to match the real World-Cup scoring
-    # environment. Estimated walk-forward from the actual results of all prior World
-    # Cups (actual_total / model_total): the value zeroes the measured -0.35-goal WC
-    # under-projection and improves pooled WC RPS. This corrects toward ACTUAL scores,
-    # not the betting line, so it applies to every WC prediction (incl. Team Explorer,
-    # which has no market line). Backtest: see src/backtest/wc_goals_backtest.py.
-    WC_GOALS_SCALE = 1.15
 
     def analyze(self, home: str, away: str, neutral: bool = True,
                 market_total: float = 2.5, spread_home_line: float | None = None,

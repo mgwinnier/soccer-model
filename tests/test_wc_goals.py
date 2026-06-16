@@ -1,44 +1,50 @@
-"""Tests for the World-Cup scoring-environment correction.
+"""Tests for the matchup-strength-aware World-Cup goals correction.
 
-The model is trained on all internationals and under-projects WC goals vs ACTUAL
-results (backtested across 1998-2022). ``MatchPredictor.WC_GOALS_SCALE`` corrects the
-expected goals toward real WC scoring — not toward the Vegas line. These tests pin the
-mechanism, not exact numbers (which depend on the fitted model).
+The model under-projects WC goals vs ACTUAL results, and not uniformly — the favorite
+(higher expected goals) is under-projected more than the underdog. ``models/wc_goals.py``
+scales the favored/underdog sides by separate factors. These tests pin the mechanism, not
+exact fitted numbers.
 """
 import numpy as np
 
+from src.models import wc_goals
 from src.predict.predict_match import MatchPredictor
 
 
-def test_scale_is_a_meaningful_uplift():
-    # measured WC under-projection is ~-0.35 goals on a ~2.2 base -> ~15% uplift
-    assert 1.05 < MatchPredictor.WC_GOALS_SCALE < 1.30
+def test_scales_are_meaningful_and_favorite_bigger():
+    fav, dog = wc_goals.load_scales()
+    assert 1.0 < dog < fav < 1.40          # both uplift; favorite gets the larger one
 
 
-def test_analyze_applies_the_wc_scale_to_expected_goals():
+def test_correct_applies_favorite_scale_to_higher_side():
+    fav, dog = wc_goals.WC_FAV_SCALE, wc_goals.WC_DOG_SCALE
+    # lam is the favorite
+    lam, mu = wc_goals.correct(2.0, 1.0)
+    assert np.isclose(lam, 2.0 * fav) and np.isclose(mu, 1.0 * dog)
+    # mu is the favorite (lower lam) -> scales swap
+    lam2, mu2 = wc_goals.correct(0.8, 1.6)
+    assert np.isclose(lam2, 0.8 * dog) and np.isclose(mu2, 1.6 * fav)
+
+
+def test_favorite_gets_a_larger_uplift_than_its_underdog():
+    # a heavy-favorite matchup: the favored side's goals rise by a bigger fraction
+    lam, mu = 2.4, 0.6
+    clam, cmu = wc_goals.correct(lam, mu)
+    assert (clam / lam) > (cmu / mu)
+
+
+def test_predictor_applies_correction_no_market_line_needed():
     mp = MatchPredictor()
-    home, away = "Brazil", "Morocco"
-    raw = mp.dc.expected_goals(home, away, True)          # un-corrected DC goals
-    a = mp.analyze(home, away, neutral=True)
+    raw = mp.dc.expected_goals("Spain", "Cape Verde", True)     # un-corrected DC
+    a = mp.analyze("Spain", "Cape Verde", neutral=True)         # no line passed
     eg = a["expected_goals"]
-    s = MatchPredictor.WC_GOALS_SCALE
-    # the analyzed expected goals are the raw DC goals scaled by WC_GOALS_SCALE
-    assert eg[0] == round(raw[0] * s, 2)
-    assert eg[1] == round(raw[1] * s, 2)
-    # and the correction genuinely raises the projected total
+    # corrected total exceeds raw (under-projection fixed) and favorite side scaled most
     assert sum(eg) > sum(raw)
+    fav_raw = max(raw); fav_corr = max(eg)
+    assert (fav_corr / fav_raw) > 1.10
 
 
-def test_outcome_probs_still_normalize():
+def test_outcome_probs_normalize():
     mp = MatchPredictor()
-    a = mp.analyze("Spain", "Cape Verde", neutral=True)
-    p = a["probs"]
+    p = mp.analyze("Argentina", "Mexico", neutral=True)["probs"]
     assert abs(p["H"] + p["D"] + p["A"] - 1.0) < 1e-6
-
-
-def test_no_market_line_needed():
-    # the correction must work without any Vegas total (Team Explorer path):
-    # analyze takes no goals/line argument and still corrects toward real WC scoring.
-    mp = MatchPredictor()
-    a = mp.analyze("Argentina", "Mexico", neutral=True)
-    assert sum(a["expected_goals"]) > 0

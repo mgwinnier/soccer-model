@@ -76,13 +76,16 @@ class TournamentSimulator:
         c = self.dc.intercept_
         # lam_neutral[a, b] = expected goals of a vs b at a neutral venue
         self.lam = np.exp(c + atk[:, None] + dfn[None, :])
-        # World-Cup scoring-environment correction: the model under-projects WC goals
-        # vs actual results (see backtest/wc_goals_backtest.py); scale every expected-goal
-        # rate to the real WC environment so group goal-difference tiebreakers and
-        # knockout scorelines reflect how WC matches actually score. Same constant the
-        # deployed match predictor uses (single source of truth).
-        from ..predict.predict_match import MatchPredictor
-        self.lam = self.lam * MatchPredictor.WC_GOALS_SCALE
+        # World-Cup scoring-environment correction (matchup-strength aware): the model
+        # under-projects WC goals vs actual results, and the FAVORITE more than the
+        # underdog (see models/wc_goals.py + backtest/wc_goals_backtest.py). For each
+        # pairing, the side with the higher expected goals gets the favorite multiplier,
+        # the other the underdog multiplier — so group goal-difference tiebreakers and
+        # knockout scorelines reflect how WC matches actually score. Single source of truth.
+        from ..models.wc_goals import load_scales
+        fav_s, dog_s = load_scales(self.cfg)
+        favmask = self.lam >= self.lam.T          # a favored over b in pairing (a, b)
+        self.lam = np.where(favmask, self.lam * fav_s, self.lam * dog_s)
         self.home_mult = float(np.exp(self.dc.home_adv_))
         # Knockout advance prob: win in 90'/ET, else win the shootout.
         # WP[a, b] = P(a wins) + P(draw) * P(a wins shootout | Elo gap)
