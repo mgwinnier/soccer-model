@@ -289,9 +289,10 @@ def render_match(m: dict, live: dict | None = None, min_ev: float = 0.03,
         if move is not None and not pd.isna(move) and abs(move) >= 0.015:
             who = m["home"] if move > 0 else m["away"]
             move_txt = f" · 📈 line moving toward {who} ({abs(move)*100:.0f}%)"
+        eg = a["expected_goals"]
         st.caption(f"Venue: {'neutral' if m['neutral'] else m['home'] + ' home'} · "
-                   f"proj {a['expected_goals'][0]:.1f}–{a['expected_goals'][1]:.1f} goals · "
-                   f"odds: {m['provider'] or 'n/a'}{move_txt}")
+                   f"expected goals: {m['home']} {eg[0]:.1f}, {m['away']} {eg[1]:.1f} "
+                   f"(**{eg[0] + eg[1]:.1f} total**) · odds: {m['provider'] or 'n/a'}{move_txt}")
         motivation_block(m, live)
         context_strip(m)
         st.divider()

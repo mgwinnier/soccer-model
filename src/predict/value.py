@@ -74,7 +74,8 @@ def build_bets(start: str, days: int = 3, bankroll: float = 100.0,
             neutral = _host_neutral(home)
             a = predictor.analyze(home, away, neutral=neutral, market_total=total_line,
                                   spread_home_line=spread_line,
-                                  home_avail=h_avail, away_avail=a_avail)
+                                  home_avail=h_avail, away_avail=a_avail,
+                                  goals_to_line=_f(r.total_line))
         except ValueError:
             continue  # unknown team — skip, never fabricate
 

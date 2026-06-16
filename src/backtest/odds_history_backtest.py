@@ -115,6 +115,12 @@ def build_predictions(cfg: dict | None = None, anchor_w: float = 0.5,
         # the off-consensus split below asks whether our book beating the market
         # actually predicts winning bets. Exclude our own book so it can't anchor.
         cons = match_consensus(r.game_id, r.league, exclude="bet365", cfg=cfg)
+        # nudge expected goals toward the market total line (corrects the model's
+        # under-projection), then rebuild the matrix used for totals/spread
+        line_t = od.get("total_line")
+        if line_t is not None and line_t == line_t and (lam + mu) > 0:
+            s = ((1 - 0.6) * (lam + mu) + 0.6 * float(line_t)) / (lam + mu)
+            mat = dc.scoreline_matrix(lam * s, mu * s)
         for market, sel, code, am, mp, fair in _candidates(
                 home, away, blend, mat, od, calibrators, anchor_w):
             if am is None or mp is None:

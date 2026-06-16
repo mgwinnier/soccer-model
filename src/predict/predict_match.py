@@ -98,13 +98,33 @@ class MatchPredictor:
             "btts": round(float(mat[1:, 1:].sum()), 3),
         }
 
+    # Fraction of the way the expected total is moved toward the market line when a
+    # real line is available. The model under-projects WC totals badly (2022 WC: 2.13
+    # vs line 2.50 vs actual 2.69, low in 86% of games), so we lean on the sharp line.
+    GOALS_NUDGE = 0.6
+
+    def _nudge_goals(self, lam, mu, mat, line):
+        if line is None or (lam + mu) <= 0:
+            return lam, mu, mat
+        tot = lam + mu
+        target = (1 - self.GOALS_NUDGE) * tot + self.GOALS_NUDGE * float(line)
+        s = target / tot
+        lam, mu = lam * s, mu * s
+        return lam, mu, self.dc.scoreline_matrix(lam, mu)
+
     def analyze(self, home: str, away: str, neutral: bool = True,
                 market_total: float = 2.5, spread_home_line: float | None = None,
-                home_avail: float = 1.0, away_avail: float = 1.0) -> dict:
+                home_avail: float = 1.0, away_avail: float = 1.0,
+                goals_to_line: float | None = None) -> dict:
         """Rich analysis: W/D/L + scoreline matrix + O/U ladder + spread cover +
-        BTTS + team context. Built on the same scoreline distribution as predict()."""
+        BTTS + team context. Built on the same scoreline distribution as predict().
+
+        ``goals_to_line`` (the real market total) corrects the model's measured WC
+        goals under-projection: the expected total is nudged a fraction toward the
+        sharp line and the scoreline matrix rebuilt. None ⇒ no nudge (Team Explorer)."""
         home, away = self._validate(home), self._validate(away)
         blend, lam, mu, mat = self._compute(home, away, neutral, home_avail, away_avail)
+        lam, mu, mat = self._nudge_goals(lam, mu, mat, goals_to_line)
         scores = sorted(
             (((i, j), float(mat[i, j])) for i in range(mat.shape[0])
              for j in range(mat.shape[1])), key=lambda kv: -kv[1])
