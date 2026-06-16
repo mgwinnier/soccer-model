@@ -32,6 +32,21 @@ from src.predict import value as value_mod  # noqa: E402
 from src.models.base import OUTCOMES  # noqa: E402
 from app import theme  # noqa: E402
 from app.flags import flag_url, flag_html, team_with_flag  # noqa: E402
+from src.predict.betting import expected_value  # noqa: E402
+try:                                              # resilient to a stale deploy
+    from src.predict.betting import qualifies  # noqa: E402
+except Exception:  # noqa: BLE001
+    def qualifies(model_p, fair_p, decimal, min_ev=0.03, min_prob_edge=0.02,
+                  max_decimal=6.0):
+        if model_p is None or decimal is None or not (decimal > 1):
+            return False
+        if expected_value(model_p, decimal) < min_ev:
+            return False
+        if max_decimal is not None and decimal > max_decimal:
+            return False
+        if fair_p is not None and (model_p - fair_p) < min_prob_edge:
+            return False
+        return True
 
 st.set_page_config(page_title="FIFA World Cup 2026 · Soccer Model",
                    page_icon="🏆", layout="wide")
@@ -197,7 +212,6 @@ def _qualifying_bets(m: dict, min_ev: float, min_prob_edge: float):
     """Bets that clear the probability-edge gate AND aren't in a disabled segment."""
     from src.models.segment_gate import disabled_set
     from src.predict.value import _type_key
-    from src.predict.betting import qualifies
     disabled = disabled_set(CFG)
     return [b for b in m["bets"]
             if qualifies(b.model_p, b.fair_p, b.decimal, min_ev, min_prob_edge, 6.0)

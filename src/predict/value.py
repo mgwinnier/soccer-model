@@ -244,7 +244,11 @@ def best_bets(bets_df: pd.DataFrame, min_ev: float = 0.0,
     if not include_disabled and "disabled" in keep.columns:
         keep = keep[~keep["disabled"].astype(bool)]
     if {"model_p", "decimal"}.issubset(keep.columns):
-        from .betting import qualifies
+        try:
+            from .betting import qualifies
+        except ImportError:  # resilient to a stale deploy of betting.py
+            return keep[keep["ev"] >= min_ev].sort_values("ev", ascending=False) \
+                .reset_index(drop=True)
         mask = keep.apply(lambda r: qualifies(
             r["model_p"], r.get("fair_p"), r.get("decimal"),
             min_ev, min_prob_edge, max_decimal), axis=1)
