@@ -1,7 +1,11 @@
-# Streamlit configuration for the hosted dashboard.
+# Streamlit configuration — "Stadium Night" theme.
 [theme]
 base = "dark"
-primaryColor = "#2e7d32"          # green accent (matches the app's EV/qualify color)
+primaryColor = "#1ec773"            # pitch green
+backgroundColor = "#0b0f19"         # deep navy
+secondaryBackgroundColor = "#151b2b"  # glassy card
+textColor = "#e6e9f0"
+font = "sans serif"
 
 [server]
 # Streamlit Community Cloud manages the server; these are safe defaults.

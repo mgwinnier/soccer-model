@@ -204,6 +204,34 @@ def backtest(cfg: dict | None = None, anchor_w: float = 0.5, min_ev: float = 0.0
     return out
 
 
+def wc2022_report(cfg: dict | None = None, min_ev: float = 0.03,
+                  split: str = "2022-06-01", write: bool = True) -> dict:
+    """Betting backtest on the **2022 World Cup only** (out-of-sample: split before the
+    tournament). OVERALL + by-market ROI with bootstrap CI → reports/wc2022_backtest.csv.
+    For the dashboard's Performance page — a WC app should show WC results."""
+    cfg = cfg or load_config()
+    preds = build_predictions(cfg, anchor_w=0.5, split=split)
+    if preds.empty:
+        print("[wc2022] no predictions — harvest odds first")
+        return {}
+    train = preds[preds["date"] < pd.Timestamp(split)]
+    bias = fit_market_bias(train["type"], train["model_p"], train["fair_p"])
+    wc = preds[(preds["league"] == "fifa.world")
+               & (preds["date"].dt.year == 2022)
+               & (preds["date"] >= pd.Timestamp(split))].copy()
+    out = {"overall": _grade_block(wc, bias, min_ev), "by_market": {}}
+    for mk, g in wc.groupby("market"):
+        r = _grade_block(g, bias, min_ev)
+        if r:
+            out["by_market"][mk] = r
+    if write:
+        ensure_dirs(cfg)
+        rows = [{"segment": "OVERALL", **out["overall"]}] if out["overall"] else []
+        rows += [{"segment": mk, **r} for mk, r in out["by_market"].items()]
+        pd.DataFrame(rows).to_csv(path_for("reports", cfg) / "wc2022_backtest.csv", index=False)
+    return out
+
+
 def _fmt(r):
     return (f"{r['bets']:4d} bets, {r['wins']} won, {r['units']:+.1f}u, "
             f"ROI {r['roi']*100:+.1f}%  [95% CI {r['roi_lo']*100:+.1f}%, {r['roi_hi']*100:+.1f}%]")
@@ -215,6 +243,14 @@ if __name__ == "__main__":
         sys.stdout.reconfigure(encoding="utf-8")
     except Exception:  # noqa: BLE001
         pass
+    if len(sys.argv) > 1 and sys.argv[1] == "wc2022":
+        r = wc2022_report()
+        if r.get("overall"):
+            print("2022 WORLD CUP betting backtest (out-of-sample):")
+            print("OVERALL  :", _fmt(r["overall"]))
+            for mk, b in r.get("by_market", {}).items():
+                print(f"{mk:11s}:", _fmt(b))
+        raise SystemExit
     res = backtest()
     if not res:
         raise SystemExit

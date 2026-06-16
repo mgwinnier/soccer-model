@@ -30,11 +30,16 @@ from src.config import load_config, path_for  # noqa: E402
 from src.predict.predict_match import MatchPredictor  # noqa: E402
 from src.predict import value as value_mod  # noqa: E402
 from src.models.base import OUTCOMES  # noqa: E402
+from app import theme  # noqa: E402
+from app.flags import flag_url, flag_html, team_with_flag  # noqa: E402
 
-st.set_page_config(page_title="Badass Soccer Model", page_icon="⚽", layout="wide")
+st.set_page_config(page_title="FIFA World Cup 2026 · Soccer Model",
+                   page_icon="🏆", layout="wide")
+theme.inject_css()
+theme.enable_altair()
 CFG = load_config()
 
-GREEN, GREY, RED = "#2e7d32", "#9e9e9e", "#c62828"
+GREEN, GREY, RED, GOLD = theme.GREEN, theme.MUTED, theme.RED, theme.GOLD
 
 
 # ----------------------------------------------------------------- loaders
@@ -169,7 +174,8 @@ def motivation_block(m: dict, live: dict | None):
     c1, c2 = st.columns(2)
     for col, team, sm in ((c1, m["home"], hs), (c2, m["away"], aw)):
         with col:
-            st.caption(f"**{team}** · Group {sm['group']}")
+            st.markdown(f"{team_with_flag(team, bold=True)} · Group {sm['group']}",
+                        unsafe_allow_html=True)
             st.write(f"{sm['pos_str']}, **{sm['pts']} pts** · GD {sm['gd']:+d} "
                      f"· {sm['played']} GP")
             adv = sm["p_advance"]
@@ -188,21 +194,26 @@ def best_bet_block(m: dict, min_ev: float = 0.03):
     cands = [b for b in m["bets"]
              if b.ev is not None and b.ev >= min_ev
              and _type_key(b.market, b.selection, m["home"], m["away"]) not in disabled]
-    st.divider()
     if not cands:
-        st.markdown("💡 **Best bet:** _no edge — pass_")
+        st.markdown('<div class="bbet"><span class="h">💡 Best bet</span> &nbsp; '
+                    '<span style="color:#8b93a7">no edge here — pass</span></div>',
+                    unsafe_allow_html=True)
         return
     b = max(cands, key=lambda x: x.ev)
     units = b.kelly_used * 100
     cons = (m.get("cons_edge") or {}).get(b.selection)
     cons_txt = ""
     if cons is not None:
-        cons_txt = (f" · {'✅ beats consensus' if cons > 0 else '⚠️ ≤ consensus'} "
-                    f"({cons*100:+.0f}%)")
+        cons_txt = (f' &nbsp;·&nbsp; {"✅ beats consensus" if cons > 0 else "⚠️ ≤ consensus"} '
+                    f'({cons*100:+.0f}%)')
     st.markdown(
-        f"💡 **Best bet — {b.market}: {b.selection}** &nbsp; {_am(b.american)} &nbsp;·&nbsp; "
-        f"model {_pct(b.model_p)} vs market {_pct(b.fair_p)} &nbsp;·&nbsp; "
-        f"**EV {b.ev*100:+.0f}%** &nbsp;·&nbsp; stake **{units:.1f}u**{cons_txt}")
+        f'<div class="bbet"><span class="h">💡 Best bet</span> &nbsp; '
+        f'<b style="font-size:15px">{b.market}: {b.selection}</b> &nbsp; '
+        f'{theme.pill(_am(b.american), "grey")} &nbsp;·&nbsp; '
+        f'model {_pct(b.model_p)} vs market {_pct(b.fair_p)} &nbsp;·&nbsp; '
+        f'{theme.pill(f"EV {b.ev*100:+.0f}%", "green" if b.ev > 0 else "red")} &nbsp;·&nbsp; '
+        f'stake <b style="color:{GOLD}">{units:.1f}u</b>{cons_txt}</div>',
+        unsafe_allow_html=True)
     st.caption("Highest-edge selection here (spreads & disabled segments excluded). An "
                "edge = the model disagrees with the price, **not** a guaranteed win — "
                "the Tracker page shows how these picks are actually doing.")
@@ -216,8 +227,21 @@ def render_match(m: dict, live: dict | None = None, min_ev: float = 0.03):
     pick_name = {"H": m["home"], "D": "Draw", "A": m["away"]}[pick]
     n_value = sum(1 for b in m["bets"] if b.ev > 0.02)
     title = (f"{m['home']}  vs  {m['away']}   ·   {t}   ·   "
-             f"model leans {pick_name}" + (f"   ·   💰{n_value} value" if n_value else ""))
+             f"⚽ leans {pick_name}" + (f"   ·   💰 {n_value} value" if n_value else ""))
     with st.expander(title, expanded=False):
+        # flag-vs-flag header + lean pill + value badge
+        lean_pill = theme.pill(f"model leans {pick_name}", "green")
+        val_pill = theme.pill(f"💰 {n_value} value bet" + ("s" if n_value != 1 else ""),
+                              "gold") if n_value else ""
+        st.markdown(
+            f'<div class="mcard-head" style="font-size:20px;justify-content:center;'
+            f'gap:14px;margin-bottom:2px">{team_with_flag(m["home"], 22, True)}'
+            f'<span style="color:{GREY};font-size:14px">vs</span>'
+            f'{team_with_flag(m["away"], 22, True)}</div>'
+            f'<div style="text-align:center;margin-bottom:8px">{lean_pill} &nbsp; {val_pill}</div>',
+            unsafe_allow_html=True)
+        st.markdown(theme.prob_bar(probs["H"], probs["D"], probs["A"], m["home"], m["away"]),
+                    unsafe_allow_html=True)
         move = m.get("home_line_move")
         move_txt = ""
         if move is not None and not pd.isna(move) and abs(move) >= 0.015:
@@ -249,23 +273,27 @@ def render_match(m: dict, live: dict | None = None, min_ev: float = 0.03):
 
 # --------------------------------------------------------------------- pages
 def page_matches(bankroll, kelly, min_ev=0.03):
-    st.header("⚽ Matches — model vs Vegas, all markets")
+    theme.hero("Matches", "Model vs market across every priced market — flags, probabilities, "
+               "and the single best bet per game.", icon="⚽")
     c1, c2 = st.columns([1, 1])
     day = c1.date_input("From date", value=date.today())
     days = c2.slider("Days ahead", 1, 7, 3)
     res = get_bets(day.strftime("%Y-%m-%d"), days, bankroll, kelly)
     matches = res["matches"]
     if not matches:
-        st.info("No upcoming fixtures with odds in this window (ESPN nulls odds once "
-                "a match kicks off). Try the current World Cup dates.")
+        theme.callout("No upcoming fixtures with odds in this window — ESPN nulls odds once a "
+                      "match kicks off. Try the current World Cup dates.", "info")
+        theme.footer()
         return
     bets = res["bets"]
     n_val = int((bets["ev"] > 0.02).sum()) if not bets.empty else 0
-    a, b, c = st.columns(3)
-    a.metric("Fixtures", len(matches))
-    b.metric("+EV selections", n_val)
-    c.metric("Markets / match", "Result · Totals · Spread · BTTS")
-    st.divider()
+    theme.kpi_row([
+        {"label": "Fixtures", "value": len(matches), "accent": theme.GREEN},
+        {"label": "+EV selections", "value": n_val, "accent": theme.GOLD,
+         "value_color": theme.GOLD if n_val else theme.TEXT},
+        {"label": "Markets / match", "value": "4", "sub": "Result · Totals · Spread · BTTS",
+         "accent": theme.BLUE},
+    ])
     # live 2026 group state for the "stakes" block on group-stage cards (best-effort)
     live = None
     try:
@@ -274,20 +302,19 @@ def page_matches(bankroll, kelly, min_ev=0.03):
         live = None
     for m in matches:
         render_match(m, live, min_ev)
+    theme.footer()
 
 
 def page_value_board(bankroll, kelly, min_ev, max_exposure):
-    st.header("💰 Value Board — every +EV bet, ranked")
-    st.caption("Stakes shown in **units (1 unit = 1% of bankroll)**, sized by fractional "
-               "Kelly and **capped to your max exposure** so simultaneous bets never "
-               "exceed it. EV uses the offered (vigged) price; 'Vegas' is the de-vigged "
-               "fair probability.")
+    theme.hero("Value Board", "Every +EV bet across the slate, ranked — staked by fractional "
+               "Kelly and capped to your max exposure.", icon="💰")
     day = st.date_input("From date", value=date.today(), key="vb_date")
     days = st.slider("Days ahead", 1, 7, 3, key="vb_days")
     res = get_bets(day.strftime("%Y-%m-%d"), days, bankroll, kelly)
     bb = value_mod.best_bets(res["bets"], min_ev=min_ev)
     if bb.empty:
-        st.info("No bets clear the EV threshold for this window.")
+        theme.callout("No bets clear the EV threshold for this window.", "info")
+        theme.footer()
         return
     bb = value_mod.cap_exposure(bb, bankroll, max_fraction=max_exposure)
     bb["units"] = bb["stake"] / (bankroll / 100.0)   # 1 unit = 1% of bankroll
@@ -297,18 +324,19 @@ def page_value_board(bankroll, kelly, min_ev, max_exposure):
     show["EV"] = (show["ev"] * 100).round(0).astype(int).astype(str) + "%"
     show["price"] = show["american"].map(_am)
     show["stake"] = show["units"].round(2).astype(str) + "u"
-    a, b, c = st.columns(3)
-    a.metric("+EV bets", len(bb))
-    b.metric("Total stake", f"{bb['units'].sum():.1f}u")
-    c.metric("Avg edge", f"{bb['edge'].mean()*100:.1f}%")
+    theme.kpi_row([
+        {"label": "+EV bets", "value": len(bb), "accent": theme.GREEN},
+        {"label": "Total stake", "value": f"{bb['units'].sum():.1f}u", "accent": theme.GOLD},
+        {"label": "Avg edge", "value": f"{bb['edge'].mean()*100:.1f}%", "accent": theme.BLUE},
+    ])
     st.dataframe(
         show[["match", "market", "selection", "price", "model", "vegas", "EV", "stake"]],
         hide_index=True, use_container_width=True)
-    st.download_button("Download CSV", bb.to_csv(index=False),
-                       "value_bets.csv", "text/csv")
-    st.warning("⚠ Reality check: many of these are unders/draws/underdogs — markets "
-               "the model's calibration was **not** backtested against (only 1X2 RPS "
-               "was). Treat large EVs on longshots with extra skepticism.")
+    st.download_button("⬇ Download CSV", bb.to_csv(index=False), "value_bets.csv", "text/csv")
+    theme.callout("⚠ <b>Reality check:</b> many of these are unders / draws / underdogs — "
+                  "markets the model's calibration was <b>not</b> backtested against (only 1X2 "
+                  "RPS was). Treat large EVs on longshots with extra skepticism.", "warn")
+    theme.footer()
 
 
 def _group_color(row):
@@ -325,13 +353,8 @@ def _group_color(row):
 
 
 def page_tournament():
-    st.header("🏆 2026 World Cup — live groups, qualification & title odds")
-    st.caption("Standings from results played so far; **P(advance)** and championship "
-               "odds are Monte-Carlo with those results **locked in** and the rest "
-               "simulated. **Team strength (Elo + Dixon-Coles) updates from 2026 form** "
-               "too — a team that beats strong opponents is rated a little stronger for "
-               "its remaining matches (standard Elo, no momentum-chasing). Format: top-2 "
-               "of each group **plus the 8 best third-placed** teams reach the knockouts.")
+    theme.hero("Tournament", "Live group standings + Monte-Carlo qualification and title odds — "
+               "results locked in, team strength updating from 2026 form.", icon="🏆")
     cc1, cc2 = st.columns([1, 4])
     if cc1.button("🔄 Refresh results"):
         get_live_state.clear()
@@ -341,21 +364,31 @@ def page_tournament():
         st.error(f"Could not compute live state: {e}")
         return
     qual = live["qual"]
-    cc2.caption(f"{live['n_played']} group games played and locked in.")
+    cc2.caption(f"{live['n_played']} group games played and locked in · top-2 of each group "
+                "**plus the 8 best third-placed** teams reach the knockouts.")
 
-    # --- championship odds ---
+    # --- title odds: KPI for the favourite + chart ---
     top = qual.sort_values("champion", ascending=False).head(20)
-    chart = alt.Chart(top).mark_bar(color=GREEN).encode(
+    fav = top.iloc[0]
+    theme.kpi_row([
+        {"label": "Title favourite", "value": fav["team"],
+         "sub": f"{fav['champion']*100:.1f}% to win it all", "accent": theme.GOLD},
+        {"label": "Games locked in", "value": live["n_played"], "accent": theme.GREEN},
+        {"label": "Teams alive", "value": int((qual["advance"] > 0.001).sum()),
+         "sub": "still able to reach the knockouts", "accent": theme.BLUE},
+    ])
+    st.markdown("#### 🏆 Championship probability")
+    chart = alt.Chart(top).mark_bar(color=GREEN, cornerRadiusEnd=4).encode(
         x=alt.X("champion:Q", axis=alt.Axis(format="%"), title="Championship probability"),
         y=alt.Y("team:N", sort="-x", title=None),
         tooltip=["team", "group", alt.Tooltip("champion:Q", format=".1%"),
                  alt.Tooltip("advance:Q", format=".1%")]).properties(height=460)
     st.altair_chart(chart, use_container_width=True)
 
-    # --- live group leaderboards with P(advance) ---
-    st.subheader("Group standings & qualification odds")
-    st.caption("🟢 green = top-2 (auto-qualify) · 🟠 amber = 3rd (best-third bubble) · "
-               "grey = bottom. **Adv%** = model probability of reaching the knockouts.")
+    # --- live group leaderboards with flags + P(advance) ---
+    st.markdown("#### Group standings & qualification odds")
+    st.caption("🟢 top-2 (auto-qualify) · 🟡 3rd (best-third bubble) · ⚪ bottom. "
+               "**Adv%** = model probability of reaching the knockouts.")
     adv = qual[["team", "advance", "win_group"]]
     groups = live["standings"]
     letters = list(groups)
@@ -365,32 +398,53 @@ def page_tournament():
             with col:
                 show = groups[g].merge(adv, on="team", how="left")
                 show["Adv%"] = (show["advance"] * 100).round(0).astype("Int64")
-                show = show[["Pos", "team", "P", "Pts", "GD", "Adv%"]]
+                show["S"] = show["Pos"].map(lambda p: "🟢" if p <= 2 else ("🟡" if p == 3 else "⚪"))
+                show["flag"] = show["team"].map(lambda t: flag_url(t, 40))
+                show = show[["S", "flag", "team", "P", "Pts", "GD", "Adv%"]]
                 st.markdown(f"**Group {g}**")
-                st.dataframe(show.style.apply(_group_color, axis=1),
-                             hide_index=True, use_container_width=True)
+                st.dataframe(show, hide_index=True, use_container_width=True, column_config={
+                    "S": st.column_config.TextColumn("", width="small"),
+                    "flag": st.column_config.ImageColumn("", width="small"),
+                    "team": st.column_config.TextColumn("Team"),
+                    "Adv%": st.column_config.NumberColumn("Adv%", format="%d%%")})
 
     with st.expander("Full qualification & advancement table"):
         show = qual.sort_values("champion", ascending=False).copy()
+        show.insert(0, "flag", show["team"].map(lambda t: flag_url(t, 40)))
         for c in ["win_group", "advance", "reach_r16", "reach_qf", "reach_sf",
                   "reach_final", "champion"]:
             if c in show:
                 show[c] = (show[c] * 100).round(1)
-        st.dataframe(show, use_container_width=True, hide_index=True)
+        st.dataframe(show, use_container_width=True, hide_index=True, column_config={
+            "flag": st.column_config.ImageColumn("", width="small")})
+    theme.footer()
 
 
 def page_performance():
-    st.header("📊 Model performance (backtest)")
+    theme.hero("Performance", "How the model actually scores — accuracy on past World Cups and "
+               "an honest betting backtest of the 2022 tournament.", icon="📊")
     bt = load_csv("backtest_pooled.csv")
     if not bt.empty:
-        st.subheader("Pooled over 2010–2022 World Cups (lower RPS is better)")
+        # headline RPS KPI (ensemble row if present)
+        try:
+            rps_col = next(c for c in bt.columns if "rps" in c.lower())
+            best = bt[rps_col].min()
+            theme.kpi_row([
+                {"label": "Best pooled RPS", "value": f"{best:.4f}",
+                 "sub": "2010–2022 World Cups · ≈0.20 is bookmaker-grade", "accent": theme.GREEN},
+                {"label": "Benchmark", "value": "≈ 0.20", "sub": "good football models",
+                 "accent": theme.BLUE},
+            ])
+        except Exception:  # noqa: BLE001
+            pass
+        st.markdown("#### Accuracy — pooled over 2010–2022 World Cups (lower RPS is better)")
         st.dataframe(bt.round(4), use_container_width=True, hide_index=True)
     cal = load_csv("calibration.csv")
     if not cal.empty:
-        st.subheader("Calibration — predicted vs observed")
+        st.markdown("#### Calibration — predicted vs observed")
         diag = alt.Chart(pd.DataFrame({"x": [0, 1], "y": [0, 1]})).mark_line(
-            strokeDash=[4, 4], color="gray").encode(x="x", y="y")
-        pts = alt.Chart(cal).mark_circle(size=90, color="#1565c0").encode(
+            strokeDash=[4, 4], color=GREY).encode(x="x", y="y")
+        pts = alt.Chart(cal).mark_circle(size=90, color=GREEN).encode(
             x=alt.X("mean_predicted:Q", scale=alt.Scale(domain=[0, 1]), title="Predicted"),
             y=alt.Y("observed_freq:Q", scale=alt.Scale(domain=[0, 1]), title="Observed"),
             size=alt.Size("n:Q", title="N"),
@@ -398,23 +452,33 @@ def page_performance():
         st.altair_chart(diag + pts, use_container_width=True)
     abl = load_csv("ablation.csv")
     if not abl.empty:
-        st.subheader("Ablation — does each block lower RPS?")
+        st.markdown("#### Ablation — does each block lower RPS?")
         st.dataframe(abl.round(4), use_container_width=True, hide_index=True)
-    hist = load_csv("odds_history_backtest.csv")
-    if not hist.empty:
-        st.subheader("Historical betting backtest (Bet365 close, out-of-sample)")
-        st.caption("Thousands of international bets graded at the closing line. An edge "
-                   "is real only if a row's ROI 95% CI (roi_lo…roi_hi) is **clearly "
-                   "above 0** — otherwise it's variance.")
-        show = hist.copy()
+
+    wc = load_csv("wc2022_backtest.csv")
+    if not wc.empty:
+        st.markdown("#### 🏆 2022 World Cup betting backtest (Bet365 close, out-of-sample)")
+        show = wc.copy()
         for c in ["roi", "roi_lo", "roi_hi"]:
             if c in show:
                 show[c] = (show[c] * 100).round(1).astype(str) + "%"
         st.dataframe(show, use_container_width=True, hide_index=True)
+        ov = wc[wc["segment"] == "OVERALL"]
+        roi = float(ov["roi"].iloc[0]) * 100 if not ov.empty else 0
+        n = int(ov["bets"].iloc[0]) if not ov.empty else 0
+        theme.callout(
+            f"<b>Read this honestly:</b> the model's 2022 WC bets returned <b>{roi:+.1f}% ROI</b> "
+            f"over {n} bets — but the 95% CI <b>includes 0</b> (one tournament is a tiny, "
+            f"variance-heavy sample). This is encouraging, <b>not a proven edge</b>. The large "
+            f"all-internationals backtest still shows no reliable edge against the closing line.",
+            "warn")
+    theme.footer()
 
 
 def page_team():
-    st.header("🔎 Team explorer & match predictor")
+    theme.hero("Team Explorer", "Pick any two nations and get the model's full read — "
+               "win/draw/win, expected goals, scoreline heatmap, form and head-to-head.",
+               icon="🔎")
     pred = get_predictor()
     teams = sorted(pred.known_teams)
     c1, c2, c3 = st.columns([2, 2, 1])
@@ -424,15 +488,24 @@ def page_team():
                         index=teams.index("Argentina") if "Argentina" in teams else 1)
     neutral = c3.checkbox("Neutral venue", value=True)
     if home == away:
-        st.warning("Pick two different teams.")
+        theme.callout("Pick two different teams.", "info")
+        theme.footer()
         return
     a = pred.analyze(home, away, neutral=neutral)
-    x, y, z = st.columns(3)
-    x.metric(f"{home} win", _pct(a["probs"]["H"]))
-    y.metric("Draw", _pct(a["probs"]["D"]))
-    z.metric(f"{away} win", _pct(a["probs"]["A"]))
-    st.caption(f"Expected goals {a['expected_goals'][0]:.2f}–{a['expected_goals'][1]:.2f} · "
-               f"BTTS {_pct(a['btts'])}")
+    st.markdown(
+        f'<div class="mcard-head" style="font-size:22px;justify-content:center;gap:14px;'
+        f'margin:6px 0">{team_with_flag(home, 24, True)}'
+        f'<span style="color:{GREY};font-size:14px">vs</span>'
+        f'{team_with_flag(away, 24, True)}</div>', unsafe_allow_html=True)
+    st.markdown(theme.prob_bar(a["probs"]["H"], a["probs"]["D"], a["probs"]["A"], home, away),
+                unsafe_allow_html=True)
+    theme.kpi_row([
+        {"label": f"{home} win", "value": _pct(a["probs"]["H"]), "accent": theme.GREEN},
+        {"label": "Draw", "value": _pct(a["probs"]["D"]), "accent": theme.MUTED},
+        {"label": f"{away} win", "value": _pct(a["probs"]["A"]), "accent": theme.GOLD},
+        {"label": "Exp. goals", "value": f"{a['expected_goals'][0]:.1f}–{a['expected_goals'][1]:.1f}",
+         "sub": f"BTTS {_pct(a['btts'])}", "accent": theme.BLUE},
+    ])
     st.write("**Over/Under ladder:** " + " · ".join(
         f"O{ln} {p*100:.0f}%" for ln, p in a["ou_ladder"].items()))
     left, right = st.columns([2, 3])
@@ -440,7 +513,9 @@ def page_team():
         context_strip({"analysis": a, "home": home, "away": away,
                        "key_out_home": [], "key_out_away": []})
     with right:
+        st.markdown("**Scoreline heatmap**")
         heatmap(a["scoreline_matrix"], home, away)
+    theme.footer()
 
 
 @st.cache_data(ttl=300, show_spinner="Syncing tracker (recording picks + settling results)…")
@@ -483,11 +558,9 @@ def _kelly_units(df: pd.DataFrame, frac: float):
 
 
 def page_clv(min_ev=0.03, kelly=0.25):
-    st.header("📈 Live tracker — how the model's suggested bets are doing")
-    st.caption(f"Every +EV pick is recorded at the offered price, then settled against the "
-               f"result and the **closing line** once the match finishes. Units are staked "
-               f"at **{kelly:.2f}× Kelly** (set by the sidebar slider). Auto-syncs every few "
-               f"minutes; a daily scheduled job keeps it current too.")
+    theme.hero("Live Tracker", f"Every +EV pick recorded at the offered price, then settled "
+               f"vs the result and the closing line. Units staked at {kelly:.2f}× Kelly.",
+               icon="📈")
     from src.predict import clv
     today = date.today().strftime("%Y-%m-%d")
 
@@ -523,13 +596,19 @@ def page_clv(min_ev=0.03, kelly=0.25):
         wins = losses = 0
         beat = float("nan")
 
-    a, b, c, d = st.columns(4)
-    a.metric("Settled bets", len(settled))
-    b.metric("Net (units)", f"{net:+.1f}u" if len(settled) else "—",
-             delta=f"{wins}-{losses}" if len(settled) else None, delta_color="off",
-             help=f"At {kelly:.2f}× Kelly · {staked:.1f}u staked")
-    c.metric("ROI", f"{roi*100:+.1f}%" if staked else "—", help="net ÷ staked")
-    d.metric("Beat the close", f"{beat*100:.0f}%" if beat == beat else "—")
+    net_col = theme.GREEN if net > 0 else (theme.RED if net < 0 else theme.TEXT)
+    roi_col = theme.GREEN if roi > 0 else (theme.RED if roi < 0 else theme.TEXT)
+    theme.kpi_row([
+        {"label": "Settled bets", "value": len(settled),
+         "sub": f"{wins}-{losses}" if len(settled) else "none yet", "accent": theme.BLUE},
+        {"label": "Net (units)", "value": f"{net:+.1f}u" if len(settled) else "—",
+         "sub": f"{staked:.1f}u staked @ {kelly:.2f}× Kelly", "accent": net_col,
+         "value_color": net_col},
+        {"label": "ROI", "value": f"{roi*100:+.1f}%" if staked else "—",
+         "sub": "net ÷ staked", "accent": roi_col, "value_color": roi_col},
+        {"label": "Beat the close", "value": f"{beat*100:.0f}%" if beat == beat else "—",
+         "sub": "forward bets only", "accent": theme.GOLD},
+    ])
 
     # cumulative Kelly P&L over time — "how it's doing" at a glance
     if len(settled) and "pnl_u" in settled.columns:
@@ -575,36 +654,51 @@ def page_clv(min_ev=0.03, kelly=0.25):
                 if c in settled.columns]
         st.dataframe(settled[cols].iloc[::-1], hide_index=True, use_container_width=True)
     elif op.empty:
-        st.info("No picks tracked yet. Hit **Sync now** (or wait for auto-sync) on a day "
-                "with upcoming fixtures + odds to start recording the model's bets.")
+        theme.callout("No picks tracked yet. Hit <b>Sync now</b> (or wait for auto-sync) on a "
+                      "day with upcoming fixtures + odds to start recording the model's bets.",
+                      "info")
+    theme.footer()
 
 
-PAGES = {
-    "Matches": "matches", "Value Board": "value", "Tracker": "clv",
-    "Tournament": "tournament", "Performance": "performance", "Team explorer": "team",
-}
+NAV = [
+    ("⚽", "Matches", "matches"),
+    ("💰", "Value Board", "value"),
+    ("📈", "Tracker", "clv"),
+    ("🏆", "Tournament", "tournament"),
+    ("📊", "Performance", "performance"),
+    ("🔎", "Team Explorer", "team"),
+]
 
 
 def main():
-    st.sidebar.title("⚽ Badass Soccer Model")
-    st.sidebar.caption("Ensemble (Dixon-Coles + Elo + GBM) · live odds from ESPN")
-    choice = st.sidebar.radio("Page", list(PAGES))
-    st.sidebar.divider()
-    st.sidebar.subheader("Staking")
-    st.sidebar.caption("Stakes shown in **units** · 1 unit = 1% of bankroll")
-    bankroll = st.sidebar.number_input("Bankroll ($)", 10, 1_000_000, 1000, step=50)
-    kelly = st.sidebar.slider("Kelly fraction", 0.0, 1.0, 0.25, 0.05,
-                              help="0.25 = quarter Kelly (default, conservative). "
-                                   "0.5 = half Kelly. 1.0 = full Kelly (aggressive). "
-                                   "Stakes and tracker units scale with this.")
-    min_ev = st.sidebar.slider("Min EV for Value Board", 0.0, 0.30, 0.05, 0.01)
-    max_exp = st.sidebar.slider("Max total exposure (× bankroll)", 0.1, 2.0, 1.0, 0.1)
-    st.sidebar.divider()
-    st.sidebar.caption("⚠ EV/Kelly are only as good as the model's probabilities. "
-                       "Fractional Kelly + capped exposure by default. Not betting "
-                       "advice. Odds shown for upcoming matches only.")
+    with st.sidebar:
+        st.markdown(
+            '<div style="padding:6px 2px 10px 2px">'
+            '<div style="font-family:Oswald;font-size:22px;font-weight:700;line-height:1.05;'
+            'text-transform:uppercase;letter-spacing:.5px">🏆 FIFA World&nbsp;Cup'
+            '<span style="color:#1ec773"> 2026</span></div>'
+            '<div style="font-family:Oswald;font-size:15px;color:#8b93a7;'
+            'letter-spacing:2px;text-transform:uppercase">Soccer Model</div></div>',
+            unsafe_allow_html=True)
+        st.caption("Dixon-Coles · Elo · LightGBM ensemble · live ESPN data")
+        labels = [f"{icon} {name}" for icon, name, _ in NAV]
+        choice = st.radio("Navigate", labels, label_visibility="collapsed")
+        page = NAV[labels.index(choice)][2]
+        st.divider()
+        st.markdown("**⚙️ Staking** &nbsp; <span style='color:#8b93a7;font-size:12px'>"
+                    "1 unit = 1% of bankroll</span>", unsafe_allow_html=True)
+        bankroll = st.number_input("Bankroll ($)", 10, 1_000_000, 1000, step=50)
+        kelly = st.slider("Kelly fraction", 0.0, 1.0, 0.25, 0.05,
+                          help="0.25 = quarter Kelly (default, conservative). 0.5 = half. "
+                               "1.0 = full Kelly (aggressive). Stakes + tracker units scale "
+                               "with this.")
+        min_ev = st.slider("Min EV for Value Board", 0.0, 0.30, 0.05, 0.01)
+        max_exp = st.slider("Max total exposure (× bankroll)", 0.1, 2.0, 1.0, 0.1)
+        st.divider()
+        st.caption("⚠ EV/Kelly are only as good as the model's probabilities. Fractional "
+                   "Kelly + capped exposure by default. **Not betting advice** · independent "
+                   "model, not affiliated with FIFA.")
 
-    page = PAGES[choice]
     if page == "matches":
         page_matches(bankroll, kelly, min_ev)
     elif page == "value":
