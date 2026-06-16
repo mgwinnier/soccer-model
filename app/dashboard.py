@@ -470,24 +470,52 @@ def page_tournament():
 
 
 def page_performance():
-    theme.hero("Performance", "How the model actually scores — accuracy on past World Cups and "
-               "an honest betting backtest of the 2022 tournament.", icon="📊")
-    bt = load_csv("backtest_pooled.csv")
-    if not bt.empty:
-        # headline RPS KPI (ensemble row if present)
-        try:
-            rps_col = next(c for c in bt.columns if "rps" in c.lower())
-            best = bt[rps_col].min()
+    theme.hero("Performance", "How the model actually scores — walk-forward accuracy on 7 past "
+               "World Cups (1998–2022) and an honest betting backtest of the 2022 tournament.",
+               icon="📊")
+    # Deployed-model accuracy, walk-forward over 7 World Cups (1998–2022). This is the
+    # EXACT live pipeline (market-independent DC+Elo blend + WC goals correction).
+    acc = load_csv("wc_accuracy_backtest.csv")
+    if not acc.empty:
+        pooled = acc[acc["world_cup"].astype(str) == "POOLED"].set_index("model")
+        _LABEL = {"deployed": "Deployed model (DC+Elo + WC correction)",
+                  "no_wc_corr": "…without the WC goals correction",
+                  "dixon_coles": "Dixon-Coles only", "elo": "Elo only",
+                  "home_prior": "Home-prior baseline", "climatology": "Base-rate baseline"}
+        if "deployed" in pooled.index:
+            dep = pooled.loc["deployed"]
+            elo_rps = pooled.loc["elo"]["rps"] if "elo" in pooled.index else None
             theme.kpi_row([
-                {"label": "Best pooled RPS", "value": f"{best:.4f}",
-                 "sub": "2010–2022 World Cups · ≈0.20 is bookmaker-grade", "accent": theme.GREEN},
-                {"label": "Benchmark", "value": "≈ 0.20", "sub": "good football models",
-                 "accent": theme.BLUE},
+                {"label": "Deployed RPS", "value": f"{dep['rps']:.4f}",
+                 "sub": "7 World Cups 1998–2022 · ≈0.20 is bookmaker-grade", "accent": theme.GREEN},
+                {"label": "Pick accuracy", "value": f"{dep['accuracy']*100:.0f}%",
+                 "sub": f"correct result · {int(dep['n'])} matches", "accent": theme.GOLD},
+                {"label": "vs Elo-only", "value": (f"{elo_rps:.4f}" if elo_rps else "—"),
+                 "sub": "the model beats it", "accent": theme.BLUE},
             ])
-        except Exception:  # noqa: BLE001
-            pass
-        st.markdown("#### Accuracy — pooled over 2010–2022 World Cups (lower RPS is better)")
-        st.dataframe(bt.round(4), use_container_width=True, hide_index=True)
+        st.markdown("#### Accuracy — walk-forward over 7 World Cups, 1998–2022 (lower RPS is better)")
+        st.caption("The exact live pipeline, market-independent. Leak-free: for each World "
+                   "Cup the model is trained only on matches before it.")
+        comp = pooled.reset_index()
+        comp["model"] = comp["model"].map(_LABEL).fillna(comp["model"])
+        comp["accuracy"] = (comp["accuracy"] * 100).round(1)
+        comp = comp.rename(columns={"model": "Model", "rps": "RPS", "log_loss": "Log loss",
+                                    "brier": "Brier", "accuracy": "Accuracy %", "n": "N"})
+        st.dataframe(comp[["Model", "N", "RPS", "Log loss", "Brier", "Accuracy %"]].round(4),
+                     use_container_width=True, hide_index=True)
+        per = acc[(acc["model"] == "deployed") & (acc["world_cup"].astype(str) != "POOLED")].copy()
+        if not per.empty:
+            per["accuracy"] = (per["accuracy"] * 100).round(0)
+            per = per.rename(columns={"world_cup": "World Cup", "rps": "RPS",
+                                      "accuracy": "Accuracy %", "n": "N"})
+            with st.expander("Per–World Cup breakdown", expanded=False):
+                st.dataframe(per[["World Cup", "N", "RPS", "Accuracy %"]].round(4),
+                             use_container_width=True, hide_index=True)
+    else:
+        bt = load_csv("backtest_pooled.csv")
+        if not bt.empty:
+            st.markdown("#### Accuracy — pooled over 2010–2022 World Cups (lower RPS is better)")
+            st.dataframe(bt.round(4), use_container_width=True, hide_index=True)
     cal = load_csv("calibration.csv")
     if not cal.empty:
         st.markdown("#### Calibration — predicted vs observed")
