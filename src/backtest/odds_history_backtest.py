@@ -102,6 +102,11 @@ def build_predictions(cfg: dict | None = None, anchor_w: float = 0.5,
         dc_p = np.array(scoreline_to_outcome_probs(mat))
         blend = (dc_p + elo_p) / 2
         blend /= blend.sum()
+        # favorite-longshot calibration (same map MatchPredictor applies), renormalized
+        if calibrators.models.get("mr") is not None:
+            c3 = np.array([calibrators.calibrate("mr", float(x)) for x in blend])
+            if c3.sum() > 0:
+                blend = c3 / c3.sum()
         od = {k: getattr(r, k) for k in (
             "ml_home", "ml_away", "ml_draw", "total_line", "ou_over_odds",
             "ou_under_odds", "spread_home_line", "spread_home_odds", "spread_away_odds")}

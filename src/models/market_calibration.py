@@ -52,7 +52,7 @@ def _collect(cfg: dict, as_of: str | None):
     if as_of:
         matches = matches[matches["date"] < pd.Timestamp(as_of)]
     years = range(_START_YEAR, int(matches["date"].dt.year.max()) + 1)
-    pools = {"over": [[], []], "cover": [[], []], "btts": [[], []]}
+    pools = {"over": [[], []], "cover": [[], []], "btts": [[], []], "mr": [[], []]}
     for y in years:
         train = matches[matches["date"] < pd.Timestamp(f"{y}-01-01")]
         test = matches[(matches["date"] >= pd.Timestamp(f"{y}-01-01"))
@@ -62,9 +62,17 @@ def _collect(cfg: dict, as_of: str | None):
         dc = DixonColesModel.from_config(cfg).fit(train)
         mp = market_probs_pooled(dc, test)
         oc = outcomes_pooled(test)
-        for k in pools:
+        for k in ("over", "cover", "btts"):
             pools[k][0].append(mp[k])
             pools[k][1].append(oc[k])
+        # Match Result: pool H/D/A selection probabilities vs whether they hit, so the
+        # isotonic learns the favorite-longshot curve (favorites win MORE than the raw
+        # model says, longshots LESS) and corrects it regardless of role.
+        p3 = dc.predict_proba(test)                 # (n, 3) = [H, D, A]
+        res = test["result"].to_numpy()
+        pools["mr"][0].append(np.concatenate([p3[:, 0], p3[:, 1], p3[:, 2]]))
+        pools["mr"][1].append(np.concatenate(
+            [res == "H", res == "D", res == "A"]).astype(float))
     return pools
 
 

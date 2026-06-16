@@ -39,6 +39,28 @@ def kelly_stake(p: float, decimal_odds: float, bankroll: float,
     return round(bankroll * fraction * kelly_fraction(p, decimal_odds), 2)
 
 
+def qualifies(model_p: float, fair_p: float | None, decimal_odds: float | None,
+              min_ev: float = 0.03, min_prob_edge: float = 0.02,
+              max_decimal: float | None = 8.0) -> bool:
+    """Should this selection actually be flagged as a bet?
+
+    `EV = p·(d−1)−(1−p)` is hyper-sensitive on long odds, so a *well-calibrated but
+    noisy* model flags underdogs constantly from tiny probability errors. We add a
+    **probability-edge floor**: the model must beat the de-vigged price by at least
+    ``min_prob_edge`` (a *real* disagreement, not EV leverage), and we drop longshots
+    past ``max_decimal`` (v8 showed the model's longshot bets lose). This rebalances
+    the flags toward credible edges on either side."""
+    if model_p is None or decimal_odds is None or not (decimal_odds > 1):
+        return False                                  # also rejects NaN decimals
+    if expected_value(model_p, decimal_odds) < min_ev:
+        return False
+    if max_decimal is not None and decimal_odds > max_decimal:
+        return False
+    if fair_p is not None and (model_p - fair_p) < min_prob_edge:
+        return False
+    return True
+
+
 @dataclass
 class BetEval:
     market: str          # "Match Result" | "Total Goals" | "Spread"

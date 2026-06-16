@@ -70,6 +70,12 @@ class MatchPredictor:
         elo_p = self.elo_model.predict_proba(elo_fx)[0]
         blend = (dc_p + elo_p) / 2
         blend = blend / blend.sum()
+        # Favorite-longshot calibration: map each W/D/L prob to its observed frequency
+        # (the model under-rates heavy favorites and over-rates longshots), renormalize.
+        if self.calibrators is not None and self.calibrators.models.get("mr") is not None:
+            cal3 = np.array([self.calibrators.calibrate("mr", float(x)) for x in blend])
+            if cal3.sum() > 0:
+                blend = cal3 / cal3.sum()
         return blend, lam, mu, mat
 
     def predict(self, home: str, away: str, neutral: bool = True,

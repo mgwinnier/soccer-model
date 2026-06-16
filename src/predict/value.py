@@ -228,20 +228,32 @@ def _recenter_matches(matches: list, bankroll: float, kelly_fraction: float,
 
 
 def best_bets(bets_df: pd.DataFrame, min_ev: float = 0.0,
-              include_disabled: bool = False) -> pd.DataFrame:
-    """Filter to recommended +EV bets (EV ≥ min_ev) ranked by EV descending.
+              include_disabled: bool = False, min_prob_edge: float = 0.02,
+              max_decimal: float | None = 6.0) -> pd.DataFrame:
+    """Filter to recommended bets, ranked by EV descending.
 
-    Bets in a disabled segment (spreads by default, plus any CLV-killed segment)
-    are dropped unless ``include_disabled`` is set — so the value board never
-    recommends a segment the kill-switches have turned off."""
+    Beyond EV ≥ min_ev, a bet must clear the **probability-edge gate**
+    (``betting.qualifies``): the model must beat the de-vigged price by at least
+    ``min_prob_edge`` (a *real* disagreement, not EV leverage on long odds) and not
+    be a longshot past ``max_decimal``. This rebalances the flags away from the
+    leverage-driven underdog junk. Disabled segments (spreads etc.) are dropped
+    unless ``include_disabled``."""
     if bets_df.empty:
         return bets_df
-    keep = bets_df[bets_df["ev"] >= min_ev].copy()
+    keep = bets_df.copy()
     if not include_disabled and "disabled" in keep.columns:
         keep = keep[~keep["disabled"].astype(bool)]
+    if {"model_p", "decimal"}.issubset(keep.columns):
+        from .betting import qualifies
+        mask = keep.apply(lambda r: qualifies(
+            r["model_p"], r.get("fair_p"), r.get("decimal"),
+            min_ev, min_prob_edge, max_decimal), axis=1)
+        keep = keep[mask]
+    else:
+        keep = keep[keep["ev"] >= min_ev]
     cols = ["date", "match", "market", "selection", "segment", "american", "model_p",
             "fair_p", "cons_edge", "edge", "ev", "kelly_used", "stake"]
-    keep = keep[[c for c in cols if c in keep.columns]]
+    keep = keep[[c for c in cols if c in keep.columns]].copy()
     return keep.sort_values("ev", ascending=False).reset_index(drop=True)
 
 

@@ -193,15 +193,21 @@ def motivation_block(m: dict, live: dict | None):
     st.divider()
 
 
-def best_bet_block(m: dict, min_ev: float = 0.03):
-    """One clear 'best bet' per card: the highest-EV selection in a non-disabled
-    segment (spreads off by default), or an explicit 'pass' when there's no edge."""
+def _qualifying_bets(m: dict, min_ev: float, min_prob_edge: float):
+    """Bets that clear the probability-edge gate AND aren't in a disabled segment."""
     from src.models.segment_gate import disabled_set
     from src.predict.value import _type_key
+    from src.predict.betting import qualifies
     disabled = disabled_set(CFG)
-    cands = [b for b in m["bets"]
-             if b.ev is not None and b.ev >= min_ev
-             and _type_key(b.market, b.selection, m["home"], m["away"]) not in disabled]
+    return [b for b in m["bets"]
+            if qualifies(b.model_p, b.fair_p, b.decimal, min_ev, min_prob_edge, 6.0)
+            and _type_key(b.market, b.selection, m["home"], m["away"]) not in disabled]
+
+
+def best_bet_block(m: dict, min_ev: float = 0.03, min_prob_edge: float = 0.02):
+    """One clear 'best bet' per card: the highest-EV selection that clears the
+    probability-edge gate in a non-disabled segment, or an explicit 'pass'."""
+    cands = _qualifying_bets(m, min_ev, min_prob_edge)
     if not cands:
         st.markdown('<div class="bbet"><span class="h">💡 Best bet</span> &nbsp; '
                     '<span style="color:#8b93a7">no edge here — pass</span></div>',
@@ -240,13 +246,14 @@ def _display_probs(m: dict) -> dict:
     return {k: v / s for k, v in p.items()}
 
 
-def render_match(m: dict, live: dict | None = None, min_ev: float = 0.03):
+def render_match(m: dict, live: dict | None = None, min_ev: float = 0.03,
+                 min_prob_edge: float = 0.02):
     a = m["analysis"]
     t = pd.to_datetime(m["date"]).strftime("%a %d %b %H:%M UTC")
     probs = _display_probs(m)
     pick = OUTCOMES[int(np.argmax([probs["H"], probs["D"], probs["A"]]))]
     pick_name = {"H": m["home"], "D": "Draw", "A": m["away"]}[pick]
-    n_value = sum(1 for b in m["bets"] if b.ev > 0.02)
+    n_value = len(_qualifying_bets(m, min_ev, min_prob_edge))
     title = (f"{m['home']}  vs  {m['away']}   ·   {t}   ·   "
              f"⚽ leans {pick_name}" + (f"   ·   💰 {n_value} value" if n_value else ""))
     with st.expander(title, expanded=False):
@@ -292,11 +299,11 @@ def render_match(m: dict, live: dict | None = None, min_ev: float = 0.03):
             heatmap(a["scoreline_matrix"], m["home"], m["away"])
             tops = " · ".join(f"{s} ({p*100:.0f}%)" for s, p in a["top_scorelines"][:5])
             st.caption("Most likely: " + tops)
-        best_bet_block(m, min_ev)
+        best_bet_block(m, min_ev, min_prob_edge)
 
 
 # --------------------------------------------------------------------- pages
-def page_matches(bankroll, kelly, min_ev=0.03):
+def page_matches(bankroll, kelly, min_ev=0.03, min_prob_edge=0.02):
     theme.hero("Matches", "Model vs market across every priced market — flags, probabilities, "
                "and the single best bet per game.", icon="⚽")
     c1, c2 = st.columns([1, 1])
@@ -325,17 +332,17 @@ def page_matches(bankroll, kelly, min_ev=0.03):
     except Exception:  # noqa: BLE001 — cards still render without the stakes block
         live = None
     for m in matches:
-        render_match(m, live, min_ev)
+        render_match(m, live, min_ev, min_prob_edge)
     theme.footer()
 
 
-def page_value_board(bankroll, kelly, min_ev, max_exposure):
+def page_value_board(bankroll, kelly, min_ev, max_exposure, min_prob_edge=0.02):
     theme.hero("Value Board", "Every +EV bet across the slate, ranked — staked by fractional "
                "Kelly and capped to your max exposure.", icon="💰")
     day = st.date_input("From date", value=date.today(), key="vb_date")
     days = st.slider("Days ahead", 1, 7, 3, key="vb_days")
     res = get_bets(day.strftime("%Y-%m-%d"), days, bankroll, kelly)
-    bb = value_mod.best_bets(res["bets"], min_ev=min_ev)
+    bb = value_mod.best_bets(res["bets"], min_ev=min_ev, min_prob_edge=min_prob_edge)
     if bb.empty:
         theme.callout("No bets clear the EV threshold for this window.", "info")
         theme.footer()
@@ -716,17 +723,21 @@ def main():
                           help="0.25 = quarter Kelly (default, conservative). 0.5 = half. "
                                "1.0 = full Kelly (aggressive). Stakes + tracker units scale "
                                "with this.")
-        min_ev = st.slider("Min EV for Value Board", 0.0, 0.30, 0.05, 0.01)
+        min_ev = st.slider("Min EV", 0.0, 0.30, 0.05, 0.01)
+        min_edge = st.slider("Min edge (model − market)", 0.0, 0.10, 0.02, 0.005,
+                             help="The model must beat the de-vigged price by at least this "
+                                  "much — a REAL disagreement, not EV leverage on long odds. "
+                                  "This is what stops the underdog/longshot junk.")
         max_exp = st.slider("Max total exposure (× bankroll)", 0.1, 2.0, 1.0, 0.1)
         st.divider()
-        st.caption("⚠ EV/Kelly are only as good as the model's probabilities. Fractional "
-                   "Kelly + capped exposure by default. **Not betting advice** · independent "
-                   "model, not affiliated with FIFA.")
+        st.caption("⚠ EV/Kelly are only as good as the model's probabilities. The **min-edge "
+                   "gate** drops leverage-driven longshot flags. **Not betting advice** · "
+                   "independent model, not affiliated with FIFA.")
 
     if page == "matches":
-        page_matches(bankroll, kelly, min_ev)
+        page_matches(bankroll, kelly, min_ev, min_edge)
     elif page == "value":
-        page_value_board(bankroll, kelly, min_ev, max_exp)
+        page_value_board(bankroll, kelly, min_ev, max_exp, min_edge)
     elif page == "clv":
         page_clv(min_ev, kelly)
     elif page == "tournament":
