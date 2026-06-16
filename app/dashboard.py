@@ -248,9 +248,10 @@ def best_bet_block(m: dict, min_ev: float = 0.03, min_prob_edge: float = 0.02):
 
 
 def _display_probs(m: dict) -> dict:
-    """The model's W/D/L probabilities for display — the SAME anchored+recentered
-    `model_p` used in the Match Result table (so the header bar and table agree).
-    Falls back to the raw forecast if there are no Match Result bets (no odds)."""
+    """The model's W/D/L probabilities for display — the SAME pure (market-independent)
+    `model_p` used in the Match Result table, so the header bar, the table, the expected
+    goals and the scoreline heatmap all tell one consistent story. Falls back to the raw
+    forecast if there are no Match Result bets (no odds)."""
     a = m["analysis"]
     mr = {b.selection: b.model_p for b in m["bets"] if b.market == "Match Result"}
     p = {"H": mr.get(m["home"]), "D": mr.get("Draw"), "A": mr.get(m["away"])}
@@ -304,9 +305,11 @@ def render_match(m: dict, live: dict | None = None, min_ev: float = 0.03,
             for mk in ["Match Result", "Total Goals", "Spread"]:
                 if mk in by_market:
                     market_table(mk, by_market[mk])
-            st.caption("**Model** = market-anchored probability (drives EV, matches the bar "
-                       "above) · **Fair** = de-vigged market · **Break-even** = the offered "
-                       "price's implied %. EV is positive only when **Model > Break-even**.")
+            st.caption("**Model** = our pure probability, calibrated to historical results — "
+                       "**independent of the betting market** (matches the bar, the expected "
+                       "goals and the heatmap) · **Fair** = de-vigged market (shown only as a "
+                       "reference) · **Break-even** = the offered price's implied %. EV is "
+                       "positive only when **Model > Break-even**.")
             st.markdown(f"**Both Teams To Score** — model **{_pct(a['btts'])}** "
                         f"(no Vegas line — info only)")
         with right:

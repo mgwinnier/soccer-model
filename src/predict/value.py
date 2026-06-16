@@ -19,7 +19,6 @@ from ..config import load_config
 from ..data.odds import fetch_fixtures
 from .predict_match import MatchPredictor
 from .betting import evaluate_bet
-from .anchor import anchor, DEFAULT_W
 
 VALUE_THRESHOLD = 0.05    # legacy edge flag (model prob − fair prob)
 
@@ -37,16 +36,18 @@ def build_bets(start: str, days: int = 3, bankroll: float = 100.0,
                kelly_fraction: float = 0.5, cfg: dict | None = None,
                predictor: MatchPredictor | None = None,
                use_cache: bool = True, anchor_w: float | None = None,
-               recenter: bool = True, recenter_shrink: float = 0.8,
+               recenter: bool = False, recenter_shrink: float = 0.8,
                league: str = "fifa.world", consensus_ref: bool = True) -> dict:
     """Return {'matches': [rich per-match dicts], 'bets': DataFrame of all bets}.
 
-    Model probabilities are calibrated (in ``analyze``), **anchored** toward the
-    de-vigged market by ``anchor_w`` (1.0 = independent), and finally **recentered**
-    to remove the model's systematic per-market tilt vs the sharp line (so it stops
-    flagging a blanket under/underdog lean and only surfaces game-specific edges)."""
+    The model's probabilities are **pure** — the DC+Elo blend calibrated to historical
+    match *outcomes* (the isotonic maps in ``analyze``), and NOT influenced by the
+    betting market. EV/Kelly compare that honest probability to the offered price; the
+    de-vigged market is shown only as a reference ("Fair"). ``anchor_w``/``recenter``
+    are retained for backward compatibility but default to OFF — the deployed model is
+    market-independent by design. A positive EV means the model genuinely disagrees with
+    the price (which historically has *not* been a proven profit edge — see CLV)."""
     cfg = cfg or load_config()
-    w = DEFAULT_W if anchor_w is None else anchor_w
     fixtures = fetch_fixtures(start, days=days, league=league, cfg=cfg, use_cache=use_cache)
     if fixtures.empty:
         return {"matches": [], "bets": pd.DataFrame()}
@@ -79,9 +80,9 @@ def build_bets(start: str, days: int = 3, bankroll: float = 100.0,
             continue  # unknown team — skip, never fabricate
 
         bets = []
-        # anchor the (already calibrated) model prob toward the market price
+        # pure model probability vs the offered price (no market anchoring)
         def ev_bet(market, sel, am, model_p, fair):
-            return evaluate_bet(market, sel, am, anchor(model_p, fair, w),
+            return evaluate_bet(market, sel, am, model_p,
                                 fair, bankroll, kelly_fraction)
         # --- Match Result (1X2) ---
         for sel, code, am, fair in [

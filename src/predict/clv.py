@@ -128,11 +128,12 @@ def backfill(start: str = "2026-06-11", end: str | None = None, min_ev: float = 
     """Record the model's +EV bets on **already-played** 2026 WC games into the ledger.
 
     Leak-free: the predictor is trained only on data before ``start`` (kickoff), and
-    each game is priced at its retained ESPN historical line. Uses the **same**
-    pipeline as the live tracker — as-of calibration + market anchoring + the deployed
-    market-bias recentering, spreads (and any disabled segment) excluded — so the
-    backfilled bets are consistent with the forward ones. Kelly units are derived from
-    ``model_p``/``decimal`` at display time, identical to live.
+    each game is priced at its retained ESPN historical line. Uses the **same** pipeline
+    as the live tracker — as-of isotonic calibration only, **no market anchoring or
+    market-bias recentering** (the deployed model is market-independent), spreads (and
+    any disabled segment) excluded — so the backfilled bets are consistent with the
+    forward ones. Kelly units are derived from ``model_p``/``decimal`` at display time,
+    identical to live.
 
     Honest note: CLV is left blank for backfilled bets — we only have one historical
     price per game, so there's no separate decision-vs-close to measure. They count for
@@ -143,15 +144,12 @@ def backfill(start: str = "2026-06-11", end: str | None = None, min_ev: float = 
     now = now or datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
     from .odds_backtest import _AsOfPredictor
     from .bet_grade import _candidates, _grade, _grade_type
-    from .anchor import DEFAULT_W
     from ..models.market_calibration import fit_calibrators
-    from ..models.market_bias import load_default
     from ..models.segment_gate import disabled_set
     from ..simulate.bracket_2026 import HOST_TEAMS
 
     pred = _AsOfPredictor(start, cfg)
     cal = fit_calibrators(cfg, as_of=start, save=False)
-    bias = load_default(cfg)
     disabled = disabled_set(cfg)
     events = [e for e in fetch_espn_range(start, end, league="fifa.world", cfg=cfg, use_cache=True)
               if e["status"] == "post" and e["home_score"] is not None and e.get("game_id")]
@@ -172,17 +170,16 @@ def backfill(start: str = "2026-06-11", end: str | None = None, min_ev: float = 
         mat = pred.dc.scoreline_matrix(lam, mu)
         hs, as_ = int(ev["home_score"]), int(ev["away_score"])
         mdate = pd.to_datetime(ev["date"])
-        for market, sel, code, am, mp, fair in _candidates(home, away, probs, mat, od, cal, DEFAULT_W):
+        for market, sel, code, am, mp, fair in _candidates(home, away, probs, mat, od, cal):
             if am is None or mp is None:
                 continue
             seg = _grade_type(code)
             if seg in disabled:                       # spreads off, etc.
                 continue
-            mp_adj = bias.recenter(seg, mp)           # deployed recentering (live parity)
             dec = american_to_decimal(am)
             if dec is None:
                 continue
-            ev_val = mp_adj * (dec - 1) - (1 - mp_adj)
+            ev_val = mp * (dec - 1) - (1 - mp)         # pure model vs offered price
             if ev_val < min_ev:
                 continue
             res = _grade(code, hs, as_)
@@ -192,7 +189,7 @@ def backfill(start: str = "2026-06-11", end: str | None = None, min_ev: float = 
                 "match": f"{home} v {away}", "market": market, "code": _code_str(code),
                 "segment": seg, "system": _system_tag(market, dec), "selection": sel,
                 "american": am, "decimal": round(dec, 4),
-                "model_p": round(float(mp_adj), 4), "fair_p": round(fair, 4) if fair else None,
+                "model_p": round(float(mp), 4), "fair_p": round(fair, 4) if fair else None,
                 "ev": round(float(ev_val), 4), "snapshot_time": mdate.strftime("%Y-%m-%dT%H:%M:%SZ"),
                 "score": f"{hs}-{as_}", "closing_decimal": round(dec, 3), "clv": None,
                 "result": res, "pnl": round(pnl, 3), "graded_time": now, "backfilled": True,
