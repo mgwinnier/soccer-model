@@ -928,6 +928,32 @@ def page_clv(min_ev=0.03, kelly=0.25):
         st.dataframe(op[cols], hide_index=True, use_container_width=True)
 
     if not settled.empty:
+        # units by category (Kelly) — how each market/selection type is doing
+        if "stake_u" in settled.columns:
+            st.subheader("📊 Units by category (Kelly)")
+            grp_col = "segment" if "segment" in settled.columns else "market"
+            rows = []
+            for cat, g in settled.groupby(grp_col):
+                wins = int((g["result"] == "win").sum())
+                losses = int((g["result"] == "loss").sum())
+                staked = float(g["stake_u"].sum())
+                net = float(g["pnl_u"].sum())
+                rows.append({"Category": cat, "Bets": len(g), "W-L": f"{wins}-{losses}",
+                             "Net units": f"{net:+.1f}u", "Staked": f"{staked:.1f}u",
+                             "ROI": f"{(net/staked*100 if staked else 0):+.1f}%",
+                             "_net": net})
+            cat_df = pd.DataFrame(rows).sort_values("_net", ascending=False).drop(columns="_net")
+            # TOTAL row
+            tot_staked = float(settled["stake_u"].sum()); tot_net = float(settled["pnl_u"].sum())
+            total = {"Category": "TOTAL", "Bets": len(settled),
+                     "W-L": f"{int((settled['result']=='win').sum())}-{int((settled['result']=='loss').sum())}",
+                     "Net units": f"{tot_net:+.1f}u", "Staked": f"{tot_staked:.1f}u",
+                     "ROI": f"{(tot_net/tot_staked*100 if tot_staked else 0):+.1f}%"}
+            cat_df = pd.concat([cat_df, pd.DataFrame([total])], ignore_index=True)
+            st.dataframe(cat_df, hide_index=True, use_container_width=True)
+            st.caption("Net units = profit/loss at the current Kelly fraction (1u = 1% of "
+                       "bankroll). Categories: MR = Match Result, TG = Total Goals, SP = Spread.")
+
         st.subheader("✅ Settled")
         cols = [c for c in ["match_date", "match", "market", "selection", "american",
                             "result", "stake_u", "pnl_u", "clv", "system"]
