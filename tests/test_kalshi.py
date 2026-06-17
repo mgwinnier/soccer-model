@@ -74,6 +74,49 @@ def test_signal_buy_sell_hold():
     assert k.signal(None, None, None)["action"] == "HOLD"
 
 
+def _mkt(event, ticker, sub, ya, yb, na=None, nb=None, floor=None):
+    return {"event_ticker": event, "ticker": ticker, "yes_sub_title": sub,
+            "yes_ask_dollars": ya, "yes_bid_dollars": yb, "previous_yes_ask_dollars": ya,
+            "no_ask_dollars": na, "no_bid_dollars": nb, "previous_no_ask_dollars": na,
+            "floor_strike": floor, "last_price_dollars": ya}
+
+
+# A full Ghana–Panama book across the four series (real shapes).
+BOOK_MK = [
+    _mkt("KXWCGAME-26JUN17GHAPAN", "...-GHA", "Ghana", 0.43, 0.42),
+    _mkt("KXWCGAME-26JUN17GHAPAN", "...-TIE", "Tie", 0.30, 0.29),
+    _mkt("KXWCGAME-26JUN17GHAPAN", "...-PAN", "Panama", 0.30, 0.29),
+    _mkt("KXWCBTTS-26JUN17GHAPAN", "...-BTTS", "Both Teams To Score", 0.49, 0.48, na=0.52, nb=0.51),
+    _mkt("KXWCTOTAL-26JUN17GHAPAN", "...-3", "Over 2.5 goals scored", 0.42, 0.41,
+         na=0.59, nb=0.58, floor=2.5),
+    _mkt("KXWCSPREAD-26JUN17GHAPAN", "...-GHA2", "Ghana wins by over 1.5 goals", 0.19, 0.18,
+         na=0.82, nb=0.81, floor=1.5),
+    _mkt("KXWCSPREAD-26JUN17GHAPAN", "...-PAN2", "Panama wins by over 1.5 goals", 0.12, 0.11,
+         na=0.89, nb=0.88, floor=1.5),
+]
+
+
+def test_match_book_assembles_all_markets():
+    b = k.match_book("Ghana", "Panama", markets=BOOK_MK)
+    assert b["moneyline"]["H"]["ask"] == 0.43 and b["moneyline"]["A"]["ask"] == 0.30
+    assert b["btts"]["yes"]["ask"] == 0.49 and b["btts"]["no"]["ask"] == 0.52
+    assert b["totals"][2.5]["over"]["ask"] == 0.42 and b["totals"][2.5]["under"]["ask"] == 0.59
+    assert 1.5 in b["spread"] and b["spread"][1.5]["home"]["yes"]["ask"] == 0.19
+
+
+def test_price_for_every_market():
+    b = k.match_book("Ghana", "Panama", markets=BOOK_MK)
+    pf = lambda mk, sel: k.price_for(b, mk, sel, "Ghana", "Panama")
+    assert pf("Match Result", "Ghana")["ask"] == 0.43
+    assert pf("BTTS", "Both Teams Score: Yes")["ask"] == 0.49
+    assert pf("BTTS", "Both Teams Score: No")["ask"] == 0.52
+    assert pf("Total Goals", "Over 2.5")["ask"] == 0.42
+    assert pf("Total Goals", "Under 2.5")["ask"] == 0.59      # No side of the over market
+    assert pf("Spread", "Ghana -1.5")["ask"] == 0.19         # Ghana favored -> its 'wins by over' Yes
+    assert pf("Spread", "Panama +1.5")["ask"] == 0.82        # +1.5 = No of Ghana's market
+    assert pf("Total Goals", "Over 3.5") is None             # line not listed -> None
+
+
 def test_winner_futures_parses(monkeypatch):
     monkeypatch.setattr(k, "_markets", lambda *a, **kw: [
         {"yes_sub_title": "France", "yes_bid_dollars": 0.184, "yes_ask_dollars": 0.186,

@@ -235,11 +235,11 @@ def _match_not_started(m: dict) -> bool:
 
 
 @st.cache_data(ttl=30, show_spinner=False)
-def get_kalshi_winner(home: str, away: str):
-    """Live Kalshi 1X2 (H/D/A bid/ask) for a fixture, or None. Exchange ask ≈ implied % you pay."""
+def get_kalshi_book(home: str, away: str):
+    """Full live Kalshi book (Match Result + BTTS + Totals + Spread) for a fixture, or None."""
     try:
         from src.data import kalshi
-        return kalshi.match_winner(home, away)
+        return kalshi.match_book(home, away)
     except Exception:  # noqa: BLE001
         return None
 
@@ -255,13 +255,13 @@ def get_kalshi_futures():
 
 
 def _kalshi_dec(b, m: dict, kal: dict | None):
-    """Kalshi decimal price (1/ask) for a Match Result selection, or None. Kalshi has no per-match
-    totals/BTTS, so only Match Result resolves."""
-    if not kal or b.market != "Match Result":
+    """Kalshi decimal price (1/ask) for a bet selection across all four markets (Match Result,
+    Total Goals, Spread, BTTS), or None when Kalshi doesn't list that selection."""
+    if not kal:
         return None
-    code = "H" if b.selection == m["home"] else ("A" if b.selection == m["away"] else "D")
-    px = (kal.get(code) or {})
-    ask = px.get("ask")
+    from src.data import kalshi
+    px = kalshi.price_for(kal, b.market, b.selection, m["home"], m["away"])
+    ask = (px or {}).get("ask")
     return (1.0 / ask) if (ask and ask > 0) else None
 
 
@@ -559,9 +559,9 @@ def market_table(title: str, bets: list, key_note: str | None = None, m: dict | 
                     unsafe_allow_html=True)
     played = bool(m and m.get("played"))
     book = get_book_odds(m["home"], m["away"], str(m.get("date"))[:10]) if m else None
-    # Kalshi has per-match 1X2 only, and only for not-yet-started games (settled/live hidden).
-    kal = (get_kalshi_winner(m["home"], m["away"])
-           if (m and title == "Match Result" and _match_not_started(m)) else None)
+    # Kalshi book (Match Result / Total Goals / Spread / BTTS), only for not-yet-started games.
+    kal = (get_kalshi_book(m["home"], m["away"])
+           if (m and _match_not_started(m)) else None)
     rows = []
     for b in bets:
         units = b.kelly_used * 100  # 1 unit = 1% of bankroll
@@ -831,23 +831,22 @@ def _kalshi_alert_block(m: dict):
     if not _match_not_started(m):
         return
     thr = float(st.session_state.get("kalshi_alert_ev", 0.08))
-    kal = get_kalshi_winner(m["home"], m["away"])
+    kal = get_kalshi_book(m["home"], m["away"])
     if not kal:
         return
-    a = m.get("analysis") or {}
-    probs = _display_probs(m)
-    best = None
-    for code, name in (("H", m["home"]), ("D", "Draw"), ("A", m["away"])):
-        ask = (kal.get(code) or {}).get("ask")
-        p = probs.get(code)
-        if ask and ask > 0 and p is not None:
-            ev = p / ask - 1.0
+    from src.data import kalshi
+    best = None                                  # best Kalshi value across ALL markets
+    for b in m.get("bets", []):
+        px = kalshi.price_for(kal, b.market, b.selection, m["home"], m["away"])
+        ask = (px or {}).get("ask")
+        if ask and ask > 0:
+            ev = b.model_p / ask - 1.0
             if ev >= thr and (best is None or ev > best[0]):
-                best = (ev, name, ask, p)
+                best = (ev, f"{b.market}: {b.selection}", ask, b.model_p)
     if best:
         ev, name, ask, p = best
         theme.callout(
-            f"🔔 <b>Kalshi value</b> — buy <b>{name}</b> Yes at <b>{ask*100:.0f}¢</b> "
+            f"🔔 <b>Kalshi value</b> — buy <b>{name}</b> at <b>{ask*100:.0f}¢</b> "
             f"(model {p*100:.0f}% vs {ask*100:.0f}% implied) → <b>EV {ev*100:+.0f}%</b>. "
             f"Tradeable on Kalshi now; an edge ≠ a guaranteed win.", "good")
 
@@ -1631,32 +1630,36 @@ def page_clv(min_ev=0.03, kelly=0.25):
     theme.footer()
 
 
-def _kalshi_signals(fixtures: list, mk: list, buy_edge: float, sell_edge: float, kelly: float):
-    """Scan every upcoming fixture's 3 outcomes against the live Kalshi book → BUY / SELL rows."""
+def _kalshi_signals(matches: list, mk: list, buy_edge: float, sell_edge: float, kelly: float):
+    """Scan every upcoming fixture's model bets (Match Result / Total / Spread / BTTS) against the
+    live Kalshi book → BUY rows (model beats the ask) and SELL/fade rows (bid richer than model)."""
     from src.data import kalshi as kal
     from src.predict.betting import kelly_fraction
     buys, sells = [], []
-    for home, away, date, probs in fixtures:
-        w = kal.match_winner(home, away, markets=mk)
-        if not w:
+    for m in matches:
+        book = kal.match_book(m["home"], m["away"], markets=mk)
+        if not book:
             continue
-        match = f"{home} v {away}"
-        for code, name in (("H", home), ("D", "Draw"), ("A", away)):
-            p, px = probs.get(code), w[code]
-            sig = kal.signal(p, px["bid"], px["ask"], buy_edge, sell_edge)
-            ask, bid, prev = px["ask"], px["bid"], px["prev_ask"]
+        match = f"{m['home']} v {m['away']}"
+        for b in m.get("bets", []):
+            px = kal.price_for(book, b.market, b.selection, m["home"], m["away"])
+            if not px:
+                continue
+            ask, bid, prev = px.get("ask"), px.get("bid"), px.get("prev_ask")
+            p = b.model_p
+            sig = kal.signal(p, bid, ask, buy_edge, sell_edge)
             delta = (ask - prev) if (ask is not None and prev is not None) else None
             if sig["action"] == "BUY" and ask:
                 stake = min(kelly_fraction(p, 1.0 / ask) * kelly * 100.0, 2.0)
-                buys.append({"Match": match, "Buy": name, "Model": p, "Ask¢": ask,
-                             "Edge": p - ask, "EV": sig["ev_buy"], "Δ¢": delta,
-                             "Stake": stake, "_when": date})
+                buys.append({"Match": match, "Market": b.market, "Pick": b.selection,
+                             "Model": p, "Ask": ask, "Edge": p - ask, "EV": sig["ev_buy"],
+                             "Δ": delta, "Stake": stake})
             elif sig["action"] == "SELL" and bid is not None:
-                sells.append({"Match": match, "Rich side": name, "Model": p, "Bid¢": bid,
-                              "Mkt−Model": bid - p, "No-side EV": sig["ev_sell"], "Δ¢": delta,
-                              "_when": date})
+                sells.append({"Match": match, "Market": b.market, "Pick": b.selection,
+                              "Model": p, "Bid": bid, "Gap": bid - p, "Fade EV": sig["ev_sell"],
+                              "Δ": delta})
     buys.sort(key=lambda r: (r["EV"] is None, -(r["EV"] or 0)))
-    sells.sort(key=lambda r: (r["No-side EV"] is None, -(r["No-side EV"] or 0)))
+    sells.sort(key=lambda r: (r["Fade EV"] is None, -(r["Fade EV"] or 0)))
     return buys, sells
 
 
@@ -1691,57 +1694,59 @@ def page_kalshi(bankroll=1000, kelly=0.25, upset_temp=1.0):
     except Exception:  # noqa: BLE001
         res = {"matches": []}
 
-    fixtures = [(m["home"], m["away"], str(m["date"])[:10], (m.get("analysis") or {}).get("probs") or {})
-                for m in res.get("matches", []) if _match_not_started(m)]
-    if not fixtures:
+    matches = [m for m in res.get("matches", []) if _match_not_started(m)]
+    if not matches:
         st.info("No upcoming (not-yet-started) fixtures right now — settled and in-play games are hidden.")
         theme.footer()
         return
+    st.caption("Markets: Match Result · Total Goals · Spread · Both Teams To Score — every "
+               "model bet priced against the live Kalshi order book.")
 
     @st.fragment(run_every=(30 if auto else None))
     def _live():
-        mk = kal.wc_game_markets(ttl=20.0)
+        mk = kal.all_match_markets(ttl=20.0)
         now_ct = (datetime.now(_CT) if _CT is not None else datetime.utcnow()).strftime("%I:%M:%S %p")
         if not mk:
             st.warning("Kalshi prices unavailable right now (the exchange API may be blocking this "
                        "server). Try again shortly.")
             return
-        buys, sells = _kalshi_signals(fixtures, mk, buy_edge, sell_edge, kelly)
+        buys, sells = _kalshi_signals(matches, mk, buy_edge, sell_edge, kelly)
         st.caption(f"Kalshi prices as of {now_ct} CT · {len(mk)} live contracts · "
                    f"{len(buys)} buy / {len(sells)} sell signals")
 
-        st.markdown("#### 🟢 BUY — model beats the ask")
+        st.markdown("#### 🟢 BUY — model probability beats the Kalshi ask")
         if buys:
             df = pd.DataFrame(buys)
             disp = pd.DataFrame({
-                "Match": df["Match"], "Buy Yes": df["Buy"],
-                "Model": df["Model"].map(_fmt_pct), "Ask": df["Ask¢"].map(_fmt_cent),
+                "Match": df["Match"], "Market": df["Market"], "Pick": df["Pick"],
+                "Model %": df["Model"].map(_fmt_pct), "Buy @": df["Ask"].map(_fmt_cent),
                 "Edge": df["Edge"].map(_fmt_pct), "EV": df["EV"].map(_fmt_pct),
-                "Δ ask": df["Δ¢"].map(_fmt_signed_cent),
+                "Δ": df["Δ"].map(_fmt_signed_cent),
                 "Stake": df["Stake"].map(lambda u: f"{u:.1f}u" if u > 0.05 else "—")})
             st.dataframe(disp, hide_index=True, use_container_width=True)
         else:
             st.caption("No buy signal clears your edge right now.")
 
-        st.markdown("#### 🔴 SELL / fade — the bid is richer than the model")
+        st.markdown("#### 🔴 SELL / fade — the Kalshi bid is richer than the model")
         if sells:
             df = pd.DataFrame(sells)
             disp = pd.DataFrame({
-                "Match": df["Match"], "Rich side": df["Rich side"],
-                "Model": df["Model"].map(_fmt_pct), "Bid": df["Bid¢"].map(_fmt_cent),
-                "Mkt − model": df["Mkt−Model"].map(_fmt_pct),
-                "Buy-No EV": df["No-side EV"].map(_fmt_pct),
-                "Δ ask": df["Δ¢"].map(_fmt_signed_cent)})
+                "Match": df["Match"], "Market": df["Market"], "Pick": df["Pick"],
+                "Model %": df["Model"].map(_fmt_pct), "Sell @": df["Bid"].map(_fmt_cent),
+                "Over-priced by": df["Gap"].map(_fmt_pct),
+                "Fade EV": df["Fade EV"].map(_fmt_pct), "Δ": df["Δ"].map(_fmt_signed_cent)})
             st.dataframe(disp, hide_index=True, use_container_width=True)
-            st.caption("If you hold Yes on the rich side, sell into the bid to lock value; if flat, "
-                       "the cheap **No** side carries the model edge (Buy-No EV).")
+            st.caption("**Sell @** is the bid you'd receive — if you hold this pick, sell to lock value. "
+                       "**Fade EV** is the model's edge on the opposite side at its current price.")
         else:
             st.caption("Nothing is trading rich enough to fade right now.")
 
     _live()
-    st.caption("Kalshi prices are an exchange order book (the ask ≈ the implied % you pay). An edge = "
-               "the model disagrees with a tradeable price, **not** a guaranteed win. Buy at the ask, "
-               "sell at the bid; stakes are capped at 2u (2% of bankroll). **Not financial advice.**")
+    st.caption("Kalshi is an exchange order book — the **ask ≈ the implied % you pay**, so EV = "
+               "model ÷ ask − 1 with no de-vig. **Buy @** = ask, **Sell @** = bid; the ~3% spread "
+               "means only net-of-spread edges count. **Δ** = ask move since the last tick. An edge = "
+               "the model disagrees with a tradeable price, **not** a guaranteed win. Stakes capped at "
+               "2u (2% of bankroll). **Not financial advice.**")
     theme.footer()
 
 
