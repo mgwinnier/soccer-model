@@ -698,14 +698,17 @@ def page_performance():
         show = wc.copy()
         show["record"] = show["wins"].astype(int).astype(str) + "/" + show["bets"].astype(int).astype(str)
         if "kelly_units" in show:
-            show["bankroll %"] = show["kelly_units"].round(1).astype(str) + "%"
+            show["Net units (Kelly)"] = show["kelly_units"].map(lambda x: f"{x:+.1f}u")
             show["Kelly ROI"] = (show["kelly_roi"] * 100).round(1).astype(str) + "%"
+        show["Net units (flat)"] = show["units"].map(lambda x: f"{x:+.1f}u")
         show["flat ROI"] = (show["roi"] * 100).round(1).astype(str) + "%"
         show["flat 95% CI"] = ("[" + (show["roi_lo"] * 100).round(0).astype(int).astype(str)
                                + "%, " + (show["roi_hi"] * 100).round(0).astype(int).astype(str) + "%]")
-        cols = [c for c in ["segment", "record", "bankroll %", "Kelly ROI", "flat ROI",
-                            "flat 95% CI"] if c in show.columns]
+        cols = [c for c in ["segment", "record", "Net units (Kelly)", "Kelly ROI",
+                            "Net units (flat)", "flat ROI", "flat 95% CI"] if c in show.columns]
         st.dataframe(show[cols], use_container_width=True, hide_index=True)
+        st.caption("Net units = profit/loss in units (1u = 1% of bankroll). "
+                   "Kelly = how the model actually stakes; flat = 1u per bet, for reference.")
         theme.callout(
             "<b>Read this honestly:</b> quarter-Kelly turns the full-2022 slate slightly positive, "
             "but the 95% CI <b>includes 0</b> and the result flips sign if you change the staking "
