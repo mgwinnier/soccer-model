@@ -38,6 +38,17 @@ def load_secrets() -> dict[str, bool]:
             key, val = key.strip(), val.strip().strip('"').strip("'")
             if key and not os.environ.get(key):
                 os.environ[key] = val
+    # Streamlit Cloud: secrets set in the app's Secrets UI live in ``st.secrets``, not
+    # os.environ. Bridge the keys we use across so the cloud picks them up. Guarded so
+    # the offline pipeline (no streamlit / no secrets file) is unaffected.
+    try:
+        import streamlit as _st
+        for _k in ("THESTATSAPI_KEY", "API_FOOTBALL_KEY", "KAGGLE_USERNAME", "KAGGLE_KEY"):
+            if not os.environ.get(_k) and _k in _st.secrets:
+                os.environ[_k] = str(_st.secrets[_k])
+    except Exception:  # noqa: BLE001 — streamlit absent or no secrets configured
+        pass
+
     # Accept KAGGLE_API_TOKEN as an alias for the CLI's KAGGLE_KEY.
     if os.environ.get("KAGGLE_API_TOKEN") and not os.environ.get("KAGGLE_KEY"):
         os.environ["KAGGLE_KEY"] = os.environ["KAGGLE_API_TOKEN"]
@@ -49,6 +60,7 @@ def load_secrets() -> dict[str, bool]:
 
     kaggle_env = bool(os.environ.get("KAGGLE_USERNAME") and os.environ.get("KAGGLE_KEY"))
     return {
+        "thestatsapi": bool(os.environ.get("THESTATSAPI_KEY")),
         "api_football": bool(os.environ.get("API_FOOTBALL_KEY")),
         "kaggle": kaggle_json.exists() or kaggle_env,
         # surfaced so we can warn about a token without a username
