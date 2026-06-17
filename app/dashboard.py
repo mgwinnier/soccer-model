@@ -588,7 +588,7 @@ def market_table(title: str, bets: list, key_note: str | None = None, m: dict | 
            if (m and _match_not_started(m)) else None)
     rows = []
     for b in bets:
-        units = b.kelly_used * 100  # 1 unit = 1% of bankroll
+        units = min(b.kelly_used * 100, 2.0)  # 1 unit = 1% of bankroll; capped at 2u/bet
         row = {
             "Selection": b.selection,
             "Model": _pct(b.model_p),
@@ -725,7 +725,7 @@ def best_bet_block(m: dict, min_ev: float = 0.03, min_prob_edge: float = 0.02):
                     unsafe_allow_html=True)
         return
     b = max(cands, key=lambda x: x.ev)
-    units = b.kelly_used * 100
+    units = min(b.kelly_used * 100, 2.0)         # capped at 2u/bet (2% of bankroll)
     cons = (m.get("cons_edge") or {}).get(b.selection)
     cons_txt = ""
     if cons is not None:
@@ -834,14 +834,13 @@ def _brief_facts(m: dict) -> dict:
     return f
 
 
-def get_match_brief(facts: dict):
-    """Grounded brief for a match, cached per-session on SUCCESS only (so a transient error or a
-    pre-key failure never sticks). Returns {"text","sources"} | {"error"} | None."""
-    import hashlib
-    import json
+def get_match_brief(facts: dict, cache_key: str):
+    """Grounded brief for a match, cached per-session on SUCCESS only. Keyed on the MATCH
+    (``cache_key`` = game_id), NOT on the facts content — so live drift in EV/odds/lineups across
+    reruns and the auto-refresh doesn't keep re-calling Gemini. A transient error/no-key never
+    sticks (retried next time). Returns {"summary"/"text","angles","sources"} | {"error"} | None."""
     from src.ai import match_brief as mb
-    fj = json.dumps(facts, sort_keys=True)
-    skey = "brief_cache_" + hashlib.md5(fj.encode()).hexdigest()
+    skey = "brief_cache_" + str(cache_key)
     cached = st.session_state.get(skey)
     if cached:
         return cached
@@ -948,7 +947,8 @@ def render_match(m: dict, live: dict | None = None, min_ev: float = 0.03,
                     st.session_state[bkey] = True
                 if st.session_state.get(bkey):
                     with st.spinner("Searching the news + reading the bets…"):
-                        res = get_match_brief(_brief_facts(m))
+                        res = get_match_brief(_brief_facts(m),
+                                              m.get("game_id") or (m["home"] + m["away"]))
                     if res and res.get("text"):
                         theme.callout(res.get("summary") or res["text"], "info")
                         brief_angles = res.get("angles") or []
