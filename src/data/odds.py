@@ -309,6 +309,32 @@ def fetch_fixtures(start: str, days: int = 3, league: str = "fifa.world",
     if not rows:
         return pd.DataFrame()
     df = pd.DataFrame(rows)
+    # Played matches: the scoreboard nulls the live moneyline after kickoff, so the
+    # model-vs-market comparison would vanish. Backfill the RETAINED closing line from
+    # the summary endpoint (same source the historical backtest uses) so finished games
+    # still show Vegas odds and can be graded. Best-effort per game; cache-friendly.
+    _BF = ["ml_home", "ml_away", "ml_draw", "total_line", "ou_over_odds",
+           "ou_under_odds", "spread_home_line", "spread_home_odds", "spread_away_odds"]
+    if "game_id" in df.columns:
+        # all-null columns can be inferred as string dtype — make them object so we can
+        # write back numeric American odds without a dtype error
+        for _c in _BF + ["provider"]:
+            if _c in df.columns:
+                df[_c] = df[_c].astype(object)
+        need = df["ml_home"].isna() & df["game_id"].notna()
+        for idx in df.index[need]:
+            try:
+                o = fetch_summary_odds(str(df.at[idx, "game_id"]), league, cfg, use_cache=True)
+            except Exception:  # noqa: BLE001
+                o = None
+            if not o:
+                continue
+            for k in _BF:
+                cur = df.at[idx, k]
+                if cur is None or (isinstance(cur, float) and pd.isna(cur)):
+                    df.at[idx, k] = o.get(k)
+            if not df.at[idx, "provider"]:
+                df.at[idx, "provider"] = o.get("provider")
     # de-vig moneylines into market probabilities
     raw = df.apply(
         lambda r: [

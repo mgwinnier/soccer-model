@@ -16,7 +16,7 @@ Pages
 from __future__ import annotations
 
 import sys
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from pathlib import Path
 
 import altair as alt
@@ -25,6 +25,28 @@ import pandas as pd
 import streamlit as st
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+# All displayed times are Central (America/Chicago, auto CST/CDT). ESPN datetimes are UTC.
+try:
+    from zoneinfo import ZoneInfo
+    _CT = ZoneInfo("America/Chicago")
+except Exception:  # pragma: no cover - fallback if tzdata missing
+    _CT = None
+
+
+def _ct(dt):
+    """Convert a (UTC) datetime to a Central-time pandas Timestamp."""
+    ts = pd.to_datetime(dt, errors="coerce")
+    if ts is None or pd.isna(ts):
+        return ts
+    if ts.tzinfo is None:
+        ts = ts.tz_localize("UTC")
+    return ts.tz_convert(_CT) if _CT is not None else ts
+
+
+def _ct_str(dt, fmt="%a %d %b %I:%M %p CT"):
+    ts = _ct(dt)
+    return ts.strftime(fmt) if ts is not None and not pd.isna(ts) else ""
 
 from src.config import load_config, path_for  # noqa: E402
 from src.predict.predict_match import MatchPredictor  # noqa: E402
@@ -69,13 +91,21 @@ def load_csv(name: str) -> pd.DataFrame:
     return pd.read_csv(p) if p.exists() else pd.DataFrame()
 
 
-@st.cache_data(ttl=600, show_spinner="Pulling live odds + analysing…")
+@st.cache_data(ttl=180, show_spinner="Pulling live odds + analysing…")
 def get_bets(day: str, days: int, bankroll: float, kelly: float,
              upset_temp: float = 1.0) -> dict:
     return value_mod.build_bets(day, days=days, bankroll=bankroll,
                                 kelly_fraction=kelly, cfg=CFG,
                                 predictor=get_predictor(), use_cache=False,
                                 upset_temp=upset_temp)
+
+
+@st.cache_data(ttl=300, show_spinner="Grading the 2026 World Cup so far…")
+def get_2026_played() -> list:
+    """All played 2026 WC matches with the model's pre-match call (for Performance)."""
+    res = value_mod.build_bets("2026-06-09", days=40, bankroll=1000, kelly_fraction=0.25,
+                               cfg=CFG, predictor=get_predictor(), use_cache=False)
+    return [m for m in res["matches"] if m.get("played")]
 
 
 @st.cache_data(ttl=300, show_spinner="Computing live group state + qualification odds…")
@@ -111,13 +141,41 @@ def _implied_pct(american) -> str:
     return _pct(p)
 
 
-def market_table(title: str, bets: list, key_note: str | None = None):
-    """Render one market's selections with model%, fair%, price, break-even, EV, stake."""
+def _grade_bet(b, m: dict):
+    """'win'/'loss'/'push' for a played match, else None. Reuses the backtest grader."""
+    if not m.get("played"):
+        return None
+    import re
+    from src.predict.bet_grade import _grade
+    hs, as_ = m["home_score"], m["away_score"]
+    mk, sel = b.market, b.selection
+    if mk == "Match Result":
+        code = "H" if sel == m["home"] else ("A" if sel == m["away"] else "D")
+    elif mk == "Total Goals":
+        mt = re.search(r"[-+]?\d*\.?\d+", sel)
+        if not mt:
+            return None
+        code = ("over" if sel.startswith("Over") else "under", float(mt.group()))
+    else:
+        return None                      # spreads off by default — skip grading
+    try:
+        return _grade(code, hs, as_)
+    except Exception:  # noqa: BLE001
+        return None
+
+
+_GRADE_MARK = {"win": "✅ Win", "loss": "❌ Loss", "push": "➖ Push"}
+
+
+def market_table(title: str, bets: list, key_note: str | None = None, m: dict | None = None):
+    """Render one market's selections with model%, fair%, price, break-even, EV, stake.
+    For a played match (``m`` with played=True), append a graded Result column."""
     st.markdown(f"**{title}**")
+    played = bool(m and m.get("played"))
     rows = []
     for b in bets:
         units = b.kelly_used * 100  # 1 unit = 1% of bankroll
-        rows.append({
+        row = {
             "Selection": b.selection,
             "Model": _pct(b.model_p),
             "Fair (no-vig)": _pct(b.fair_p),
@@ -125,7 +183,10 @@ def market_table(title: str, bets: list, key_note: str | None = None):
             "Break-even": _implied_pct(b.american),
             "EV": f"{b.ev*100:+.0f}%",
             "Stake": f"{units:.1f}u" if units > 0.05 else "—",
-        })
+        }
+        if played:
+            row["Result"] = _GRADE_MARK.get(_grade_bet(b, m), "—")
+        rows.append(row)
     df = pd.DataFrame(rows)
 
     def _style(row):
@@ -266,14 +327,27 @@ def _display_probs(m: dict) -> dict:
 def render_match(m: dict, live: dict | None = None, min_ev: float = 0.03,
                  min_prob_edge: float = 0.02):
     a = m["analysis"]
-    t = pd.to_datetime(m["date"]).strftime("%a %d %b %H:%M UTC")
+    t = _ct_str(m["date"])
     probs = _display_probs(m)
     pick = OUTCOMES[int(np.argmax([probs["H"], probs["D"], probs["A"]]))]
     pick_name = {"H": m["home"], "D": "Draw", "A": m["away"]}[pick]
     n_value = len(_qualifying_bets(m, min_ev, min_prob_edge))
-    title = (f"{m['home']}  vs  {m['away']}   ·   {t}   ·   "
-             f"⚽ leans {pick_name}" + (f"   ·   💰 {n_value} value" if n_value else ""))
+    if m.get("played"):
+        hit = (m["result"] == pick)
+        title = (f"{m['home']} {m['home_score']}–{m['away_score']} {m['away']}   ·   {t}   ·   "
+                 f"{'✅ model called it' if hit else '❌ upset vs model'}")
+    else:
+        title = (f"{m['home']}  vs  {m['away']}   ·   {t}   ·   "
+                 f"⚽ leans {pick_name}" + (f"   ·   💰 {n_value} value" if n_value else ""))
     with st.expander(title, expanded=False):
+        if m.get("played"):
+            res_name = {"H": m["home"], "D": "Draw", "A": m["away"]}[m["result"]]
+            tone = "green" if m["result"] == pick else "red"
+            st.markdown(
+                f'<div style="text-align:center;margin:2px 0 8px">'
+                f'{theme.pill(f"FINAL {m['home_score']}–{m['away_score']} · {res_name}", tone)} '
+                f'{theme.pill(f"model leaned {pick_name} ({_pct(probs[pick])})", "grey")}</div>',
+                unsafe_allow_html=True)
         # flag-vs-flag header + lean pill + value badge
         lean_pill = theme.pill(f"model leans {pick_name}", "green")
         val_pill = theme.pill(f"💰 {n_value} value bet" + ("s" if n_value != 1 else ""),
@@ -322,7 +396,7 @@ def render_match(m: dict, live: dict | None = None, min_ev: float = 0.03,
                 by_market.setdefault(b.market, []).append(b)
             for mk in ["Match Result", "Total Goals", "Spread"]:
                 if mk in by_market:
-                    market_table(mk, by_market[mk])
+                    market_table(mk, by_market[mk], m=m)
             st.caption("**Model** = our pure probability, calibrated to historical results — "
                        "**independent of the betting market** (matches the bar, the expected "
                        "goals and the heatmap) · **Fair** = de-vigged market (shown only as a "
@@ -342,24 +416,32 @@ def render_match(m: dict, live: dict | None = None, min_ev: float = 0.03,
 def page_matches(bankroll, kelly, min_ev=0.03, min_prob_edge=0.02, upset_temp=1.0):
     theme.hero("Matches", "Model vs market across every priced market — flags, probabilities, "
                "and the single best bet per game.", icon="⚽")
-    c1, c2 = st.columns([1, 1])
+    c1, c2, c3 = st.columns([1, 1, 1])
     day = c1.date_input("From date", value=date.today())
     days = c2.slider("Days ahead", 1, 7, 3)
-    res = get_bets(day.strftime("%Y-%m-%d"), days, bankroll, kelly, upset_temp)
+    lookback = c3.slider("Days back (show results)", 0, 21, 5,
+                         help="Include recently-played matches so you can see how the model did "
+                              "vs the result and the closing Vegas line.")
+    if st.button("🔄 Refresh odds & results"):
+        get_bets.clear()
+        get_live_state.clear()
+    start = (day - timedelta(days=lookback)).strftime("%Y-%m-%d")
+    res = get_bets(start, days + lookback, bankroll, kelly, upset_temp)
     matches = res["matches"]
     if not matches:
-        theme.callout("No upcoming fixtures with odds in this window — ESPN nulls odds once a "
-                      "match kicks off. Try the current World Cup dates.", "info")
+        theme.callout("No fixtures with odds in this window — try the current World Cup dates.",
+                      "info")
         theme.footer()
         return
+    played = [m for m in matches if m.get("played")]
+    upcoming = [m for m in matches if not m.get("played")]
     bets = res["bets"]
     n_val = int((bets["ev"] > 0.02).sum()) if not bets.empty else 0
     theme.kpi_row([
-        {"label": "Fixtures", "value": len(matches), "accent": theme.GREEN},
+        {"label": "Upcoming", "value": len(upcoming), "accent": theme.GREEN},
+        {"label": "Results shown", "value": len(played), "accent": theme.BLUE},
         {"label": "+EV selections", "value": n_val, "accent": theme.GOLD,
          "value_color": theme.GOLD if n_val else theme.TEXT},
-        {"label": "Markets / match", "value": "4", "sub": "Result · Totals · Spread · BTTS",
-         "accent": theme.BLUE},
     ])
     # live 2026 group state for the "stakes" block on group-stage cards (best-effort)
     live = None
@@ -367,8 +449,19 @@ def page_matches(bankroll, kelly, min_ev=0.03, min_prob_edge=0.02, upset_temp=1.
         live = get_live_state()
     except Exception:  # noqa: BLE001 — cards still render without the stakes block
         live = None
-    for m in matches:
-        render_match(m, live, min_ev, min_prob_edge)
+    if upcoming:
+        st.markdown("### ⚽ Upcoming")
+        for m in sorted(upcoming, key=lambda x: pd.to_datetime(x["date"])):
+            render_match(m, live, min_ev, min_prob_edge)
+    if played:
+        hits = sum(1 for m in played
+                   if m["result"] == OUTCOMES[int(np.argmax(list(_display_probs(m).values())))])
+        st.markdown(f"### ✅ Recent results &nbsp; "
+                    f"<span style='font-size:14px;color:#8b93a7'>model called "
+                    f"{hits}/{len(played)} ({hits/len(played)*100:.0f}%)</span>",
+                    unsafe_allow_html=True)
+        for m in sorted(played, key=lambda x: pd.to_datetime(x["date"]), reverse=True):
+            render_match(m, live, min_ev, min_prob_edge)
     theme.footer()
 
 
@@ -466,31 +559,51 @@ def page_tournament():
                 show = groups[g].merge(adv, on="team", how="left")
                 show["Adv%"] = (show["advance"] * 100).round(0).astype("Int64")
                 show["S"] = show["Pos"].map(lambda p: "🟢" if p <= 2 else ("🟡" if p == 3 else "⚪"))
-                show["flag"] = show["team"].map(lambda t: flag_url(t, 40))
-                show = show[["S", "flag", "team", "P", "Pts", "GD", "Adv%"]]
+                show = show[["S", "team", "P", "Pts", "GD", "Adv%"]]
                 st.markdown(f"**Group {g}**")
                 st.dataframe(show, hide_index=True, use_container_width=True, column_config={
                     "S": st.column_config.TextColumn("", width="small"),
-                    "flag": st.column_config.ImageColumn("", width="small"),
                     "team": st.column_config.TextColumn("Team"),
                     "Adv%": st.column_config.NumberColumn("Adv%", format="%d%%")})
 
     with st.expander("Full qualification & advancement table"):
         show = qual.sort_values("champion", ascending=False).copy()
-        show.insert(0, "flag", show["team"].map(lambda t: flag_url(t, 40)))
         for c in ["win_group", "advance", "reach_r16", "reach_qf", "reach_sf",
                   "reach_final", "champion"]:
             if c in show:
                 show[c] = (show[c] * 100).round(1)
-        st.dataframe(show, use_container_width=True, hide_index=True, column_config={
-            "flag": st.column_config.ImageColumn("", width="small")})
+        st.dataframe(show, use_container_width=True, hide_index=True)
     theme.footer()
 
 
 def page_performance():
-    theme.hero("Performance", "How the model actually scores — walk-forward accuracy on 7 past "
-               "World Cups (1998–2022) and an honest betting backtest of the 2022 tournament.",
-               icon="📊")
+    theme.hero("Performance", "How the model actually scores — its 2026 record so far, "
+               "walk-forward accuracy on 7 past World Cups (1998–2022), and an honest betting "
+               "backtest of the 2022 tournament.", icon="📊")
+
+    # --- 2026 World Cup so far: the model's live record on already-played matches ---
+    try:
+        played26 = get_2026_played()
+    except Exception:  # noqa: BLE001
+        played26 = []
+    if played26:
+        picks = [OUTCOMES[int(np.argmax(list(_display_probs(m).values())))] for m in played26]
+        hits = sum(1 for m, p in zip(played26, picks) if m["result"] == p)
+        n = len(played26)
+        # average goal error (model expected total vs actual)
+        gerr = np.mean([abs(sum(m["analysis"]["expected_goals"])
+                            - (m["home_score"] + m["away_score"])) for m in played26])
+        st.markdown("#### 🔴 2026 World Cup — live so far")
+        theme.kpi_row([
+            {"label": "Matches played", "value": n, "accent": theme.GREEN},
+            {"label": "Result called", "value": f"{hits}/{n} ({hits/n*100:.0f}%)",
+             "accent": theme.GOLD},
+            {"label": "Goal-total error", "value": f"{gerr:.2f}", "sub": "avg |model − actual|",
+             "accent": theme.BLUE},
+        ])
+        st.caption("The model's pre-match pick vs what actually happened in 2026, updated live as "
+                   "games finish. Small sample — one tournament is noise, not proof.")
+
     # Deployed-model accuracy, walk-forward over 7 World Cups (1998–2022). This is the
     # EXACT live pipeline (market-independent DC+Elo blend + WC goals correction).
     acc = load_csv("wc_accuracy_backtest.csv")
@@ -735,6 +848,43 @@ def page_clv(min_ev=0.03, kelly=0.25):
             st.dataframe(pd.DataFrame(sys_rows), hide_index=True, use_container_width=True)
             st.caption("`pickem_ml_2_3` = the even-money moneyline candidate from v8 — tracked, "
                        "**not** a deployed bet (it failed the pre-registered backtest bar).")
+
+    # ⭐ Best bets — the single strongest qualifying pick per match, settled
+    if not settled.empty:
+        from src.predict.betting import qualifies
+        s = settled.copy()
+        for c in ("model_p", "fair_p", "decimal", "ev"):
+            s[c] = pd.to_numeric(s.get(c), errors="coerce")
+        s["_q"] = s.apply(lambda r: qualifies(r["model_p"], r["fair_p"], r["decimal"],
+                                              0.03, 0.02, 6.0), axis=1)
+        bb = s[s["_q"]].copy()
+        keycol = "game_id" if "game_id" in bb.columns else "match"
+        if not bb.empty:
+            bb = bb.sort_values("ev", ascending=False).drop_duplicates(subset=[keycol], keep="first")
+            bs, bp = _kelly_units(bb, kelly)
+            bb = bb.assign(stake_u=bs.round(2), pnl_u=bp.round(2))
+            bnet, bst = float(bp.sum()), float(bs.sum())
+            broi = bnet / bst if bst else 0.0
+            bw = int((bb["result"] == "win").sum())
+            bl = int((bb["result"] == "loss").sum())
+            bcol = theme.GREEN if bnet > 0 else (theme.RED if bnet < 0 else theme.TEXT)
+            st.subheader("⭐ Best bets — the model's strongest call per match")
+            theme.kpi_row([
+                {"label": "Best bets settled", "value": len(bb),
+                 "sub": f"{bw}-{bl}", "accent": theme.BLUE},
+                {"label": "Record", "value": (f"{bw/(bw+bl)*100:.0f}% won" if (bw + bl) else "—"),
+                 "accent": theme.GOLD},
+                {"label": "Net (units)", "value": f"{bnet:+.1f}u",
+                 "sub": f"{bst:.1f}u staked", "accent": bcol, "value_color": bcol},
+                {"label": "ROI", "value": f"{broi*100:+.1f}%", "accent": bcol,
+                 "value_color": bcol},
+            ])
+            cols = [c for c in ["match_date", "match", "market", "selection", "american",
+                                "model_p", "result", "stake_u", "pnl_u"] if c in bb.columns]
+            st.dataframe(bb[cols].iloc[::-1], hide_index=True, use_container_width=True)
+            st.caption("One pick per match: the highest-EV selection that clears the quality gate "
+                       "(≥3% EV, ≥2% edge vs the price, odds ≤ +500). Honest read — small sample; "
+                       "the model has **no proven betting edge**, this is a track record, not a promise.")
 
     if not op.empty:
         st.subheader(f"⏳ Pending ({len(op)}) — awaiting results")

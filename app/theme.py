@@ -132,9 +132,33 @@ section[data-testid="stSidebar"] div[role="radiogroup"] label > div:first-child 
     border-radius: 12px; padding: 12px 14px; margin-top: 8px; }}
 .bbet .h {{ font-family:'Oswald'; font-size: 14px; letter-spacing: 1px; text-transform: uppercase; color: var(--gold); }}
 
-.mcard-head {{ display:flex; align-items:center; gap: 10px; font-family:'Oswald'; }}
+.mcard-head {{ display:flex; align-items:center; gap: 10px; font-family:'Oswald';
+    flex-wrap: wrap; justify-content: center; }}
 .foot {{ color: var(--muted); font-size: 12px; text-align: center; margin: 26px 0 6px 0;
     padding-top: 14px; border-top: 1px solid var(--border); line-height: 1.7; }}
+
+/* ---------- mobile / narrow viewports ---------- */
+@media (max-width: 640px) {{
+    .block-container {{ padding-left: .6rem !important; padding-right: .6rem !important;
+        padding-top: .6rem; }}
+    /* stack side-by-side columns instead of cramming them */
+    [data-testid="stHorizontalBlock"] {{ flex-wrap: wrap !important; gap: .4rem !important; }}
+    [data-testid="stHorizontalBlock"] > [data-testid="stColumn"],
+    [data-testid="stHorizontalBlock"] > [data-testid="column"] {{
+        flex: 1 1 100% !important; width: 100% !important; min-width: 100% !important; }}
+    .hero {{ padding: 16px 16px; border-radius: 14px; }}
+    .hero h1 {{ font-size: 22px; }}
+    .hero p {{ font-size: 12.5px; }}
+    .hero::after {{ display: none; }}              /* drop the decorative blob */
+    .kpi .v {{ font-size: 21px; }}
+    .mcard-head {{ font-size: 16px !important; gap: 8px; }}
+    .pill {{ font-size: 11px; padding: 2px 8px; }}
+    h1, h2, h3 {{ font-size: 1.15rem !important; }}
+    /* let wide dataframes scroll instead of overflow */
+    [data-testid="stDataFrame"] {{ overflow-x: auto; }}
+    /* keep the sidebar usable when expanded */
+    section[data-testid="stSidebar"] {{ min-width: 16rem; }}
+}}
 </style>
 """, unsafe_allow_html=True)
 

@@ -113,12 +113,25 @@ def build_bets(start: str, days: int = 3, bankroll: float = 100.0,
                         if p.lower() in availability.team_key_players(home)]
         key_out_away = [p for p in away_out
                         if p.lower() in availability.team_key_players(away)]
+        # final score / result for played matches (so the card shows what happened
+        # and bets can be graded) — None for upcoming games
+        hs = _f(getattr(r, "home_score", None))
+        as_ = _f(getattr(r, "away_score", None))
+        status = getattr(r, "status", None)
+        played = status == "post" and hs is not None and as_ is not None
+        result = None
+        if played:
+            hs, as_ = int(hs), int(as_)
+            result = "H" if hs > as_ else ("A" if as_ > hs else "D")
         match = {
             "game_id": getattr(r, "game_id", None),
             "date": r.date, "home": home, "away": away, "provider": r.provider,
             "neutral": neutral, "analysis": a, "bets": bets,
             "key_out_home": key_out_home, "key_out_away": key_out_away,
             "home_line_move": _f(getattr(r, "home_line_move", None)),
+            "status": status, "played": played, "result": result,
+            "home_score": (int(hs) if played else None),
+            "away_score": (int(as_) if played else None),
         }
         matches.append(match)
 
