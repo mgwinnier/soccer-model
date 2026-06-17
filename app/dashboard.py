@@ -672,21 +672,46 @@ def page_performance():
 
     wc = load_csv("wc2022_backtest.csv")
     if not wc.empty:
-        st.markdown("#### 🏆 2022 World Cup betting backtest (Bet365 close, out-of-sample)")
-        show = wc.copy()
-        for c in ["roi", "roi_lo", "roi_hi"]:
-            if c in show:
-                show[c] = (show[c] * 100).round(1).astype(str) + "%"
-        st.dataframe(show, use_container_width=True, hide_index=True)
+        st.markdown("#### 🏆 2022 World Cup — how our betting model would have done")
+        st.caption("Exactly how the model bets: its own market-independent probabilities, the "
+                   "quality gate (≥3% EV, ≥2% edge, odds ≤ +500), staked at **quarter-Kelly** "
+                   "(1 unit = 1% of bankroll). Out-of-sample — the model was trained only on data "
+                   "before the tournament and priced at the Bet365 close.")
         ov = wc[wc["segment"] == "OVERALL"]
-        roi = float(ov["roi"].iloc[0]) * 100 if not ov.empty else 0
-        n = int(ov["bets"].iloc[0]) if not ov.empty else 0
+        has_kelly = "kelly_units" in wc.columns and not ov.empty
+        if has_kelly:
+            ku = float(ov["kelly_units"].iloc[0])           # net units = % of bankroll
+            kroi = float(ov["kelly_roi"].iloc[0]) * 100
+            froi = float(ov["roi"].iloc[0]) * 100
+            bets = int(ov["bets"].iloc[0]); wins = int(ov["wins"].iloc[0])
+            kcol = theme.GREEN if ku > 0 else (theme.RED if ku < 0 else theme.TEXT)
+            theme.kpi_row([
+                {"label": "Bankroll result", "value": f"{ku:+.1f}%",
+                 "sub": "quarter-Kelly · 1u = 1% bankroll", "accent": kcol, "value_color": kcol},
+                {"label": "Record", "value": f"{wins}/{bets}", "sub": "bets won", "accent": theme.BLUE},
+                {"label": "Kelly ROI", "value": f"{kroi:+.1f}%", "sub": "net ÷ staked",
+                 "accent": kcol, "value_color": kcol},
+                {"label": "Flat ROI", "value": f"{froi:+.1f}%", "sub": "1u/bet, for reference",
+                 "accent": theme.GOLD},
+            ])
+        # by-market table (Kelly units + ROI, with the flat ROI + CI alongside)
+        show = wc.copy()
+        show["record"] = show["wins"].astype(int).astype(str) + "/" + show["bets"].astype(int).astype(str)
+        if "kelly_units" in show:
+            show["bankroll %"] = show["kelly_units"].round(1).astype(str) + "%"
+            show["Kelly ROI"] = (show["kelly_roi"] * 100).round(1).astype(str) + "%"
+        show["flat ROI"] = (show["roi"] * 100).round(1).astype(str) + "%"
+        show["flat 95% CI"] = ("[" + (show["roi_lo"] * 100).round(0).astype(int).astype(str)
+                               + "%, " + (show["roi_hi"] * 100).round(0).astype(int).astype(str) + "%]")
+        cols = [c for c in ["segment", "record", "bankroll %", "Kelly ROI", "flat ROI",
+                            "flat 95% CI"] if c in show.columns]
+        st.dataframe(show[cols], use_container_width=True, hide_index=True)
         theme.callout(
-            f"<b>Read this honestly:</b> the model's 2022 WC bets returned <b>{roi:+.1f}% ROI</b> "
-            f"over {n} bets — but the 95% CI <b>includes 0</b> (one tournament is a tiny, "
-            f"variance-heavy sample). This is encouraging, <b>not a proven edge</b>. The large "
-            f"all-internationals backtest still shows no reliable edge against the closing line.",
-            "warn")
+            "<b>Read this honestly:</b> quarter-Kelly turns the full-2022 slate slightly positive, "
+            "but the 95% CI <b>includes 0</b> and the result flips sign if you change the staking "
+            "method or slice by stage — i.e. it's <b>one tiny, variance-heavy tournament, not a "
+            "proven edge</b>. The large all-internationals backtest still shows no reliable edge "
+            "against the closing line. Bet responsibly.", "warn")
     theme.footer()
 
 

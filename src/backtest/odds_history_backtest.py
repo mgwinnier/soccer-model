@@ -158,7 +158,8 @@ def _bootstrap_roi(pnl: np.ndarray, n: int = 2000, seed: int = 0):
 
 
 def _grade_block(test: pd.DataFrame, bias: MarketBias, min_ev: float,
-                 min_prob_edge: float = 0.0, max_decimal: float | None = None):
+                 min_prob_edge: float = 0.0, max_decimal: float | None = None,
+                 kelly_frac: float | None = None):
     adj = np.array([bias.recenter(t, p) for t, p in zip(test["type"], test["model_p"])])
     dec = test["dec"].to_numpy()
     ev = adj * (dec - 1) - (1 - adj)
@@ -174,12 +175,24 @@ def _grade_block(test: pd.DataFrame, bias: MarketBias, min_ev: float,
     sel = test[keep].copy()
     if sel.empty:
         return None
-    pnl = np.where(sel["result"] == "push", 0.0,
-                   np.where(sel["result"] == "win", sel["dec"] - 1, -1.0))
-    settled = sel["result"] != "push"
-    mean, lo, hi = _bootstrap_roi(pnl[settled.to_numpy()])
-    return {"bets": len(sel), "wins": int((sel["result"] == "win").sum()),
-            "roi": mean, "roi_lo": lo, "roi_hi": hi, "units": float(pnl.sum())}
+    sdec = sel["dec"].to_numpy()
+    res = sel["result"].to_numpy()
+    pnl = np.where(res == "push", 0.0, np.where(res == "win", sdec - 1, -1.0))
+    settled = res != "push"
+    mean, lo, hi = _bootstrap_roi(pnl[settled])
+    out = {"bets": len(sel), "wins": int((res == "win").sum()),
+           "roi": mean, "roi_lo": lo, "roi_hi": hi, "units": float(pnl.sum())}
+    if kelly_frac:
+        # how the deployed model actually stakes: fractional Kelly, 1u = 1% bankroll
+        from ..predict.betting import kelly_fraction
+        sadj = adj[keep]
+        stake = np.array([kelly_fraction(p, d) for p, d in zip(sadj, sdec)]) * kelly_frac * 100.0
+        kpnl = np.where(res == "push", 0.0, np.where(res == "win", stake * (sdec - 1), -stake))
+        staked = float(stake[settled].sum())
+        out["kelly_units"] = float(kpnl.sum())             # net units (= % of bankroll)
+        out["kelly_staked"] = staked
+        out["kelly_roi"] = float(kpnl.sum() / staked) if staked else 0.0
+    return out
 
 
 def backtest(cfg: dict | None = None, anchor_w: float = 0.5, min_ev: float = 0.03,
@@ -253,9 +266,10 @@ def wc2022_report(cfg: dict | None = None, min_ev: float = 0.03,
     wc = preds[(preds["league"] == "fifa.world")
                & (preds["date"].dt.year == 2022)
                & (preds["date"] >= pd.Timestamp(split))].copy()
-    out = {"overall": _grade_block(wc, bias, min_ev, 0.02, 6.0), "by_market": {}}
+    out = {"overall": _grade_block(wc, bias, min_ev, 0.02, 6.0, kelly_frac=0.25),
+           "by_market": {}}
     for mk, g in wc.groupby("market"):
-        r = _grade_block(g, bias, min_ev, 0.02, 6.0)
+        r = _grade_block(g, bias, min_ev, 0.02, 6.0, kelly_frac=0.25)
         if r:
             out["by_market"][mk] = r
     if write:
