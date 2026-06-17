@@ -1305,15 +1305,17 @@ def _read_fresh(path) -> pd.DataFrame:
     return pd.read_csv(path) if path.exists() else pd.DataFrame()
 
 
-def _kelly_units(df: pd.DataFrame, frac: float):
+def _kelly_units(df: pd.DataFrame, frac: float, cap_u: float = 2.0):
     """Per-bet stake and P&L in units (1u = 1% bankroll) at the given Kelly fraction.
-    Stake = Kelly_fraction(model_p, decimal) · frac · 100."""
+    Stake = min(Kelly_fraction(model_p, decimal) · frac · 100, ``cap_u``). The cap keeps any
+    single high-edge/longshot pick from demanding a wild stake — disciplined bankroll management,
+    not raw Kelly (which can ask for 8–10% on a big-edge dog)."""
     from src.predict.betting import kelly_fraction
     mp = pd.to_numeric(df["model_p"], errors="coerce").to_numpy()
     dec = pd.to_numeric(df["decimal"], errors="coerce").to_numpy()
     kf = np.array([kelly_fraction(p, d) if (pd.notna(p) and pd.notna(d) and d > 1) else 0.0
                    for p, d in zip(mp, dec)])
-    stake = kf * frac * 100.0
+    stake = np.minimum(kf * frac * 100.0, cap_u)         # cap per-bet exposure at cap_u units
     dec_safe = np.nan_to_num(dec, nan=1.0)        # un-priceable rows get stake 0 anyway
     res = df["result"].to_numpy()
     pnl = np.where(res == "push", 0.0,
@@ -1323,8 +1325,8 @@ def _kelly_units(df: pd.DataFrame, frac: float):
 
 def page_clv(min_ev=0.03, kelly=0.25):
     theme.hero("Live Tracker", f"Every +EV pick recorded at the offered price, then settled "
-               f"vs the result and the closing line. Units staked at {kelly:.2f}× Kelly.",
-               icon="📈")
+               f"vs the result and the closing line. Staked at {kelly:.2f}× Kelly, capped at 2u "
+               f"(2% of bankroll) per bet.", icon="📈")
     from src.predict import clv
     today = _today_ct().strftime("%Y-%m-%d")
 
@@ -1376,20 +1378,39 @@ def page_clv(min_ev=0.03, kelly=0.25):
          "sub": "forward bets only", "accent": theme.GOLD},
     ])
 
-    # cumulative Kelly P&L over time — "how it's doing" at a glance
+    # cumulative Kelly P&L over time — a clean daily equity curve ("how it's doing" at a glance).
+    # Aggregate to one point per day (many bets settle on the same date) so the line is a smooth
+    # step through time, not the intra-day zig-zag the per-bet version produced.
     if len(settled) and "pnl_u" in settled.columns:
         d2 = settled.copy()
         when = d2["match_date"] if "match_date" in d2 else d2.get("graded_time")
-        d2["when"] = pd.to_datetime(when, errors="coerce")
-        d2 = d2.dropna(subset=["when"]).sort_values("when")
-        d2["cum_units"] = d2["pnl_u"].cumsum()
-        line = alt.Chart(d2).mark_area(line=True, opacity=0.2, color=GREEN).encode(
-            x=alt.X("when:T", title=None),
-            y=alt.Y("cum_units:Q", title=f"Cumulative units ({kelly:.2f}× Kelly)"),
-            tooltip=[alt.Tooltip("when:T"), alt.Tooltip("cum_units:Q", format="+.1f"),
-                     "match", "selection", "result"]).properties(height=220)
-        zero = alt.Chart(pd.DataFrame({"y": [0]})).mark_rule(color=GREY).encode(y="y")
-        st.altair_chart(zero + line, use_container_width=True)
+        d2["day"] = pd.to_datetime(when, errors="coerce").dt.normalize()
+        d2 = d2.dropna(subset=["day"])
+        daily = (d2.groupby("day", as_index=False)
+                 .agg(net=("pnl_u", "sum"), bets=("pnl_u", "size")).sort_values("day"))
+        daily["cum_units"] = daily["net"].cumsum()
+        # seed a zero baseline the day before the first settle so the curve starts at 0
+        seed = pd.DataFrame({"day": [daily["day"].iloc[0] - pd.Timedelta(days=1)],
+                             "net": [0.0], "bets": [0], "cum_units": [0.0]})
+        daily = pd.concat([seed, daily], ignore_index=True)
+        up = daily["cum_units"].iloc[-1] >= 0
+        col = GREEN if up else RED
+        base = alt.Chart(daily).encode(
+            x=alt.X("day:T", title=None, axis=alt.Axis(format="%b %d", grid=False)),
+            y=alt.Y("cum_units:Q", title=f"Cumulative units ({kelly:.2f}× Kelly)",
+                    axis=alt.Axis(grid=True)))
+        area = base.mark_area(interpolate="monotone", line=False, opacity=0.16, color=col).encode(
+            y="cum_units:Q")
+        ln = base.mark_line(interpolate="monotone", strokeWidth=2.5, color=col).encode(
+            tooltip=[alt.Tooltip("day:T", title="Date", format="%b %d"),
+                     alt.Tooltip("cum_units:Q", title="Cumulative", format="+.1f"),
+                     alt.Tooltip("net:Q", title="Day net", format="+.1f"),
+                     alt.Tooltip("bets:Q", title="Bets")])
+        pts = base.mark_point(size=34, filled=True, color=col, opacity=0.9).encode(y="cum_units:Q")
+        zero = alt.Chart(pd.DataFrame({"y": [0]})).mark_rule(
+            color=GREY, strokeDash=[4, 4]).encode(y="y")
+        st.altair_chart((zero + area + ln + pts).properties(height=240),
+                        use_container_width=True)
 
     # tracked systems (e.g. the v8 pick'em candidate — forward, observational)
     if not settled.empty and "system" in settled.columns:

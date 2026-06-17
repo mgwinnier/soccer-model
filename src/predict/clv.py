@@ -285,6 +285,14 @@ def grade(cfg: dict | None = None, now: str | None = None) -> int:
     opendf = pd.read_csv(op)
     if opendf.empty:
         return 0
+    try:
+        return _grade_open(opendf, op, cfg, now)
+    except Exception as e:  # noqa: BLE001 — last-resort guard: never propagate to the UI
+        print(f"[clv] grade aborted ({type(e).__name__}: {e}); left open untouched")
+        return 0
+
+
+def _grade_open(opendf, op, cfg, now) -> int:
     # results for the date span covered by open tickets
     lo = opendf["match_date"].min()
     hi = (pd.Timestamp(opendf["match_date"].max()) + pd.Timedelta(days=2)).strftime("%Y-%m-%d")
