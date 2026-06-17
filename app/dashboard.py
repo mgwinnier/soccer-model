@@ -934,8 +934,6 @@ def main():
             unsafe_allow_html=True)
         st.caption("Dixon-Coles · Elo · LightGBM ensemble · live ESPN data")
         labels = [f"{icon} {name}" for icon, name, _ in NAV]
-        choice = st.radio("Navigate", labels, label_visibility="collapsed")
-        page = NAV[labels.index(choice)][2]
         st.divider()
         st.markdown("**⚙️ Staking** &nbsp; <span style='color:#8b93a7;font-size:12px'>"
                     "1 unit = 1% of bankroll</span>", unsafe_allow_html=True)
@@ -967,6 +965,12 @@ def main():
         st.caption("⚠ EV/Kelly are only as good as the model's probabilities. The **min-edge "
                    "gate** drops leverage-driven longshot flags. **Not betting advice** · "
                    "independent model, not affiliated with FIFA.")
+
+    # Top-of-page navigation — always visible (works on mobile, where the sidebar is
+    # collapsed). Horizontal radio wraps to multiple rows on narrow screens.
+    labels = [f"{icon} {name}" for icon, name, _ in NAV]
+    choice = st.radio("Navigate", labels, horizontal=True, label_visibility="collapsed")
+    page = NAV[labels.index(choice)][2]
 
     if page == "matches":
         page_matches(bankroll, kelly, min_ev, min_edge, upset_temp)

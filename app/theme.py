@@ -134,6 +134,9 @@ section[data-testid="stSidebar"] div[role="radiogroup"] label > div:first-child 
 
 .mcard-head {{ display:flex; align-items:center; gap: 10px; font-family:'Oswald';
     flex-wrap: wrap; justify-content: center; }}
+/* top-of-page navigation radio — wrap into tidy rows, touch-friendly */
+div[role="radiogroup"] {{ flex-wrap: wrap; gap: 6px 14px; }}
+div[role="radiogroup"] label {{ font-family:'Oswald'; letter-spacing:.3px; }}
 .foot {{ color: var(--muted); font-size: 12px; text-align: center; margin: 26px 0 6px 0;
     padding-top: 14px; border-top: 1px solid var(--border); line-height: 1.7; }}
 
