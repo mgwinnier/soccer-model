@@ -150,21 +150,28 @@ section[data-testid="stSidebar"] div[role="radiogroup"] label > div:first-child 
 .navitem:hover {{ color:var(--text); background:rgba(255,255,255,.06); border-color:var(--border); }}
 .navitem.active {{ color:#06160d; font-weight:600;
     background:linear-gradient(180deg,#34e08e,var(--green)); box-shadow:0 4px 14px rgba(30,199,115,.3); }}
-/* hamburger (hidden on desktop) */
-.navham {{ display:none; position:relative; }}
-.navham > summary {{ list-style:none; cursor:pointer; font-size:20px; line-height:1; color:var(--text);
-    padding:8px 12px; border:1px solid var(--border); border-radius:10px; background:var(--card); }}
-.navham > summary::-webkit-details-marker {{ display:none; }}
-.navham[open] > summary {{ color:var(--green); border-color:var(--green); }}
-.navmenu {{ position:absolute; right:0; top:48px; z-index:1200; display:flex; flex-direction:column;
-    gap:4px; min-width:210px; padding:8px; background:var(--elev); border:1px solid var(--border);
-    border-radius:14px; box-shadow:0 18px 50px rgba(0,0,0,.55); }}
-.navmenu .navitem {{ display:block; }}
+/* hamburger button (CSS :target toggle — no JS, no <details>) */
+.navham-btn {{ display:none; cursor:pointer; font-size:22px; line-height:1; color:var(--text);
+    padding:7px 13px; border:1px solid var(--border); border-radius:10px; background:var(--card);
+    text-decoration:none; user-select:none; }}
+.navham-btn:hover {{ color:var(--green); border-color:var(--green); }}
+/* full-screen mobile drawer, revealed when its id is the URL :target */
+.navdrawer {{ display:none; }}
+.navdrawer-head {{ display:flex; align-items:center; justify-content:space-between;
+    width:100%; max-width:440px; margin-bottom:10px; }}
+.navdrawer-close {{ font-size:22px; color:var(--muted); text-decoration:none; padding:6px 12px;
+    border:1px solid var(--border); border-radius:10px; }}
+.navdrawer .navitem {{ font-size:17px; padding:13px 18px; width:100%; max-width:440px;
+    text-align:center; background:var(--card); border:1px solid var(--border); }}
 @media (max-width:820px) {{
     .navlinks {{ display:none; }}
-    .navham {{ display:block; }}
+    .navham-btn {{ display:inline-flex; align-items:center; }}
     .navbrand {{ font-size:16px; }}
     .topnav {{ padding:8px 12px; }}
+    .navdrawer:target {{ display:flex; flex-direction:column; align-items:center;
+        position:fixed; inset:0; z-index:100000; padding:18px;
+        gap:10px; background:rgba(8,11,19,.985); backdrop-filter:blur(6px);
+        overflow:auto; }}
 }}
 .foot {{ color: var(--muted); font-size: 12px; text-align: center; margin: 26px 0 6px 0;
     padding-top: 14px; border-top: 1px solid var(--border); line-height: 1.7; }}

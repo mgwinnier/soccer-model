@@ -932,15 +932,21 @@ def _nav_links(active: str) -> str:
 
 
 def render_topnav(active: str) -> None:
-    """A real top navigation bar: brand + pill links on desktop, a hamburger dropdown
-    on mobile. Links are query-param anchors (`?page=…`) so it behaves like site nav."""
+    """A real top navigation bar: brand + pill links on desktop, a full-screen
+    hamburger drawer on mobile. Pure HTML/CSS (a CSS ``:target`` toggle — no JS, no
+    <details>, which Streamlit's sanitizer mangles). Links are ``?page=…`` anchors."""
     links = _nav_links(active)
     st.markdown(
         f'<div class="topnav">'
         f'<a class="navbrand" href="?page=matches" target="_self">🏆 FIFA&nbsp;WC&nbsp;<b>2026</b></a>'
         f'<nav class="navlinks">{links}</nav>'
-        f'<details class="navham"><summary>☰</summary>'
-        f'<nav class="navmenu">{links}</nav></details>'
+        f'<a class="navham-btn" href="#wcnav" target="_self">☰</a>'
+        f'</div>'
+        f'<div id="wcnav" class="navdrawer">'
+        f'<div class="navdrawer-head">'
+        f'<span class="navbrand">🏆 FIFA&nbsp;WC&nbsp;<b>2026</b></span>'
+        f'<a class="navdrawer-close" href="#" target="_self">✕</a></div>'
+        f'{links}'
         f'</div>', unsafe_allow_html=True)
 
 
