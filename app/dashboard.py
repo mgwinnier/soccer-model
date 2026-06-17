@@ -928,31 +928,40 @@ def page_clv(min_ev=0.03, kelly=0.25):
         st.dataframe(op[cols], hide_index=True, use_container_width=True)
 
     if not settled.empty:
-        # units by category (Kelly) — how each market/selection type is doing
+        # units by category — same layout as the Performance 2022 table
         if "stake_u" in settled.columns:
-            st.subheader("📊 Units by category (Kelly)")
-            grp_col = "segment" if "segment" in settled.columns else "market"
-            rows = []
-            for cat, g in settled.groupby(grp_col):
-                wins = int((g["result"] == "win").sum())
-                losses = int((g["result"] == "loss").sum())
-                staked = float(g["stake_u"].sum())
-                net = float(g["pnl_u"].sum())
-                rows.append({"Category": cat, "Bets": len(g), "W-L": f"{wins}-{losses}",
-                             "Net units": f"{net:+.1f}u", "Staked": f"{staked:.1f}u",
-                             "ROI": f"{(net/staked*100 if staked else 0):+.1f}%",
-                             "_net": net})
-            cat_df = pd.DataFrame(rows).sort_values("_net", ascending=False).drop(columns="_net")
-            # TOTAL row
-            tot_staked = float(settled["stake_u"].sum()); tot_net = float(settled["pnl_u"].sum())
-            total = {"Category": "TOTAL", "Bets": len(settled),
-                     "W-L": f"{int((settled['result']=='win').sum())}-{int((settled['result']=='loss').sum())}",
-                     "Net units": f"{tot_net:+.1f}u", "Staked": f"{tot_staked:.1f}u",
-                     "ROI": f"{(tot_net/tot_staked*100 if tot_staked else 0):+.1f}%"}
-            cat_df = pd.concat([cat_df, pd.DataFrame([total])], ignore_index=True)
+            st.subheader("📊 Units by category")
+
+            def _boot(pnl: np.ndarray, n: int = 1000):
+                if len(pnl) == 0:
+                    return (0.0, 0.0, 0.0)
+                rng = np.random.default_rng(0)
+                idx = rng.integers(0, len(pnl), size=(n, len(pnl)))
+                r = pnl[idx].mean(axis=1)
+                return float(pnl.mean()), float(np.percentile(r, 2.5)), float(np.percentile(r, 97.5))
+
+            def _row(name, g):
+                dec = pd.to_numeric(g["decimal"], errors="coerce").to_numpy()
+                res = g["result"].to_numpy()
+                settled_m = res != "push"
+                flat = np.where(res == "push", 0.0, np.where(res == "win", dec - 1, -1.0))
+                m, lo, hi = _boot(flat[settled_m])
+                kstaked = float(g["stake_u"].sum()); knet = float(g["pnl_u"].sum())
+                wins = int((res == "win").sum())
+                return {"segment": name, "record": f"{wins}/{len(g)}",
+                        "Net units (Kelly)": f"{knet:+.1f}u",
+                        "Kelly ROI": f"{(knet/kstaked*100 if kstaked else 0):+.1f}%",
+                        "Net units (flat)": f"{flat.sum():+.1f}u",
+                        "flat ROI": f"{m*100:+.1f}%",
+                        "flat 95% CI": f"[{lo*100:+.0f}%, {hi*100:+.0f}%]", "_net": knet}
+
+            rows = [_row("OVERALL", settled)]
+            rows += sorted((_row(mk, g) for mk, g in settled.groupby("market")),
+                           key=lambda r: -r["_net"])
+            cat_df = pd.DataFrame(rows).drop(columns="_net")
             st.dataframe(cat_df, hide_index=True, use_container_width=True)
-            st.caption("Net units = profit/loss at the current Kelly fraction (1u = 1% of "
-                       "bankroll). Categories: MR = Match Result, TG = Total Goals, SP = Spread.")
+            st.caption("Kelly = how the model actually stakes (current fraction, 1u = 1% of "
+                       "bankroll); flat = 1u per bet, for reference.")
 
         st.subheader("✅ Settled")
         cols = [c for c in ["match_date", "match", "market", "selection", "american",
