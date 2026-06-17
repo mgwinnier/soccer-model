@@ -48,6 +48,13 @@ def _ct_str(dt, fmt="%a %d %b %I:%M %p CT"):
     ts = _ct(dt)
     return ts.strftime(fmt) if ts is not None and not pd.isna(ts) else ""
 
+
+def _today_ct():
+    """Today's date in Central time — the cloud server clock is UTC, which rolls over
+    to tomorrow while it's still today in the US."""
+    base = datetime.now(_CT) if _CT is not None else datetime.utcnow()
+    return base.date()
+
 from src.config import load_config, path_for  # noqa: E402
 from src.predict.predict_match import MatchPredictor  # noqa: E402
 from src.predict import value as value_mod  # noqa: E402
@@ -417,7 +424,7 @@ def page_matches(bankroll, kelly, min_ev=0.03, min_prob_edge=0.02, upset_temp=1.
     theme.hero("Matches", "Model vs market across every priced market — flags, probabilities, "
                "and the single best bet per game.", icon="⚽")
     c1, c2, c3 = st.columns([1, 1, 1])
-    day = c1.date_input("From date", value=date.today())
+    day = c1.date_input("From date", value=_today_ct())
     days = c2.slider("Days ahead", 1, 7, 3)
     lookback = c3.slider("Days back (show results)", 0, 21, 5,
                          help="Include recently-played matches so you can see how the model did "
@@ -468,7 +475,7 @@ def page_matches(bankroll, kelly, min_ev=0.03, min_prob_edge=0.02, upset_temp=1.
 def page_value_board(bankroll, kelly, min_ev, max_exposure, min_prob_edge=0.02, upset_temp=1.0):
     theme.hero("Value Board", "Every +EV bet across the slate, ranked — staked by fractional "
                "Kelly and capped to your max exposure.", icon="💰")
-    day = st.date_input("From date", value=date.today(), key="vb_date")
+    day = st.date_input("From date", value=_today_ct(), key="vb_date")
     days = st.slider("Days ahead", 1, 7, 3, key="vb_days")
     res = get_bets(day.strftime("%Y-%m-%d"), days, bankroll, kelly, upset_temp)
     bb = value_mod.best_bets(res["bets"], min_ev=min_ev, min_prob_edge=min_prob_edge)
@@ -770,7 +777,7 @@ def page_clv(min_ev=0.03, kelly=0.25):
                f"vs the result and the closing line. Units staked at {kelly:.2f}× Kelly.",
                icon="📈")
     from src.predict import clv
-    today = date.today().strftime("%Y-%m-%d")
+    today = _today_ct().strftime("%Y-%m-%d")
 
     cc = st.columns([1, 1, 3])
     if cc[0].button("🔄 Sync now"):
