@@ -920,14 +920,36 @@ NAV = [
     ("📊", "Performance", "performance"),
     ("🔎", "Team Explorer", "team"),
 ]
+_NAV_SLUGS = {slug for _, _, slug in NAV}
+
+
+def _nav_links(active: str) -> str:
+    out = ""
+    for icon, name, slug in NAV:
+        cls = "navitem active" if slug == active else "navitem"
+        out += f'<a class="{cls}" href="?page={slug}" target="_self">{icon} {name}</a>'
+    return out
+
+
+def render_topnav(active: str) -> None:
+    """A real top navigation bar: brand + pill links on desktop, a hamburger dropdown
+    on mobile. Links are query-param anchors (`?page=…`) so it behaves like site nav."""
+    links = _nav_links(active)
+    st.markdown(
+        f'<div class="topnav">'
+        f'<a class="navbrand" href="?page=matches" target="_self">🏆 FIFA&nbsp;WC&nbsp;<b>2026</b></a>'
+        f'<nav class="navlinks">{links}</nav>'
+        f'<details class="navham"><summary>☰</summary>'
+        f'<nav class="navmenu">{links}</nav></details>'
+        f'</div>', unsafe_allow_html=True)
 
 
 def main():
-    # Nav + controls live in the MAIN column (no sidebar) so mobile can always reach
-    # them — the collapsed-sidebar trap is gone.
-    labels = [f"{icon} {name}" for icon, name, _ in NAV]
-    choice = st.radio("Navigate", labels, horizontal=True, label_visibility="collapsed")
-    page = NAV[labels.index(choice)][2]
+    # Query-param routing drives a real top nav bar (mobile hamburger included).
+    page = st.query_params.get("page", "matches")
+    if page not in _NAV_SLUGS:
+        page = "matches"
+    render_topnav(page)
     with st.expander("⚙️  Staking & filters", expanded=False):
         st.markdown(
             '<div style="padding:6px 2px 10px 2px">'

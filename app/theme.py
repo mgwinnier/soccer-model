@@ -134,25 +134,38 @@ section[data-testid="stSidebar"] div[role="radiogroup"] label > div:first-child 
 
 .mcard-head {{ display:flex; align-items:center; gap: 10px; font-family:'Oswald';
     flex-wrap: wrap; justify-content: center; }}
-/* top-of-page navigation — styled as pill tabs (works on desktop + mobile) */
-div[role="radiogroup"] {{ flex-wrap: wrap; gap: 8px; justify-content: center;
-    margin: -2px 0 16px; }}
-div[role="radiogroup"] > label {{ display:flex; align-items:center; margin:0;
-    padding: 7px 18px; cursor: pointer; background: var(--card);
-    border: 1px solid var(--border); border-radius: 999px; transition: all .15s ease;
-    font-family:'Oswald'; text-transform: uppercase; letter-spacing:.6px;
-    font-size: 13px; color: var(--muted); }}
-div[role="radiogroup"] > label:hover {{ color: var(--text); border-color: var(--green);
-    background: rgba(30,199,115,.10); }}
-/* hide the native radio circle, keep just the icon + label */
-div[role="radiogroup"] > label > div:first-child {{ display: none !important; }}
-div[role="radiogroup"] > label p {{ font-size: 13px !important; margin:0; }}
-/* active tab */
-div[role="radiogroup"] > label:has(input:checked) {{ color: #06160d; font-weight: 600;
-    border-color: var(--green);
-    background: linear-gradient(180deg, #34e08e, var(--green));
-    box-shadow: 0 4px 14px rgba(30,199,115,.32); }}
-div[role="radiogroup"] > label:has(input:checked) p {{ color: #06160d !important; }}
+/* ============ real top navigation bar (desktop pills + mobile hamburger) ============ */
+.topnav {{ display:flex; align-items:center; justify-content:space-between; gap:14px;
+    padding:10px 14px; margin:-6px 0 18px; position:sticky; top:0; z-index:1000;
+    background:rgba(11,15,25,.86); backdrop-filter:saturate(140%) blur(10px);
+    border:1px solid var(--border); border-radius:14px; }}
+.navbrand {{ font-family:'Oswald'; font-weight:700; font-size:19px; text-transform:uppercase;
+    letter-spacing:.6px; color:var(--text); text-decoration:none; white-space:nowrap; display:flex;
+    align-items:center; gap:7px; }}
+.navbrand b {{ color:var(--green); }}
+.navlinks {{ display:flex; flex-wrap:wrap; gap:6px; }}
+.navitem {{ font-family:'Oswald'; text-transform:uppercase; letter-spacing:.55px; font-size:13px;
+    color:var(--muted); text-decoration:none; padding:7px 15px; border-radius:999px;
+    border:1px solid transparent; transition:all .15s ease; white-space:nowrap; }}
+.navitem:hover {{ color:var(--text); background:rgba(255,255,255,.06); border-color:var(--border); }}
+.navitem.active {{ color:#06160d; font-weight:600;
+    background:linear-gradient(180deg,#34e08e,var(--green)); box-shadow:0 4px 14px rgba(30,199,115,.3); }}
+/* hamburger (hidden on desktop) */
+.navham {{ display:none; position:relative; }}
+.navham > summary {{ list-style:none; cursor:pointer; font-size:20px; line-height:1; color:var(--text);
+    padding:8px 12px; border:1px solid var(--border); border-radius:10px; background:var(--card); }}
+.navham > summary::-webkit-details-marker {{ display:none; }}
+.navham[open] > summary {{ color:var(--green); border-color:var(--green); }}
+.navmenu {{ position:absolute; right:0; top:48px; z-index:1200; display:flex; flex-direction:column;
+    gap:4px; min-width:210px; padding:8px; background:var(--elev); border:1px solid var(--border);
+    border-radius:14px; box-shadow:0 18px 50px rgba(0,0,0,.55); }}
+.navmenu .navitem {{ display:block; }}
+@media (max-width:820px) {{
+    .navlinks {{ display:none; }}
+    .navham {{ display:block; }}
+    .navbrand {{ font-size:16px; }}
+    .topnav {{ padding:8px 12px; }}
+}}
 .foot {{ color: var(--muted); font-size: 12px; text-align: center; margin: 26px 0 6px 0;
     padding-top: 14px; border-top: 1px solid var(--border); line-height: 1.7; }}
 
