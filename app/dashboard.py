@@ -107,31 +107,46 @@ def get_bets(day: str, days: int, bankroll: float, kelly: float,
                                 upset_temp=upset_temp)
 
 
-@st.cache_data(ttl=3600, show_spinner=False)
-def get_fixture_xg(home: str, away: str, date: str):
-    """Real (home_xg, away_xg) for a played fixture from TheStatsAPI, or None.
-
-    Honest reality-check only — returns None (and the card simply omits the line) when there's
-    no API key (e.g. local / secret not set), the match isn't matched, or xG isn't published.
-    Never fabricates. Cached so the shared cloud app makes one call per game."""
+@st.cache_data(ttl=900, show_spinner=False)
+def get_wc_cands() -> list:
+    """The full current-season WC match list, pulled ONCE and shared by every per-card lookup
+    (xG / stats / lineups) so we don't re-pull /matches for each card. [] without a key."""
     try:
         from src.data import thestatsapi as _ts
         if not _ts.is_available():
-            return None
-        return _ts.xg_for_fixture(home, away, date, cfg=CFG)
-    except Exception:  # noqa: BLE001 — any failure degrades to "no xG line"
+            return []
+        return _ts.matches(competition_id=_ts.WC_COMP,
+                           season_id=_ts.current_season_id(cfg=CFG), cfg=CFG)
+    except Exception:  # noqa: BLE001
+        return []
+
+
+def _resolve_mid(home: str, away: str, date: str):
+    """Resolve a fixture to a TheStatsAPI match_id via the shared cached match list (no extra
+    /matches pull)."""
+    from src.data import fixture_map as _fm
+    cands = get_wc_cands()
+    return _fm.find_match_id(home, away, str(date)[:10], cands) if cands else None
+
+
+@st.cache_data(ttl=3600, show_spinner=False)
+def get_fixture_xg(home: str, away: str, date: str):
+    """Real (home_xg, away_xg) for a played fixture, or None. Honest reality-check only."""
+    try:
+        from src.data import thestatsapi as _ts
+        mid = _resolve_mid(home, away, date)
+        return _ts.match_xg(mid, cfg=CFG) if mid else None
+    except Exception:  # noqa: BLE001
         return None
 
 
 @st.cache_data(ttl=3600, show_spinner=False)
 def get_match_stats(home: str, away: str, date: str):
-    """Full match-stats overview (possession, shots, xG, …) for a played fixture, or {}.
-    Honest no-op without a key / for unplayed games."""
+    """Full match-stats overview (possession, shots, xG, …) for a played fixture, or {}."""
     try:
         from src.data import thestatsapi as _ts
-        if not _ts.is_available():
-            return {}
-        return _ts.stats_for_fixture(home, away, date, cfg=CFG)
+        mid = _resolve_mid(home, away, date)
+        return _ts.match_stats(mid, cfg=CFG) if mid else {}
     except Exception:  # noqa: BLE001
         return {}
 
@@ -179,7 +194,7 @@ def get_lineup_status(home: str, away: str, date: str):
     shared app makes few calls."""
     try:
         from src.data import lineup_status as _ls
-        return _ls.lineup_status(home, away, date, cfg=CFG)
+        return _ls.lineup_status(home, away, date, cfg=CFG, cands=get_wc_cands())
     except Exception:  # noqa: BLE001
         return None
 

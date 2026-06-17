@@ -117,7 +117,7 @@ def lineup_availability(home: str, away: str, date, cfg=None,
     return (availability_from_status(ls.get("home")), availability_from_status(ls.get("away")))
 
 
-def lineup_status(home: str, away: str, date, cfg=None) -> dict | None:
+def lineup_status(home: str, away: str, date, cfg=None, cands: list | None = None) -> dict | None:
     """Confirmed-XI status for a fixture, or None if unresolved.
 
     ``{"posted": False, "status": ...}`` until the team sheet posts (~75 min pre-KO). Once posted,
@@ -128,8 +128,9 @@ def lineup_status(home: str, away: str, date, cfg=None) -> dict | None:
     if not ts.is_available():
         return None
     try:
-        sid = ts.current_season_id(cfg=cfg)
-        cands = ts.matches(competition_id=ts.WC_COMP, season_id=sid, cfg=cfg)
+        if cands is None:
+            sid = ts.current_season_id(cfg=cfg)
+            cands = ts.matches(competition_id=ts.WC_COMP, season_id=sid, cfg=cfg)
         m = fixture_map.find_match(home, away, fixture_map._to_ymd(date), cands)
         if not m:
             return None
