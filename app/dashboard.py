@@ -254,9 +254,31 @@ def _hours_to_ko(date) -> float | None:
         return None
 
 
+def _value_str(v) -> str:
+    if not v:
+        return "—"
+    return f"€{v/1e6:.0f}M" if v >= 1e6 else f"€{v/1e3:.0f}K"
+
+
+def _key_out_flag(team: str, xi_names: list):
+    """Value-based 'key player out' flag — squad's top players by market value missing from the
+    confirmed XI. Works from match 1 (no prior game needed). Uses the committed squad snapshot."""
+    try:
+        from src.data import squad_values as sv
+        miss = sv.key_absentees(team, [n for n in xi_names if n], top_n=6)
+    except Exception:  # noqa: BLE001
+        miss = []
+    if miss:
+        names = ", ".join(f"{x['name']} ({_value_str(x['market_value'])})" for x in miss)
+        st.markdown(f"<span style='color:{GOLD};font-weight:600'>Key player out:</span> "
+                    f"<span style='color:{GOLD}'>{names}</span>", unsafe_allow_html=True)
+
+
 def _espn_lineup_fallback(m: dict) -> bool:
     """Render the confirmed XI from ESPN (fast source) when TheStatsAPI hasn't posted it.
-    Returns True if it rendered something."""
+    Adds market values (static snapshot) + a value-based 'key player out' flag. Returns True
+    if it rendered something."""
+    from src.data import squad_values as sv
     el = get_espn_lineups(m.get("game_id"))
     if not el:
         return False
@@ -264,15 +286,24 @@ def _espn_lineup_fallback(m: dict) -> bool:
     c1, c2 = st.columns(2)
     for col, side, team in ((c1, "home", m["home"]), (c2, "away", m["away"])):
         s = el.get(side) or {}
+        names = [p.get("name") for p in s.get("xi", [])]
+        tot = sv.total_value(team)
         with col:
-            st.markdown(f"**{team_with_flag(team, 16, True)}** · {s.get('formation') or '?'}",
-                        unsafe_allow_html=True)
-            rows = [{"#": p.get("jersey") or "", "Starter": p.get("name"), "Pos": p.get("pos") or ""}
-                    for p in s.get("xi", [])]
+            head = f"**{team_with_flag(team, 16, True)}** · {s.get('formation') or '?'}"
+            if tot:
+                head += f" · squad {_value_str(tot)}"
+            st.markdown(head, unsafe_allow_html=True)
+            rows = []
+            for p in s.get("xi", []):
+                rows.append({"#": p.get("jersey") or "", "Starter": p.get("name"),
+                             "Pos": p.get("pos") or "",
+                             "Value": _value_str(sv.player_value(team, p.get("name")))})
             if rows:
                 st.dataframe(pd.DataFrame(rows), hide_index=True, use_container_width=True)
-    st.caption("Confirmed XI from ESPN. Player ratings + the 'out vs last XI' flag appear once "
-               "TheStatsAPI posts its sheet.")
+            _key_out_flag(team, names)
+    st.caption("Confirmed XI from ESPN · **Value** = player market value (static snapshot) · "
+               "**Key player out** = a top-value squad player not in today's XI. Form ratings "
+               "appear once TheStatsAPI posts its sheet.")
     return True
 
 
@@ -296,28 +327,33 @@ def lineup_block(m: dict):
     for col, side, team in ((c1, "home", m["home"]), (c2, "away", m["away"])):
         s = ls.get(side) or {}
         form = s.get("formation") or "?"
+        from src.data import squad_values as sv
         with col:
-            st.markdown(f"**{team_with_flag(team, 16, True)}** · {form}", unsafe_allow_html=True)
+            head = f"**{team_with_flag(team, 16, True)}** · {form}"
+            tot = sv.total_value(team)
+            if tot:
+                head += f" · squad {_value_str(tot)}"
+            st.markdown(head, unsafe_allow_html=True)
             rows = []
             for p in s.get("xi", []):
                 recent = " · ".join(f"{r:.1f}" for r in (p.get("recent") or [])[:3]) or "—"
-                row = {"#": "", "Starter": p.get("name"), "Pos": p.get("position") or "",
+                row = {"Starter": p.get("name"), "Pos": p.get("position") or "",
+                       "Value": _value_str(sv.player_value(team, p.get("name"))),
                        "Form (last 3)": recent, "Avg": (f"{p['avg']:.2f}" if p.get("avg") else "—")}
                 if played:
                     row["Today"] = f"{p['today']:.1f}" if p.get("today") is not None else "—"
                 rows.append(row)
             if rows:
-                st.dataframe(pd.DataFrame(rows).drop(columns=["#"]),
-                             hide_index=True, use_container_width=True)
+                st.dataframe(pd.DataFrame(rows), hide_index=True, use_container_width=True)
+            # value-based key-player-out flag (works from match 1)
+            _key_out_flag(team, [p.get("name") for p in s.get("xi", [])])
+            # secondary: rotation vs the previous match (ratings-based, matchday 2+)
             miss = s.get("missing_starters") or []
             if miss:
                 flagged = True
                 names = ", ".join(f"{x['name']}" + (f" ({x['avg']:.1f})" if x.get("avg") else "")
                                   for x in miss)
-                st.markdown(f"<span style='color:{GOLD};font-weight:600'>Out vs last XI:</span> "
-                            f"<span style='color:{GOLD}'>{names}</span>", unsafe_allow_html=True)
-            elif s.get("had_prior_xi"):
-                st.caption("same starters as last match")
+                st.caption(f"Out vs last XI: {names}")
     # before → after: re-run the model with a bounded availability penalty for missing regulars
     if flagged and not played:
         from src.data.lineup_status import lineup_availability

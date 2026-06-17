@@ -1,0 +1,5825 @@
+{
+ "generated_at": null,
+ "teams": {
+  "1A": {
+   "team_id": "tm_0073429",
+   "players": [],
+   "total_value": 0
+  },
+  "1C": {
+   "team_id": "tm_9902112",
+   "players": [],
+   "total_value": 0
+  },
+  "1E": {
+   "team_id": "tm_1146005",
+   "players": [],
+   "total_value": 0
+  },
+  "1F": {
+   "team_id": "tm_8820554",
+   "players": [],
+   "total_value": 0
+  },
+  "1I": {
+   "team_id": "tm_29771155",
+   "players": [],
+   "total_value": 0
+  },
+  "2A": {
+   "team_id": "tm_1107488",
+   "players": [],
+   "total_value": 0
+  },
+  "2B": {
+   "team_id": "tm_6689346",
+   "players": [],
+   "total_value": 0
+  },
+  "2C": {
+   "team_id": "tm_2268312",
+   "players": [],
+   "total_value": 0
+  },
+  "2E": {
+   "team_id": "tm_7715994",
+   "players": [],
+   "total_value": 0
+  },
+  "2F": {
+   "team_id": "tm_3351885",
+   "players": [],
+   "total_value": 0
+  },
+  "2I": {
+   "team_id": "tm_13668893",
+   "players": [],
+   "total_value": 0
+  },
+  "3A/3B/3C/3D/3F": {
+   "team_id": "tm_13668876",
+   "players": [],
+   "total_value": 0
+  },
+  "3C/3D/3F/3G/3H": {
+   "team_id": "tm_57449982",
+   "players": [],
+   "total_value": 0
+  },
+  "3C/3E/3F/3H/3I": {
+   "team_id": "tm_08335513",
+   "players": [],
+   "total_value": 0
+  },
+  "Algeria": {
+   "team_id": "tm_28025",
+   "players": [
+    {
+     "name": "Achref Abada",
+     "position": "D",
+     "market_value": 510000
+    },
+    {
+     "name": "Adil Boulbina",
+     "position": "M",
+     "market_value": 3400000
+    },
+    {
+     "name": "Amine Gouiri",
+     "position": "F",
+     "market_value": 32000000
+    },
+    {
+     "name": "Anis Hadj Moussa",
+     "position": "F",
+     "market_value": 21000000
+    },
+    {
+     "name": "Aïssa Mandi",
+     "position": "D",
+     "market_value": 1300000
+    },
+    {
+     "name": "Farès Chaïbi",
+     "position": "M",
+     "market_value": 8700000
+    },
+    {
+     "name": "Farès Ghedjemis",
+     "position": "F",
+     "market_value": 410000
+    },
+    {
+     "name": "Hicham Boudaoui",
+     "position": "M",
+     "market_value": 11300000
+    },
+    {
+     "name": "Houssem Aouar",
+     "position": "M",
+     "market_value": 7700000
+    },
+    {
+     "name": "Ibrahim Maza",
+     "position": "M",
+     "market_value": 11000000
+    },
+    {
+     "name": "Jaouen Hadjam",
+     "position": "D",
+     "market_value": 8500000
+    },
+    {
+     "name": "Luca Zidane",
+     "position": "G",
+     "market_value": 1400000
+    },
+    {
+     "name": "Mohamed El Amine Amoura",
+     "position": "F",
+     "market_value": 35000000
+    },
+    {
+     "name": "Nabil Bentaleb",
+     "position": "M",
+     "market_value": 6600000
+    },
+    {
+     "name": "Oussama Benbot",
+     "position": "G",
+     "market_value": 745000
+    },
+    {
+     "name": "Rafik Belghali",
+     "position": "M",
+     "market_value": 2600000
+    },
+    {
+     "name": "Ramiz Zerrouki",
+     "position": "M",
+     "market_value": 5600000
+    },
+    {
+     "name": "Ramy Bensebaini",
+     "position": "D",
+     "market_value": 7400000
+    },
+    {
+     "name": "Rayan Aït Nouri",
+     "position": "M",
+     "market_value": 34000000
+    },
+    {
+     "name": "Riyad Mahrez",
+     "position": "M",
+     "market_value": 8300000
+    },
+    {
+     "name": "Samir Sophian Chergui",
+     "position": "D",
+     "market_value": 650000
+    },
+    {
+     "name": "Yassine Titraoui",
+     "position": "M",
+     "market_value": 5200000
+    },
+    {
+     "name": "Zineddine Belaid",
+     "position": "D",
+     "market_value": 1300000
+    }
+   ],
+   "total_value": 214615000
+  },
+  "Argentina": {
+   "team_id": "tm_70599",
+   "players": [
+    {
+     "name": "Alexis Mac Allister",
+     "position": "M",
+     "market_value": 88000000
+    },
+    {
+     "name": "Cristian Romero",
+     "position": "D",
+     "market_value": 46000000
+    },
+    {
+     "name": "Emiliano Martínez",
+     "position": "G",
+     "market_value": 14400000
+    },
+    {
+     "name": "Enzo Fernández",
+     "position": "M",
+     "market_value": 87000000
+    },
+    {
+     "name": "Exequiel Palacios",
+     "position": "M",
+     "market_value": 26000000
+    },
+    {
+     "name": "Facundo Medina",
+     "position": "D",
+     "market_value": 16300000
+    },
+    {
+     "name": "Gerónimo Rulli",
+     "position": "G",
+     "market_value": 7700000
+    },
+    {
+     "name": "Giovani Lo Celso",
+     "position": "M",
+     "market_value": 9700000
+    },
+    {
+     "name": "Giuliano Simeone",
+     "position": "M",
+     "market_value": 44000000
+    },
+    {
+     "name": "Gonzalo Montiel",
+     "position": "D",
+     "market_value": 4800000
+    },
+    {
+     "name": "José Manuel López",
+     "position": "F",
+     "market_value": 26000000
+    },
+    {
+     "name": "Juan Musso",
+     "position": "G",
+     "market_value": 3200000
+    },
+    {
+     "name": "Julián Alvarez",
+     "position": "F",
+     "market_value": 87000000
+    },
+    {
+     "name": "Lautaro Martínez",
+     "position": "F",
+     "market_value": 80000000
+    },
+    {
+     "name": "Leandro Paredes",
+     "position": "M",
+     "market_value": 5300000
+    },
+    {
+     "name": "Lionel Messi",
+     "position": "F",
+     "market_value": 16300000
+    },
+    {
+     "name": "Lisandro Martínez",
+     "position": "D",
+     "market_value": 42000000
+    },
+    {
+     "name": "Nahuel Molina",
+     "position": "D",
+     "market_value": 14600000
+    },
+    {
+     "name": "Nico Paz",
+     "position": "M",
+     "market_value": 70000000
+    },
+    {
+     "name": "Nicolás González",
+     "position": "M",
+     "market_value": 25000000
+    },
+    {
+     "name": "Nicolás Otamendi",
+     "position": "D",
+     "market_value": 1100000
+    },
+    {
+     "name": "Nicolás Tagliafico",
+     "position": "D",
+     "market_value": 4800000
+    },
+    {
+     "name": "Rodrigo De Paul",
+     "position": "M",
+     "market_value": 15500000
+    },
+    {
+     "name": "Thiago Almada",
+     "position": "M",
+     "market_value": 21000000
+    },
+    {
+     "name": "Valentín Barco",
+     "position": "M",
+     "market_value": 38000000
+    }
+   ],
+   "total_value": 793700000
+  },
+  "Australia": {
+   "team_id": "tm_28661",
+   "players": [
+    {
+     "name": "Aiden O'Neill",
+     "position": "M",
+     "market_value": 2900000
+    },
+    {
+     "name": "Ajdin Hrustić",
+     "position": "M",
+     "market_value": 580000
+    },
+    {
+     "name": "Alessandro Circati",
+     "position": "D",
+     "market_value": 13000000
+    },
+    {
+     "name": "Awer Mabil",
+     "position": "M",
+     "market_value": 415000
+    },
+    {
+     "name": "Aziz Behich",
+     "position": "D",
+     "market_value": 245000
+    },
+    {
+     "name": "Cameron Burgess",
+     "position": "D",
+     "market_value": 1500000
+    },
+    {
+     "name": "Cameron Devlin",
+     "position": "M",
+     "market_value": 1300000
+    },
+    {
+     "name": "Connor Metcalfe",
+     "position": "M",
+     "market_value": 1400000
+    },
+    {
+     "name": "Cristian Volpato",
+     "position": "M",
+     "market_value": 9700000
+    },
+    {
+     "name": "Harry Souttar",
+     "position": "D",
+     "market_value": 3600000
+    },
+    {
+     "name": "Jackson Irvine",
+     "position": "M",
+     "market_value": 1100000
+    },
+    {
+     "name": "Jacob Italiano",
+     "position": "M",
+     "market_value": 430000
+    },
+    {
+     "name": "Jason Geria",
+     "position": "D",
+     "market_value": 385000
+    },
+    {
+     "name": "Jordan Bos",
+     "position": "D",
+     "market_value": 7400000
+    },
+    {
+     "name": "Kai Trewin",
+     "position": "M",
+     "market_value": 915000
+    },
+    {
+     "name": "Lucas Herrington",
+     "position": "D",
+     "market_value": 1600000
+    },
+    {
+     "name": "Mathew Leckie",
+     "position": "M",
+     "market_value": 280000
+    },
+    {
+     "name": "Mathew Ryan",
+     "position": "G",
+     "market_value": 1900000
+    },
+    {
+     "name": "Miloš Degenek",
+     "position": "D",
+     "market_value": 520000
+    },
+    {
+     "name": "Mohamed Touré",
+     "position": "F",
+     "market_value": 8400000
+    },
+    {
+     "name": "Nestory Irankunda",
+     "position": "F",
+     "market_value": 8500000
+    },
+    {
+     "name": "Nishan Velupillay",
+     "position": "M",
+     "market_value": 670000
+    },
+    {
+     "name": "Patrick Beach",
+     "position": "G",
+     "market_value": 870000
+    },
+    {
+     "name": "Paul Izzo",
+     "position": "G",
+     "market_value": 465000
+    },
+    {
+     "name": "Paul Okon-Engstler",
+     "position": "M",
+     "market_value": 1100000
+    },
+    {
+     "name": "Tete Yengi",
+     "position": "F",
+     "market_value": 265000
+    }
+   ],
+   "total_value": 69440000
+  },
+  "Austria": {
+   "team_id": "tm_86533",
+   "players": [
+    {
+     "name": "Alessandro Schöpf",
+     "position": "M",
+     "market_value": 680000
+    },
+    {
+     "name": "Alexander Prass",
+     "position": "M",
+     "market_value": 4900000
+    },
+    {
+     "name": "Alexander Schlager",
+     "position": "G",
+     "market_value": 2300000
+    },
+    {
+     "name": "Carney Chukwuemeka",
+     "position": "M",
+     "market_value": 16300000
+    },
+    {
+     "name": "David Affengruber",
+     "position": "D",
+     "market_value": 4500000
+    },
+    {
+     "name": "David Alaba",
+     "position": "D",
+     "market_value": 3200000
+    },
+    {
+     "name": "Florian Grillitsch",
+     "position": "M",
+     "market_value": 2100000
+    },
+    {
+     "name": "Florian Wiegele",
+     "position": "G",
+     "market_value": 580000
+    },
+    {
+     "name": "Kevin Danso",
+     "position": "D",
+     "market_value": 24000000
+    },
+    {
+     "name": "Konrad Laimer",
+     "position": "D",
+     "market_value": 24000000
+    },
+    {
+     "name": "Marcel Sabitzer",
+     "position": "M",
+     "market_value": 8300000
+    },
+    {
+     "name": "Marco Friedl",
+     "position": "D",
+     "market_value": 12700000
+    },
+    {
+     "name": "Marko Arnautović",
+     "position": "F",
+     "market_value": 3200000
+    },
+    {
+     "name": "Michael Gregoritsch",
+     "position": "F",
+     "market_value": 3200000
+    },
+    {
+     "name": "Michael Svoboda",
+     "position": "D",
+     "market_value": 2400000
+    },
+    {
+     "name": "Nicolas Seiwald",
+     "position": "M",
+     "market_value": 17500000
+    },
+    {
+     "name": "Patrick Pentz",
+     "position": "G",
+     "market_value": 2300000
+    },
+    {
+     "name": "Patrick Wimmer",
+     "position": "M",
+     "market_value": 13900000
+    },
+    {
+     "name": "Paul Wanner",
+     "position": "M",
+     "market_value": 18800000
+    },
+    {
+     "name": "Philipp Lienhart",
+     "position": "D",
+     "market_value": 11500000
+    },
+    {
+     "name": "Phillipp Mwene",
+     "position": "M",
+     "market_value": 2000000
+    },
+    {
+     "name": "Romano Schmid",
+     "position": "M",
+     "market_value": 18700000
+    },
+    {
+     "name": "Saša Kalajdžić",
+     "position": "F",
+     "market_value": 4600000
+    },
+    {
+     "name": "Stefan Posch",
+     "position": "D",
+     "market_value": 8300000
+    },
+    {
+     "name": "Xaver Schlager",
+     "position": "M",
+     "market_value": 27000000
+    }
+   ],
+   "total_value": 236960000
+  },
+  "Belgium": {
+   "team_id": "tm_32860",
+   "players": [
+    {
+     "name": "Alexis Saelemaekers",
+     "position": "M",
+     "market_value": 17600000
+    },
+    {
+     "name": "Amadou Onana",
+     "position": "M",
+     "market_value": 46000000
+    },
+    {
+     "name": "Arthur Theate",
+     "position": "D",
+     "market_value": 23000000
+    },
+    {
+     "name": "Axel Witsel",
+     "position": "D",
+     "market_value": 2100000
+    },
+    {
+     "name": "Brandon Mechele",
+     "position": "D",
+     "market_value": 3300000
+    },
+    {
+     "name": "Charles De Ketelaere",
+     "position": "F",
+     "market_value": 32000000
+    },
+    {
+     "name": "Diego Moreira",
+     "position": "F",
+     "market_value": 17500000
+    },
+    {
+     "name": "Dodi Lukebakio",
+     "position": "M",
+     "market_value": 18800000
+    },
+    {
+     "name": "Hans Vanaken",
+     "position": "M",
+     "market_value": 6800000
+    },
+    {
+     "name": "Joaquin Seys",
+     "position": "D",
+     "market_value": 13600000
+    },
+    {
+     "name": "Jérémy Doku",
+     "position": "M",
+     "market_value": 46000000
+    },
+    {
+     "name": "Kevin De Bruyne",
+     "position": "M",
+     "market_value": 21000000
+    },
+    {
+     "name": "Koni De Winter",
+     "position": "D",
+     "market_value": 21000000
+    },
+    {
+     "name": "Leandro Trossard",
+     "position": "F",
+     "market_value": 24000000
+    },
+    {
+     "name": "Matías Fernández",
+     "position": "F",
+     "market_value": 16300000
+    },
+    {
+     "name": "Maxim De Cuyper",
+     "position": "D",
+     "market_value": 15500000
+    },
+    {
+     "name": "Mike Penders",
+     "position": "G",
+     "market_value": 11400000
+    },
+    {
+     "name": "Nathan Ngoy",
+     "position": "D",
+     "market_value": 3400000
+    },
+    {
+     "name": "Nicolas Raskin",
+     "position": "M",
+     "market_value": 9100000
+    },
+    {
+     "name": "Romelu Lukaku",
+     "position": "F",
+     "market_value": 24000000
+    },
+    {
+     "name": "Senne Lammens",
+     "position": "G",
+     "market_value": 9800000
+    },
+    {
+     "name": "Thibaut Courtois",
+     "position": "G",
+     "market_value": 17400000
+    },
+    {
+     "name": "Thomas Meunier",
+     "position": "D",
+     "market_value": 1900000
+    },
+    {
+     "name": "Timothy Castagne",
+     "position": "D",
+     "market_value": 12400000
+    },
+    {
+     "name": "Youri Tielemans",
+     "position": "M",
+     "market_value": 33000000
+    },
+    {
+     "name": "Zeno Debast",
+     "position": "D",
+     "market_value": 31000000
+    }
+   ],
+   "total_value": 477900000
+  },
+  "Bosnia & Herzegovina": {
+   "team_id": "tm_70240",
+   "players": [
+    {
+     "name": "Amar Dedić",
+     "position": "D",
+     "market_value": 11600000
+    },
+    {
+     "name": "Amar Memić",
+     "position": "M",
+     "market_value": 2400000
+    },
+    {
+     "name": "Amir Hadžiahmetović",
+     "position": "M",
+     "market_value": 4099999
+    },
+    {
+     "name": "Armin Gigović",
+     "position": "M",
+     "market_value": 3100000
+    },
+    {
+     "name": "Benjamin Tahirović",
+     "position": "M",
+     "market_value": 2900000
+    },
+    {
+     "name": "Dženis Burnić",
+     "position": "M",
+     "market_value": 1200000
+    },
+    {
+     "name": "Edin Džeko",
+     "position": "F",
+     "market_value": 1400000
+    },
+    {
+     "name": "Ermedin Demirović",
+     "position": "F",
+     "market_value": 20000000
+    },
+    {
+     "name": "Ermin Mahmic",
+     "position": "F",
+     "market_value": 210000
+    },
+    {
+     "name": "Esmir Bajraktarević",
+     "position": "F",
+     "market_value": 3100000
+    },
+    {
+     "name": "Haris Tabaković",
+     "position": "F",
+     "market_value": 2600000
+    },
+    {
+     "name": "Ivan Bašić",
+     "position": "M",
+     "market_value": 1200000
+    },
+    {
+     "name": "Ivan Šunjić",
+     "position": "M",
+     "market_value": 1400000
+    },
+    {
+     "name": "Jovo Lukić",
+     "position": "F",
+     "market_value": 465000
+    },
+    {
+     "name": "Kerim Alajbegović",
+     "position": "F",
+     "market_value": 4500000
+    },
+    {
+     "name": "Mladen Jurkas",
+     "position": "G",
+     "market_value": 0
+    },
+    {
+     "name": "Nidal Čelik",
+     "position": "D",
+     "market_value": 915000
+    },
+    {
+     "name": "Nihad Mujakić",
+     "position": "D",
+     "market_value": 940000
+    },
+    {
+     "name": "Nikola Katić",
+     "position": "D",
+     "market_value": 1600000
+    },
+    {
+     "name": "Nikola Vasilj",
+     "position": "G",
+     "market_value": 3200000
+    },
+    {
+     "name": "Samed Baždar",
+     "position": "F",
+     "market_value": 2100000
+    },
+    {
+     "name": "Stjepan Radeljić",
+     "position": "D",
+     "market_value": 2900000
+    },
+    {
+     "name": "Tarik Muharemović",
+     "position": "D",
+     "market_value": 7500000
+    }
+   ],
+   "total_value": 79329999
+  },
+  "Brazil": {
+   "team_id": "tm_86500",
+   "players": [
+    {
+     "name": "Alex Sandro",
+     "position": "D",
+     "market_value": 1900000
+    },
+    {
+     "name": "Alisson",
+     "position": "G",
+     "market_value": 22000000
+    },
+    {
+     "name": "Bremer",
+     "position": "D",
+     "market_value": 47000000
+    },
+    {
+     "name": "Bruno Guimarães",
+     "position": "M",
+     "market_value": 82000000
+    },
+    {
+     "name": "Casemiro",
+     "position": "M",
+     "market_value": 9100000
+    },
+    {
+     "name": "Danilo",
+     "position": "D",
+     "market_value": 3100000
+    },
+    {
+     "name": "Danilo Oliveira",
+     "position": "M",
+     "market_value": 25000000
+    },
+    {
+     "name": "Douglas Santos",
+     "position": "D",
+     "market_value": 8400000
+    },
+    {
+     "name": "Ederson",
+     "position": "G",
+     "market_value": 18400000
+    },
+    {
+     "name": "Endrick",
+     "position": "F",
+     "market_value": 37000000
+    },
+    {
+     "name": "Fabinho",
+     "position": "M",
+     "market_value": 13700000
+    },
+    {
+     "name": "Gabriel Magalhães",
+     "position": "D",
+     "market_value": 70000000
+    },
+    {
+     "name": "Gabriel Martinelli",
+     "position": "F",
+     "market_value": 51000000
+    },
+    {
+     "name": "Igor Thiago",
+     "position": "F",
+     "market_value": 18800000
+    },
+    {
+     "name": "Lucas Paquetá",
+     "position": "M",
+     "market_value": 29000000
+    },
+    {
+     "name": "Luiz Henrique",
+     "position": "M",
+     "market_value": 26000000
+    },
+    {
+     "name": "Léo Pereira",
+     "position": "D",
+     "market_value": 8400000
+    },
+    {
+     "name": "Marquinhos",
+     "position": "D",
+     "market_value": 39000000
+    },
+    {
+     "name": "Matheus Cunha",
+     "position": "F",
+     "market_value": 63000000
+    },
+    {
+     "name": "Raphinha",
+     "position": "M",
+     "market_value": 72000000
+    },
+    {
+     "name": "Rayan",
+     "position": "M",
+     "market_value": 17500000
+    },
+    {
+     "name": "Roger Ibañez",
+     "position": "D",
+     "market_value": 16500000
+    },
+    {
+     "name": "Vinícius Júnior",
+     "position": "F",
+     "market_value": 156000000
+    },
+    {
+     "name": "Weverton",
+     "position": "G",
+     "market_value": 1100000
+    },
+    {
+     "name": "Éderson",
+     "position": "M",
+     "market_value": 48000000
+    }
+   ],
+   "total_value": 883900000
+  },
+  "Canada": {
+   "team_id": "tm_94140",
+   "players": [
+    {
+     "name": "Alfie Jones",
+     "position": "D",
+     "market_value": 5800000
+    },
+    {
+     "name": "Ali Ahmed",
+     "position": "M",
+     "market_value": 5400000
+    },
+    {
+     "name": "Alistair Johnston",
+     "position": "D",
+     "market_value": 7600000
+    },
+    {
+     "name": "Alphonso Davies",
+     "position": "D",
+     "market_value": 39000000
+    },
+    {
+     "name": "Cyle Larin",
+     "position": "F",
+     "market_value": 3600000
+    },
+    {
+     "name": "Dayne St. Clair",
+     "position": "G",
+     "market_value": 3400000
+    },
+    {
+     "name": "Derek Cornelius",
+     "position": "D",
+     "market_value": 2300000
+    },
+    {
+     "name": "Ismael Koné",
+     "position": "M",
+     "market_value": 26000000
+    },
+    {
+     "name": "Jacob Shaffelburg",
+     "position": "M",
+     "market_value": 3100000
+    },
+    {
+     "name": "Joel Waterman",
+     "position": "D",
+     "market_value": 2400000
+    },
+    {
+     "name": "Jonathan David",
+     "position": "F",
+     "market_value": 29000000
+    },
+    {
+     "name": "Jonathan Osorio",
+     "position": "M",
+     "market_value": 1200000
+    },
+    {
+     "name": "Liam Millar",
+     "position": "M",
+     "market_value": 2900000
+    },
+    {
+     "name": "Luc De Fougerolles",
+     "position": "D",
+     "market_value": 1000000
+    },
+    {
+     "name": "Mathieu Choinière",
+     "position": "M",
+     "market_value": 845000
+    },
+    {
+     "name": "Maxime Crépeau",
+     "position": "G",
+     "market_value": 2200000
+    },
+    {
+     "name": "Moise Bombito",
+     "position": "D",
+     "market_value": 7800000
+    },
+    {
+     "name": "Nathan-Dylan Saliba",
+     "position": "M",
+     "market_value": 5500000
+    },
+    {
+     "name": "Niko Sigur",
+     "position": "D",
+     "market_value": 3800000
+    },
+    {
+     "name": "Owen Goodman",
+     "position": "G",
+     "market_value": 510000
+    },
+    {
+     "name": "Promise David",
+     "position": "F",
+     "market_value": 18100000
+    },
+    {
+     "name": "Richie Laryea",
+     "position": "D",
+     "market_value": 950000
+    },
+    {
+     "name": "Stephen Eustaquio",
+     "position": "M",
+     "market_value": 7600000
+    },
+    {
+     "name": "Tajon Buchanan",
+     "position": "M",
+     "market_value": 13000000
+    },
+    {
+     "name": "Tani Oluwaseyi",
+     "position": "F",
+     "market_value": 8600000
+    }
+   ],
+   "total_value": 201605000
+  },
+  "Cape Verde": {
+   "team_id": "tm_53237",
+   "players": [
+    {
+     "name": "CJ dos Santos",
+     "position": "G",
+     "market_value": 745000
+    },
+    {
+     "name": "Dailon Rocha Livramento",
+     "position": "F",
+     "market_value": 775000
+    },
+    {
+     "name": "Deroy Duarte",
+     "position": "M",
+     "market_value": 930000
+    },
+    {
+     "name": "Diney Borges",
+     "position": "D",
+     "market_value": 1000000
+    },
+    {
+     "name": "Gilson Tavares",
+     "position": "F",
+     "market_value": 720000
+    },
+    {
+     "name": "Hélio Varela",
+     "position": "F",
+     "market_value": 1200000
+    },
+    {
+     "name": "Jamiro Monteiro",
+     "position": "M",
+     "market_value": 910000
+    },
+    {
+     "name": "Jovane Cabral",
+     "position": "F",
+     "market_value": 1400000
+    },
+    {
+     "name": "João Paulo",
+     "position": "D",
+     "market_value": 520000
+    },
+    {
+     "name": "Kelvin Pires",
+     "position": "D",
+     "market_value": 270000
+    },
+    {
+     "name": "Kevin Lenini",
+     "position": "M",
+     "market_value": 3400000
+    },
+    {
+     "name": "Laros Duarte",
+     "position": "M",
+     "market_value": 930000
+    },
+    {
+     "name": "Logan Costa",
+     "position": "D",
+     "market_value": 14600000
+    },
+    {
+     "name": "Nuno Da Costa",
+     "position": "F",
+     "market_value": 570000
+    },
+    {
+     "name": "Roberto Lopes",
+     "position": "D",
+     "market_value": 260000
+    },
+    {
+     "name": "Sidny Lopes Cabral",
+     "position": "D",
+     "market_value": 360000
+    },
+    {
+     "name": "Telmo Arcanjo",
+     "position": "M",
+     "market_value": 2900000
+    },
+    {
+     "name": "Wagner Pina",
+     "position": "M",
+     "market_value": 5200000
+    },
+    {
+     "name": "Yannick Semedo",
+     "position": "M",
+     "market_value": 290000
+    }
+   ],
+   "total_value": 36980000
+  },
+  "Colombia": {
+   "team_id": "tm_17606",
+   "players": [
+    {
+     "name": "Andrés Gómez",
+     "position": "M",
+     "market_value": 3900000
+    },
+    {
+     "name": "Camilo Portilla",
+     "position": "M",
+     "market_value": 3200000
+    },
+    {
+     "name": "Camilo Vargas",
+     "position": "G",
+     "market_value": 620000
+    },
+    {
+     "name": "Cucho Hernández",
+     "position": "F",
+     "market_value": 16500000
+    },
+    {
+     "name": "Daniel Muñoz",
+     "position": "M",
+     "market_value": 26000000
+    },
+    {
+     "name": "David Ospina",
+     "position": "G",
+     "market_value": 220000
+    },
+    {
+     "name": "Davinson Sánchez",
+     "position": "D",
+     "market_value": 21000000
+    },
+    {
+     "name": "Deiver Machado",
+     "position": "M",
+     "market_value": 3600000
+    },
+    {
+     "name": "Gustavo Puerta",
+     "position": "M",
+     "market_value": 3700000
+    },
+    {
+     "name": "Jaminton Campaz",
+     "position": "M",
+     "market_value": 6300000
+    },
+    {
+     "name": "Jefferson Lerma",
+     "position": "M",
+     "market_value": 9200000
+    },
+    {
+     "name": "Jhon Arias",
+     "position": "M",
+     "market_value": 18200000
+    },
+    {
+     "name": "Jhon Córdoba",
+     "position": "F",
+     "market_value": 13300000
+    },
+    {
+     "name": "Jhon Lucumí",
+     "position": "D",
+     "market_value": 23000000
+    },
+    {
+     "name": "Johan Mojica",
+     "position": "D",
+     "market_value": 1900000
+    },
+    {
+     "name": "Jorge Carrascal",
+     "position": "M",
+     "market_value": 6500000
+    },
+    {
+     "name": "Juan Fernando Quintero",
+     "position": "M",
+     "market_value": 2100000
+    },
+    {
+     "name": "Kevin Castaño",
+     "position": "M",
+     "market_value": 8300000
+    },
+    {
+     "name": "Luis Díaz",
+     "position": "F",
+     "market_value": 76000000
+    },
+    {
+     "name": "Luis Javier Suárez",
+     "position": "F",
+     "market_value": 25000000
+    },
+    {
+     "name": "Richard Ríos",
+     "position": "M",
+     "market_value": 24000000
+    },
+    {
+     "name": "Willer Ditta",
+     "position": "D",
+     "market_value": 6000000
+    },
+    {
+     "name": "Yerry Mina",
+     "position": "D",
+     "market_value": 2800000
+    },
+    {
+     "name": "Álvaro Montero",
+     "position": "G",
+     "market_value": 1600000
+    }
+   ],
+   "total_value": 302940000
+  },
+  "Croatia": {
+   "team_id": "tm_41754",
+   "players": [],
+   "total_value": 0
+  },
+  "Curaçao": {
+   "team_id": "tm_338165",
+   "players": [
+    {
+     "name": "ArJany Martha",
+     "position": "D",
+     "market_value": 730000
+    },
+    {
+     "name": "Armando Obispo",
+     "position": "D",
+     "market_value": 2800000
+    },
+    {
+     "name": "Brandley Kuwas",
+     "position": "M",
+     "market_value": 320000
+    },
+    {
+     "name": "Deveron Fonville",
+     "position": "D",
+     "market_value": 875000
+    },
+    {
+     "name": "Gervane Kastaneer",
+     "position": "F",
+     "market_value": 195000
+    },
+    {
+     "name": "Godfried Roemeratoe",
+     "position": "M",
+     "market_value": 560000
+    },
+    {
+     "name": "Jeremy Antonisse",
+     "position": "F",
+     "market_value": 670000
+    },
+    {
+     "name": "Juninho Bacuna",
+     "position": "M",
+     "market_value": 3000000
+    },
+    {
+     "name": "Jurien Gaari",
+     "position": "D",
+     "market_value": 465000
+    },
+    {
+     "name": "Jürgen Locadia",
+     "position": "F",
+     "market_value": 215000
+    },
+    {
+     "name": "Riechedly Bazoer",
+     "position": "D",
+     "market_value": 2400000
+    },
+    {
+     "name": "Roshon van Eijma",
+     "position": "D",
+     "market_value": 460000
+    },
+    {
+     "name": "Sherel Floranus",
+     "position": "D",
+     "market_value": 910000
+    },
+    {
+     "name": "Shurandy Sambo",
+     "position": "D",
+     "market_value": 2200000
+    },
+    {
+     "name": "Sontje Hansen",
+     "position": "M",
+     "market_value": 3900000
+    },
+    {
+     "name": "Tahith Chong",
+     "position": "F",
+     "market_value": 5800000
+    },
+    {
+     "name": "Trevor Doornbusch",
+     "position": "G",
+     "market_value": 97000
+    },
+    {
+     "name": "Tyrese Noslin",
+     "position": "M",
+     "market_value": 670000
+    },
+    {
+     "name": "Tyrick Bodak",
+     "position": "G",
+     "market_value": 27000
+    }
+   ],
+   "total_value": 26294000
+  },
+  "Czech Republic": {
+   "team_id": "tm_09485",
+   "players": [
+    {
+     "name": "Adam Hložek",
+     "position": "F",
+     "market_value": 18500000
+    },
+    {
+     "name": "Alexandr Sojka",
+     "position": "M",
+     "market_value": 855000
+    },
+    {
+     "name": "David Doudera",
+     "position": "M",
+     "market_value": 3100000
+    },
+    {
+     "name": "David Jurásek",
+     "position": "D",
+     "market_value": 4800000
+    },
+    {
+     "name": "David Zima",
+     "position": "D",
+     "market_value": 5500000
+    },
+    {
+     "name": "Denis Višinský",
+     "position": "M",
+     "market_value": 1500000
+    },
+    {
+     "name": "Hugo Sochurek",
+     "position": "M",
+     "market_value": 0
+    },
+    {
+     "name": "Jan Kuchta",
+     "position": "F",
+     "market_value": 4099999
+    },
+    {
+     "name": "Jaroslav Zelený",
+     "position": "D",
+     "market_value": 1100000
+    },
+    {
+     "name": "Jindřich Staněk",
+     "position": "G",
+     "market_value": 2700000
+    },
+    {
+     "name": "Ladislav Krejčí",
+     "position": "D",
+     "market_value": 11200000
+    },
+    {
+     "name": "Lukáš Horníček",
+     "position": "G",
+     "market_value": 7500000
+    },
+    {
+     "name": "Lukáš Provod",
+     "position": "F",
+     "market_value": 7500000
+    },
+    {
+     "name": "Lukáš Červ",
+     "position": "M",
+     "market_value": 5100000
+    },
+    {
+     "name": "Matěj Kovář",
+     "position": "G",
+     "market_value": 5200000
+    },
+    {
+     "name": "Michal Sadílek",
+     "position": "M",
+     "market_value": 8500000
+    },
+    {
+     "name": "Mojmír Chytil",
+     "position": "F",
+     "market_value": 3900000
+    },
+    {
+     "name": "Patrik Schick",
+     "position": "F",
+     "market_value": 25000000
+    },
+    {
+     "name": "Pavel Šulc",
+     "position": "M",
+     "market_value": 10300000
+    },
+    {
+     "name": "Robin Hranáč",
+     "position": "D",
+     "market_value": 3800000
+    },
+    {
+     "name": "Stepan Chaloupek",
+     "position": "D",
+     "market_value": 1900000
+    },
+    {
+     "name": "Tomáš Chorý",
+     "position": "F",
+     "market_value": 3700000
+    },
+    {
+     "name": "Tomáš Holeš",
+     "position": "D",
+     "market_value": 2300000
+    },
+    {
+     "name": "Tomáš Souček",
+     "position": "M",
+     "market_value": 17500000
+    },
+    {
+     "name": "Vladimír Coufal",
+     "position": "D",
+     "market_value": 4800000
+    }
+   ],
+   "total_value": 160354999
+  },
+  "Ivory Coast": {
+   "team_id": "tm_86577",
+   "players": [
+    {
+     "name": "Alban Lafont",
+     "position": "G",
+     "market_value": 2700000
+    },
+    {
+     "name": "Amad Diallo",
+     "position": "F",
+     "market_value": 44000000
+    },
+    {
+     "name": "Ange-Yoan Bonny",
+     "position": "F",
+     "market_value": 19400000
+    },
+    {
+     "name": "Bazoumana Touré",
+     "position": "M",
+     "market_value": 8700000
+    },
+    {
+     "name": "Christ Inao Oulaï",
+     "position": "M",
+     "market_value": 3700000
+    },
+    {
+     "name": "Christopher Operi",
+     "position": "D",
+     "market_value": 3700000
+    },
+    {
+     "name": "Elye Wahi",
+     "position": "F",
+     "market_value": 24000000
+    },
+    {
+     "name": "Emmanuel Agbadou",
+     "position": "D",
+     "market_value": 21000000
+    },
+    {
+     "name": "Evan Ndicka",
+     "position": "D",
+     "market_value": 29000000
+    },
+    {
+     "name": "Evann Guessand",
+     "position": "F",
+     "market_value": 24000000
+    },
+    {
+     "name": "Franck Kessié",
+     "position": "M",
+     "market_value": 12700000
+    },
+    {
+     "name": "Ghislain Konan",
+     "position": "D",
+     "market_value": 925000
+    },
+    {
+     "name": "Guéla Doué",
+     "position": "D",
+     "market_value": 18800000
+    },
+    {
+     "name": "Ibrahim Sangaré",
+     "position": "M",
+     "market_value": 25000000
+    },
+    {
+     "name": "Mohamed Koné",
+     "position": "G",
+     "market_value": 965000
+    },
+    {
+     "name": "Nicolas Pépé",
+     "position": "F",
+     "market_value": 6600000
+    },
+    {
+     "name": "Odilon Kossounou",
+     "position": "D",
+     "market_value": 26000000
+    },
+    {
+     "name": "Oumar Diakité",
+     "position": "F",
+     "market_value": 5800000
+    },
+    {
+     "name": "Ousmane Diomande",
+     "position": "D",
+     "market_value": 48000000
+    },
+    {
+     "name": "Parfait Guiagon",
+     "position": "M",
+     "market_value": 1800000
+    },
+    {
+     "name": "Seko Fofana",
+     "position": "M",
+     "market_value": 11000000
+    },
+    {
+     "name": "Simon Adingra",
+     "position": "M",
+     "market_value": 29000000
+    },
+    {
+     "name": "Wilfried Singo",
+     "position": "D",
+     "market_value": 26000000
+    },
+    {
+     "name": "Yahia Fofana",
+     "position": "G",
+     "market_value": 6200000
+    },
+    {
+     "name": "Yan Diomande",
+     "position": "F",
+     "market_value": 1600000
+    }
+   ],
+   "total_value": 400590000
+  },
+  "DR Congo": {
+   "team_id": "tm_53425",
+   "players": [
+    {
+     "name": "Aaron Tshibola",
+     "position": "M",
+     "market_value": 145000
+    },
+    {
+     "name": "Aaron Wan-Bissaka",
+     "position": "D",
+     "market_value": 21000000
+    },
+    {
+     "name": "Arthur Masuaku",
+     "position": "D",
+     "market_value": 2400000
+    },
+    {
+     "name": "Axel Tuanzebe",
+     "position": "D",
+     "market_value": 4600000
+    },
+    {
+     "name": "Brian Cipenga",
+     "position": "M",
+     "market_value": 2100000
+    },
+    {
+     "name": "Chancel Mbemba",
+     "position": "D",
+     "market_value": 2300000
+    },
+    {
+     "name": "Charles Pickel",
+     "position": "M",
+     "market_value": 2700000
+    },
+    {
+     "name": "Cédric Bakambu",
+     "position": "F",
+     "market_value": 1400000
+    },
+    {
+     "name": "Dylan Batubinsika",
+     "position": "D",
+     "market_value": 720000
+    },
+    {
+     "name": "Edo Kayembe",
+     "position": "M",
+     "market_value": 4200000
+    },
+    {
+     "name": "Fiston Mayele",
+     "position": "F",
+     "market_value": 1700000
+    },
+    {
+     "name": "Gaël Kakuta",
+     "position": "M",
+     "market_value": 325000
+    },
+    {
+     "name": "Gedeon Kalulu",
+     "position": "D",
+     "market_value": 1400000
+    },
+    {
+     "name": "Joris Kayembe",
+     "position": "D",
+     "market_value": 2400000
+    },
+    {
+     "name": "Lionel Mpasi Nzau",
+     "position": "G",
+     "market_value": 370000
+    },
+    {
+     "name": "Matthieu Epolo",
+     "position": "G",
+     "market_value": 4500000
+    },
+    {
+     "name": "Meschak Elia",
+     "position": "F",
+     "market_value": 1600000
+    },
+    {
+     "name": "Nathanaël Mbuku",
+     "position": "M",
+     "market_value": 1800000
+    },
+    {
+     "name": "Ngal'ayel Mukau",
+     "position": "M",
+     "market_value": 11400000
+    },
+    {
+     "name": "Noah Sadiki",
+     "position": "M",
+     "market_value": 32000000
+    },
+    {
+     "name": "Samuel Moutoussamy",
+     "position": "M",
+     "market_value": 1600000
+    },
+    {
+     "name": "Simon Banza",
+     "position": "F",
+     "market_value": 10400000
+    },
+    {
+     "name": "Steve Kapuadi",
+     "position": "D",
+     "market_value": 2600000
+    },
+    {
+     "name": "Théo Bongonda",
+     "position": "M",
+     "market_value": 3100000
+    },
+    {
+     "name": "Timothy Fayulu",
+     "position": "G",
+     "market_value": 750000
+    },
+    {
+     "name": "Yoane Wissa",
+     "position": "F",
+     "market_value": 28000000
+    }
+   ],
+   "total_value": 145510000
+  },
+  "Ecuador": {
+   "team_id": "tm_32821",
+   "players": [
+    {
+     "name": "Alan Franco",
+     "position": "M",
+     "market_value": 4200000
+    },
+    {
+     "name": "Alan Minda",
+     "position": "F",
+     "market_value": 2900000
+    },
+    {
+     "name": "Anthony Valencia",
+     "position": "F",
+     "market_value": 1200000
+    },
+    {
+     "name": "Denil Castillo",
+     "position": "M",
+     "market_value": 3600000
+    },
+    {
+     "name": "Enner Valencia",
+     "position": "F",
+     "market_value": 1400000
+    },
+    {
+     "name": "Félix Torres",
+     "position": "D",
+     "market_value": 1600000
+    },
+    {
+     "name": "Gonzalo Plata",
+     "position": "M",
+     "market_value": 8600000
+    },
+    {
+     "name": "Gonzalo Valle",
+     "position": "G",
+     "market_value": 540000
+    },
+    {
+     "name": "Hernán Galíndez",
+     "position": "G",
+     "market_value": 325000
+    },
+    {
+     "name": "Jeremy Arevalo",
+     "position": "F",
+     "market_value": 205000
+    },
+    {
+     "name": "Joel Ordóñez",
+     "position": "D",
+     "market_value": 30000000
+    },
+    {
+     "name": "John Yeboah",
+     "position": "F",
+     "market_value": 3000000
+    },
+    {
+     "name": "Jordy Alcivar",
+     "position": "M",
+     "market_value": 1500000
+    },
+    {
+     "name": "Jordy Caicedo",
+     "position": "F",
+     "market_value": 1300000
+    },
+    {
+     "name": "Kendry Páez",
+     "position": "M",
+     "market_value": 10400000
+    },
+    {
+     "name": "Kevin Rodriguez",
+     "position": "F",
+     "market_value": 2900000
+    },
+    {
+     "name": "Moisés Caicedo",
+     "position": "M",
+     "market_value": 94000000
+    },
+    {
+     "name": "Moisés Ramírez",
+     "position": "G",
+     "market_value": 760000
+    },
+    {
+     "name": "Nilson Angulo",
+     "position": "F",
+     "market_value": 4400000
+    },
+    {
+     "name": "Pedro Vite",
+     "position": "M",
+     "market_value": 4700000
+    },
+    {
+     "name": "Pervis Estupiñán",
+     "position": "D",
+     "market_value": 28000000
+    },
+    {
+     "name": "Piero Hincapié",
+     "position": "D",
+     "market_value": 37000000
+    },
+    {
+     "name": "Willian Pacho",
+     "position": "D",
+     "market_value": 61000000
+    },
+    {
+     "name": "Yaimar Medina",
+     "position": "D",
+     "market_value": 3800000
+    },
+    {
+     "name": "Ángelo Preciado",
+     "position": "M",
+     "market_value": 3900000
+    }
+   ],
+   "total_value": 311230000
+  },
+  "Egypt": {
+   "team_id": "tm_86566",
+   "players": [
+    {
+     "name": "Ahmed Fatouh",
+     "position": "D",
+     "market_value": 625000
+    },
+    {
+     "name": "Emam Ashour",
+     "position": "M",
+     "market_value": 3200000
+    },
+    {
+     "name": "Haissem Hassan",
+     "position": "M",
+     "market_value": 2600000
+    },
+    {
+     "name": "Hamdi Fathi",
+     "position": "M",
+     "market_value": 2400000
+    },
+    {
+     "name": "Hamza Abdelkarim",
+     "position": "F",
+     "market_value": 0
+    },
+    {
+     "name": "Hossam Abdelmaguid",
+     "position": "D",
+     "market_value": 370000
+    },
+    {
+     "name": "Ibrahim Adel",
+     "position": "M",
+     "market_value": 2100000
+    },
+    {
+     "name": "Karim Hafez",
+     "position": "D",
+     "market_value": 455000
+    },
+    {
+     "name": "Marwan Attia",
+     "position": "M",
+     "market_value": 2100000
+    },
+    {
+     "name": "Mohamed Abdelmonem",
+     "position": "D",
+     "market_value": 4400000
+    },
+    {
+     "name": "Mohamed Alaa",
+     "position": "G",
+     "market_value": 48000
+    },
+    {
+     "name": "Mohamed Hany",
+     "position": "D",
+     "market_value": 1400000
+    },
+    {
+     "name": "Mohamed Salah",
+     "position": "M",
+     "market_value": 48000000
+    },
+    {
+     "name": "Mohanad Lasheen",
+     "position": "M",
+     "market_value": 1400000
+    },
+    {
+     "name": "Mostafa Shobeir",
+     "position": "G",
+     "market_value": 660000
+    },
+    {
+     "name": "Mostafa Ziko",
+     "position": "F",
+     "market_value": 875000
+    },
+    {
+     "name": "Omar Marmoush",
+     "position": "F",
+     "market_value": 65000000
+    },
+    {
+     "name": "Tariq Alaa",
+     "position": "D",
+     "market_value": 260000
+    },
+    {
+     "name": "Yasser Ibrahim",
+     "position": "D",
+     "market_value": 340000
+    }
+   ],
+   "total_value": 136233000
+  },
+  "England": {
+   "team_id": "tm_53273",
+   "players": [
+    {
+     "name": "Anthony Gordon",
+     "position": "F",
+     "market_value": 67000000
+    },
+    {
+     "name": "Bukayo Saka",
+     "position": "F",
+     "market_value": 126000000
+    },
+    {
+     "name": "Dan Burn",
+     "position": "D",
+     "market_value": 5200000
+    },
+    {
+     "name": "Dean Henderson",
+     "position": "G",
+     "market_value": 29000000
+    },
+    {
+     "name": "Declan Rice",
+     "position": "M",
+     "market_value": 114000000
+    },
+    {
+     "name": "Djed Spence",
+     "position": "D",
+     "market_value": 31000000
+    },
+    {
+     "name": "Eberechi Eze",
+     "position": "M",
+     "market_value": 63000000
+    },
+    {
+     "name": "Elliot Anderson",
+     "position": "M",
+     "market_value": 54000000
+    },
+    {
+     "name": "Ezri Konsa",
+     "position": "D",
+     "market_value": 42000000
+    },
+    {
+     "name": "Harry Kane",
+     "position": "F",
+     "market_value": 65000000
+    },
+    {
+     "name": "Ivan Toney",
+     "position": "F",
+     "market_value": 22000000
+    },
+    {
+     "name": "James Trafford",
+     "position": "G",
+     "market_value": 27000000
+    },
+    {
+     "name": "Jarell Quansah",
+     "position": "D",
+     "market_value": 48000000
+    },
+    {
+     "name": "John Stones",
+     "position": "D",
+     "market_value": 13600000
+    },
+    {
+     "name": "Jordan Henderson",
+     "position": "M",
+     "market_value": 2200000
+    },
+    {
+     "name": "Jordan Pickford",
+     "position": "G",
+     "market_value": 16100000
+    },
+    {
+     "name": "Jude Bellingham",
+     "position": "M",
+     "market_value": 132000000
+    },
+    {
+     "name": "Kobbie Mainoo",
+     "position": "M",
+     "market_value": 52000000
+    },
+    {
+     "name": "Marc Guéhi",
+     "position": "D",
+     "market_value": 61000000
+    },
+    {
+     "name": "Marcus Rashford",
+     "position": "F",
+     "market_value": 38000000
+    },
+    {
+     "name": "Morgan Rogers",
+     "position": "M",
+     "market_value": 77000000
+    },
+    {
+     "name": "Nico O'Reilly",
+     "position": "D",
+     "market_value": 54000000
+    },
+    {
+     "name": "Noni Madueke",
+     "position": "F",
+     "market_value": 54000000
+    },
+    {
+     "name": "Ollie Watkins",
+     "position": "F",
+     "market_value": 31000000
+    },
+    {
+     "name": "Reece James",
+     "position": "D",
+     "market_value": 63000000
+    },
+    {
+     "name": "Tino Livramento",
+     "position": "D",
+     "market_value": 39000000
+    }
+   ],
+   "total_value": 1326100000
+  },
+  "France": {
+   "team_id": "tm_28952",
+   "players": [
+    {
+     "name": "Adrien Rabiot",
+     "position": "M",
+     "market_value": 17300000
+    },
+    {
+     "name": "Aurélien Tchouaméni",
+     "position": "M",
+     "market_value": 78000000
+    },
+    {
+     "name": "Bradley Barcola",
+     "position": "F",
+     "market_value": 68000000
+    },
+    {
+     "name": "Brice Samba",
+     "position": "G",
+     "market_value": 7400000
+    },
+    {
+     "name": "Dayot Upamecano",
+     "position": "D",
+     "market_value": 65000000
+    },
+    {
+     "name": "Désiré Doué",
+     "position": "F",
+     "market_value": 124000000
+    },
+    {
+     "name": "Ibrahima Konaté",
+     "position": "D",
+     "market_value": 46000000
+    },
+    {
+     "name": "Jean Philippe Mateta",
+     "position": "F",
+     "market_value": 33000000
+    },
+    {
+     "name": "Jules Koundé",
+     "position": "D",
+     "market_value": 69000000
+    },
+    {
+     "name": "Kylian Mbappé",
+     "position": "F",
+     "market_value": 212000000
+    },
+    {
+     "name": "Lucas Digne",
+     "position": "D",
+     "market_value": 7400000
+    },
+    {
+     "name": "Lucas Hernández",
+     "position": "D",
+     "market_value": 18600000
+    },
+    {
+     "name": "Maghnes Akliouche",
+     "position": "M",
+     "market_value": 49000000
+    },
+    {
+     "name": "Malo Gusto",
+     "position": "D",
+     "market_value": 36000000
+    },
+    {
+     "name": "Manu Koné",
+     "position": "M",
+     "market_value": 47000000
+    },
+    {
+     "name": "Marcus Thuram",
+     "position": "F",
+     "market_value": 52000000
+    },
+    {
+     "name": "Maxence Lacroix",
+     "position": "D",
+     "market_value": 43000000
+    },
+    {
+     "name": "Michael Olise",
+     "position": "M",
+     "market_value": 144000000
+    },
+    {
+     "name": "Mike Maignan",
+     "position": "G",
+     "market_value": 22000000
+    },
+    {
+     "name": "N'Golo Kanté",
+     "position": "M",
+     "market_value": 3900000
+    },
+    {
+     "name": "Ousmane Dembélé",
+     "position": "F",
+     "market_value": 97000000
+    },
+    {
+     "name": "Rayan Cherki",
+     "position": "M",
+     "market_value": 71000000
+    },
+    {
+     "name": "Robin Risser",
+     "position": "G",
+     "market_value": 26000000
+    },
+    {
+     "name": "Theo Hernández",
+     "position": "D",
+     "market_value": 30000000
+    },
+    {
+     "name": "Warren Zaïre-Emery",
+     "position": "M",
+     "market_value": 78000000
+    },
+    {
+     "name": "William Saliba",
+     "position": "D",
+     "market_value": 85000000
+    }
+   ],
+   "total_value": 1529600000
+  },
+  "Germany": {
+   "team_id": "tm_28696",
+   "players": [
+    {
+     "name": "Aleksandar Pavlović",
+     "position": "M",
+     "market_value": 96000000
+    },
+    {
+     "name": "Alexander Nübel",
+     "position": "G",
+     "market_value": 10900000
+    },
+    {
+     "name": "Angelo Stiller",
+     "position": "M",
+     "market_value": 46000000
+    },
+    {
+     "name": "Antonio Rüdiger",
+     "position": "D",
+     "market_value": 9300000
+    },
+    {
+     "name": "Assan Ouédraogo",
+     "position": "M",
+     "market_value": 26000000
+    },
+    {
+     "name": "David Raum",
+     "position": "D",
+     "market_value": 27000000
+    },
+    {
+     "name": "Deniz Undav",
+     "position": "F",
+     "market_value": 20000000
+    },
+    {
+     "name": "Felix Nmecha",
+     "position": "M",
+     "market_value": 48000000
+    },
+    {
+     "name": "Florian Wirtz",
+     "position": "M",
+     "market_value": 105000000
+    },
+    {
+     "name": "Jamal Musiala",
+     "position": "M",
+     "market_value": 97000000
+    },
+    {
+     "name": "Jamie Leweling",
+     "position": "M",
+     "market_value": 37000000
+    },
+    {
+     "name": "Jonathan Tah",
+     "position": "D",
+     "market_value": 26000000
+    },
+    {
+     "name": "Joshua Kimmich",
+     "position": "M",
+     "market_value": 38000000
+    },
+    {
+     "name": "Kai Havertz",
+     "position": "F",
+     "market_value": 48000000
+    },
+    {
+     "name": "Leon Goretzka",
+     "position": "M",
+     "market_value": 10900000
+    },
+    {
+     "name": "Leroy Sané",
+     "position": "M",
+     "market_value": 24000000
+    },
+    {
+     "name": "Malick Thiaw",
+     "position": "D",
+     "market_value": 41000000
+    },
+    {
+     "name": "Manuel Neuer",
+     "position": "G",
+     "market_value": 4099999
+    },
+    {
+     "name": "Maximilian Beier",
+     "position": "F",
+     "market_value": 43000000
+    },
+    {
+     "name": "Nadiem Amiri",
+     "position": "M",
+     "market_value": 15500000
+    },
+    {
+     "name": "Nathaniel Brown",
+     "position": "D",
+     "market_value": 37000000
+    },
+    {
+     "name": "Nick Woltemade",
+     "position": "F",
+     "market_value": 70000000
+    },
+    {
+     "name": "Nico Schlotterbeck",
+     "position": "D",
+     "market_value": 57000000
+    },
+    {
+     "name": "Oliver Baumann",
+     "position": "G",
+     "market_value": 2700000
+    },
+    {
+     "name": "Pascal Groß",
+     "position": "M",
+     "market_value": 3200000
+    },
+    {
+     "name": "Waldemar Anton",
+     "position": "D",
+     "market_value": 19700000
+    }
+   ],
+   "total_value": 962299999
+  },
+  "Ghana": {
+   "team_id": "tm_09452",
+   "players": [
+    {
+     "name": "Abdul Fatawu Issahaku",
+     "position": "M",
+     "market_value": 11300000
+    },
+    {
+     "name": "Abdul Mumin",
+     "position": "D",
+     "market_value": 5300000
+    },
+    {
+     "name": "Abdul Rahman Baba",
+     "position": "D",
+     "market_value": 2200000
+    },
+    {
+     "name": "Alidu Seidu",
+     "position": "D",
+     "market_value": 9400000
+    },
+    {
+     "name": "Antoine Semenyo",
+     "position": "M",
+     "market_value": 42000000
+    },
+    {
+     "name": "Augustine Boakye",
+     "position": "F",
+     "market_value": 2300000
+    },
+    {
+     "name": "Benjamin Asare",
+     "position": "G",
+     "market_value": 69000
+    },
+    {
+     "name": "Brandon Thomas-Asante",
+     "position": "F",
+     "market_value": 3600000
+    },
+    {
+     "name": "Caleb Yirenkyi",
+     "position": "M",
+     "market_value": 1000000
+    },
+    {
+     "name": "Christopher Baah",
+     "position": "M",
+     "market_value": 6800000
+    },
+    {
+     "name": "Derrick Luckassen",
+     "position": "D",
+     "market_value": 1000000
+    },
+    {
+     "name": "Elisha Owusu",
+     "position": "M",
+     "market_value": 3300000
+    },
+    {
+     "name": "Ernest Nuamah",
+     "position": "F",
+     "market_value": 14300000
+    },
+    {
+     "name": "Gideon Mensah",
+     "position": "D",
+     "market_value": 3700000
+    },
+    {
+     "name": "Iñaki Williams",
+     "position": "M",
+     "market_value": 13700000
+    },
+    {
+     "name": "Jerome Opoku",
+     "position": "D",
+     "market_value": 5400000
+    },
+    {
+     "name": "Jonas Adjei Adjetey",
+     "position": "D",
+     "market_value": 8500000
+    },
+    {
+     "name": "Jordan Ayew",
+     "position": "F",
+     "market_value": 2700000
+    },
+    {
+     "name": "Joseph Anang",
+     "position": "G",
+     "market_value": 290000
+    },
+    {
+     "name": "Kamaldeen Sulemana",
+     "position": "F",
+     "market_value": 12600000
+    },
+    {
+     "name": "Kojo Peprah Oppong",
+     "position": "D",
+     "market_value": 970000
+    },
+    {
+     "name": "Kwasi Sibo",
+     "position": "M",
+     "market_value": 1100000
+    },
+    {
+     "name": "Lawrence Ati",
+     "position": "G",
+     "market_value": 1900000
+    },
+    {
+     "name": "Marvin Senaya",
+     "position": "D",
+     "market_value": 3100000
+    },
+    {
+     "name": "Prince Kwabena Adu",
+     "position": "F",
+     "market_value": 3200000
+    },
+    {
+     "name": "Thomas Partey",
+     "position": "M",
+     "market_value": 13500000
+    }
+   ],
+   "total_value": 173229000
+  },
+  "Haiti": {
+   "team_id": "tm_721744",
+   "players": [
+    {
+     "name": "Alexandre Pierre",
+     "position": "G",
+     "market_value": 92000
+    },
+    {
+     "name": "Carl Fred Sainté",
+     "position": "D",
+     "market_value": 130000
+    },
+    {
+     "name": "Carlens Arcus",
+     "position": "D",
+     "market_value": 1900000
+    },
+    {
+     "name": "Danley Jean Jacques",
+     "position": "M",
+     "market_value": 3200000
+    },
+    {
+     "name": "Derrick Etienne",
+     "position": "F",
+     "market_value": 770000
+    },
+    {
+     "name": "Dominique Simon",
+     "position": "M",
+     "market_value": 210000
+    },
+    {
+     "name": "Duckens Nazon",
+     "position": "F",
+     "market_value": 720000
+    },
+    {
+     "name": "Duke Lacroix",
+     "position": "D",
+     "market_value": 130000
+    },
+    {
+     "name": "Frantzdy Pierrot",
+     "position": "F",
+     "market_value": 2400000
+    },
+    {
+     "name": "Hannes Delcroix",
+     "position": "D",
+     "market_value": 2100000
+    },
+    {
+     "name": "Jean-Kévin Duverne",
+     "position": "D",
+     "market_value": 2200000
+    },
+    {
+     "name": "Jean-Ricner Bellegarde",
+     "position": "M",
+     "market_value": 17600000
+    },
+    {
+     "name": "Johny Placide",
+     "position": "G",
+     "market_value": 155000
+    },
+    {
+     "name": "Josué Casimir",
+     "position": "M",
+     "market_value": 2800000
+    },
+    {
+     "name": "Josué Duverger",
+     "position": "G",
+     "market_value": 53000
+    },
+    {
+     "name": "Keeto Thermoncy",
+     "position": "D",
+     "market_value": 23000
+    },
+    {
+     "name": "Lenny Joseph",
+     "position": "F",
+     "market_value": 1300000
+    },
+    {
+     "name": "Leverton Pierre",
+     "position": "M",
+     "market_value": 205000
+    },
+    {
+     "name": "Louicius Don Deedson",
+     "position": "F",
+     "market_value": 1300000
+    },
+    {
+     "name": "Martin Expérience",
+     "position": "D",
+     "market_value": 360000
+    },
+    {
+     "name": "Ricardo Adé",
+     "position": "D",
+     "market_value": 310000
+    },
+    {
+     "name": "Ruben Providence",
+     "position": "M",
+     "market_value": 270000
+    },
+    {
+     "name": "Wilguens Paugain",
+     "position": "D",
+     "market_value": 620000
+    },
+    {
+     "name": "Wilson Isidor",
+     "position": "F",
+     "market_value": 18500000
+    },
+    {
+     "name": "Woodensky Pierre",
+     "position": "M",
+     "market_value": 97000
+    },
+    {
+     "name": "Yassin Fortune",
+     "position": "F",
+     "market_value": 190000
+    }
+   ],
+   "total_value": 57635000
+  },
+  "Iran": {
+   "team_id": "tm_65309",
+   "players": [
+    {
+     "name": "Ali Alipour",
+     "position": "F",
+     "market_value": 1100000
+    },
+    {
+     "name": "Ali Nemati",
+     "position": "D",
+     "market_value": 560000
+    },
+    {
+     "name": "Alireza Beiranvand",
+     "position": "G",
+     "market_value": 735000
+    },
+    {
+     "name": "Alireza Jahanbakhsh",
+     "position": "M",
+     "market_value": 1500000
+    },
+    {
+     "name": "Amirhossein Hosseinzadeh",
+     "position": "F",
+     "market_value": 1600000
+    },
+    {
+     "name": "Amirmohammad Razzaghinia",
+     "position": "M",
+     "market_value": 380000
+    },
+    {
+     "name": "Aria Yousefi",
+     "position": "M",
+     "market_value": 750000
+    },
+    {
+     "name": "Danial Eiri",
+     "position": "D",
+     "market_value": 195000
+    },
+    {
+     "name": "Dennis Eckert Ayensa",
+     "position": "F",
+     "market_value": 2400000
+    },
+    {
+     "name": "Mehdi Taremi",
+     "position": "F",
+     "market_value": 3600000
+    },
+    {
+     "name": "Mehdi Torabi",
+     "position": "F",
+     "market_value": 1400000
+    },
+    {
+     "name": "Milad Mohammadi",
+     "position": "D",
+     "market_value": 1200000
+    },
+    {
+     "name": "Mohammad Ghorbani",
+     "position": "M",
+     "market_value": 1200000
+    },
+    {
+     "name": "Mohammad Mohebi",
+     "position": "F",
+     "market_value": 3200000
+    },
+    {
+     "name": "Payam Niazmand",
+     "position": "G",
+     "market_value": 630000
+    },
+    {
+     "name": "Ramin Rezaeian",
+     "position": "M",
+     "market_value": 325000
+    },
+    {
+     "name": "Saeid Ezatolahi",
+     "position": "M",
+     "market_value": 1300000
+    },
+    {
+     "name": "Saleh Hardani",
+     "position": "D",
+     "market_value": 575000
+    },
+    {
+     "name": "Saman Ghoddos",
+     "position": "M",
+     "market_value": 1500000
+    },
+    {
+     "name": "Shahriar Moghanlou",
+     "position": "F",
+     "market_value": 1400000
+    },
+    {
+     "name": "Shoja Khalilzadeh",
+     "position": "D",
+     "market_value": 110000
+    }
+   ],
+   "total_value": 25660000
+  },
+  "Iraq": {
+   "team_id": "tm_32842",
+   "players": [],
+   "total_value": 0
+  },
+  "Japan": {
+   "team_id": "tm_17014",
+   "players": [
+    {
+     "name": "Ao Tanaka",
+     "position": "M",
+     "market_value": 10800000
+    },
+    {
+     "name": "Ayase Ueda",
+     "position": "F",
+     "market_value": 7800000
+    },
+    {
+     "name": "Ayumu Seko",
+     "position": "D",
+     "market_value": 945000
+    },
+    {
+     "name": "Daichi Kamada",
+     "position": "M",
+     "market_value": 12400000
+    },
+    {
+     "name": "Daizen Maeda",
+     "position": "F",
+     "market_value": 14600000
+    },
+    {
+     "name": "Hiroki Ito",
+     "position": "D",
+     "market_value": 33000000
+    },
+    {
+     "name": "Junnosuke Suzuki",
+     "position": "D",
+     "market_value": 670000
+    },
+    {
+     "name": "Junya Ito",
+     "position": "M",
+     "market_value": 6200000
+    },
+    {
+     "name": "Kaishu Sano",
+     "position": "M",
+     "market_value": 21000000
+    },
+    {
+     "name": "Keisuke Goto",
+     "position": "F",
+     "market_value": 1900000
+    },
+    {
+     "name": "Keito Nakamura",
+     "position": "M",
+     "market_value": 8600000
+    },
+    {
+     "name": "Kento Shiogai",
+     "position": "F",
+     "market_value": 875000
+    },
+    {
+     "name": "Ko Itakura",
+     "position": "D",
+     "market_value": 12500000
+    },
+    {
+     "name": "Koki Ogawa",
+     "position": "F",
+     "market_value": 2700000
+    },
+    {
+     "name": "Ritsu Doan",
+     "position": "M",
+     "market_value": 18400000
+    },
+    {
+     "name": "Shogo Taniguchi",
+     "position": "D",
+     "market_value": 825000
+    },
+    {
+     "name": "Takefusa Kubo",
+     "position": "M",
+     "market_value": 31000000
+    },
+    {
+     "name": "Takehiro Tomiyasu",
+     "position": "D",
+     "market_value": 34000000
+    },
+    {
+     "name": "Tsuyoshi Watanabe",
+     "position": "D",
+     "market_value": 8400000
+    },
+    {
+     "name": "Wataru Endo",
+     "position": "M",
+     "market_value": 7300000
+    },
+    {
+     "name": "Yuito Suzuki",
+     "position": "F",
+     "market_value": 10400000
+    },
+    {
+     "name": "Yukinari Sugawara",
+     "position": "D",
+     "market_value": 9900000
+    },
+    {
+     "name": "Yuto Nagatomo",
+     "position": "D",
+     "market_value": 92000
+    },
+    {
+     "name": "Zion Suzuki",
+     "position": "G",
+     "market_value": 21000000
+    }
+   ],
+   "total_value": 275307000
+  },
+  "Jordan": {
+   "team_id": "tm_28629",
+   "players": [
+    {
+     "name": "Abdallah Al-Fakhouri",
+     "position": "G",
+     "market_value": 265000
+    },
+    {
+     "name": "Abdallah Nasib",
+     "position": "D",
+     "market_value": 405000
+    },
+    {
+     "name": "Ali Al Azaizah",
+     "position": "F",
+     "market_value": 0
+    },
+    {
+     "name": "Ali Olwan",
+     "position": "F",
+     "market_value": 465000
+    },
+    {
+     "name": "Amer Jamous",
+     "position": "M",
+     "market_value": 240000
+    },
+    {
+     "name": "Anas Badawi",
+     "position": "D",
+     "market_value": 180000
+    },
+    {
+     "name": "Husam Ali Mohammad Abudahab",
+     "position": "D",
+     "market_value": 0
+    },
+    {
+     "name": "Ibrahim Sadeh",
+     "position": "M",
+     "market_value": 360000
+    },
+    {
+     "name": "Mahmoud Al-Mardi",
+     "position": "M",
+     "market_value": 440000
+    },
+    {
+     "name": "Mohammad Al Daoud",
+     "position": "M",
+     "market_value": 260000
+    },
+    {
+     "name": "Mohammad Ali Hasheesh",
+     "position": "D",
+     "market_value": 390000
+    },
+    {
+     "name": "Mohammed Abu Zrayq",
+     "position": "F",
+     "market_value": 400000
+    },
+    {
+     "name": "Mousa Tamari",
+     "position": "F",
+     "market_value": 6500000
+    },
+    {
+     "name": "Nizar Mahmoud Al-Rashdan",
+     "position": "M",
+     "market_value": 465000
+    },
+    {
+     "name": "Noor Al-Rawabdeh",
+     "position": "M",
+     "market_value": 410000
+    },
+    {
+     "name": "Noureddin Bani Ateyah",
+     "position": "G",
+     "market_value": 205000
+    },
+    {
+     "name": "Odeh Fakhoury",
+     "position": "F",
+     "market_value": 0
+    },
+    {
+     "name": "Saad Al Rousan",
+     "position": "D",
+     "market_value": 290000
+    },
+    {
+     "name": "Saleem Obaid",
+     "position": "D",
+     "market_value": 97000
+    },
+    {
+     "name": "Yazan Alarab",
+     "position": "D",
+     "market_value": 720000
+    },
+    {
+     "name": "Yazeed Abulaila",
+     "position": "G",
+     "market_value": 315000
+    }
+   ],
+   "total_value": 12407000
+  },
+  "Mexico": {
+   "team_id": "tm_28735",
+   "players": [
+    {
+     "name": "Alexis Vega",
+     "position": "M",
+     "market_value": 7700000
+    },
+    {
+     "name": "Armando González",
+     "position": "F",
+     "market_value": 16000000
+    },
+    {
+     "name": "Brian Gutiérrez",
+     "position": "M",
+     "market_value": 8300000
+    },
+    {
+     "name": "Carlos Acevedo",
+     "position": "G",
+     "market_value": 2600000
+    },
+    {
+     "name": "César Huerta",
+     "position": "M",
+     "market_value": 5300000
+    },
+    {
+     "name": "César Montes",
+     "position": "D",
+     "market_value": 7800000
+    },
+    {
+     "name": "Edson Álvarez",
+     "position": "M",
+     "market_value": 14600000
+    },
+    {
+     "name": "Erik Lira",
+     "position": "D",
+     "market_value": 13200000
+    },
+    {
+     "name": "Gilberto Mora",
+     "position": "M",
+     "market_value": 11000000
+    },
+    {
+     "name": "Guillermo Martínez",
+     "position": "F",
+     "market_value": 1500000
+    },
+    {
+     "name": "Guillermo Ochoa",
+     "position": "G",
+     "market_value": 280000
+    },
+    {
+     "name": "Israel Reyes",
+     "position": "D",
+     "market_value": 6700000
+    },
+    {
+     "name": "Jesús Gallardo",
+     "position": "D",
+     "market_value": 2700000
+    },
+    {
+     "name": "Johan Vásquez",
+     "position": "D",
+     "market_value": 12200000
+    },
+    {
+     "name": "Jorge Sánchez",
+     "position": "D",
+     "market_value": 2000000
+    },
+    {
+     "name": "Julián Quiñones",
+     "position": "F",
+     "market_value": 11100000
+    },
+    {
+     "name": "Luis Chávez",
+     "position": "M",
+     "market_value": 5800000
+    },
+    {
+     "name": "Luis Romo",
+     "position": "D",
+     "market_value": 2900000
+    },
+    {
+     "name": "Mateo Chávez",
+     "position": "D",
+     "market_value": 4099999
+    },
+    {
+     "name": "Obed Vargas",
+     "position": "M",
+     "market_value": 7400000
+    },
+    {
+     "name": "Orbelín Pineda",
+     "position": "M",
+     "market_value": 6300000
+    },
+    {
+     "name": "Raúl Jiménez",
+     "position": "F",
+     "market_value": 4200000
+    },
+    {
+     "name": "Raúl Rangel",
+     "position": "G",
+     "market_value": 5800000
+    },
+    {
+     "name": "Roberto Alvarado",
+     "position": "F",
+     "market_value": 7300000
+    },
+    {
+     "name": "Santiago Giménez",
+     "position": "F",
+     "market_value": 18600000
+    },
+    {
+     "name": "Álvaro Fidalgo",
+     "position": "M",
+     "market_value": 10900000
+    }
+   ],
+   "total_value": 196279999
+  },
+  "Morocco": {
+   "team_id": "tm_86588",
+   "players": [
+    {
+     "name": "Abdessamad Ezzalzouli",
+     "position": "M",
+     "market_value": 12800000
+    },
+    {
+     "name": "Achraf Hakimi",
+     "position": "D",
+     "market_value": 82000000
+    },
+    {
+     "name": "Ahmed Reda Tagnaouti",
+     "position": "G",
+     "market_value": 650000
+    },
+    {
+     "name": "Anass Salah-Eddine",
+     "position": "D",
+     "market_value": 7400000
+    },
+    {
+     "name": "Ayoub El Kaabi",
+     "position": "F",
+     "market_value": 5400000
+    },
+    {
+     "name": "Ayoube Amaimouni Echghouyab",
+     "position": "F",
+     "market_value": 0
+    },
+    {
+     "name": "Ayyoub Bouaddi",
+     "position": "M",
+     "market_value": 30000000
+    },
+    {
+     "name": "Azzedine Ounahi",
+     "position": "M",
+     "market_value": 10300000
+    },
+    {
+     "name": "Bilal El Khannouss",
+     "position": "M",
+     "market_value": 26000000
+    },
+    {
+     "name": "Bono",
+     "position": "G",
+     "market_value": 5300000
+    },
+    {
+     "name": "Brahim Díaz",
+     "position": "M",
+     "market_value": 37000000
+    },
+    {
+     "name": "Chadi Riad",
+     "position": "D",
+     "market_value": 14600000
+    },
+    {
+     "name": "Chemsdine Talbi",
+     "position": "M",
+     "market_value": 7300000
+    },
+    {
+     "name": "Gessime Yassine",
+     "position": "M",
+     "market_value": 1100000
+    },
+    {
+     "name": "Ismael Saibari",
+     "position": "M",
+     "market_value": 30000000
+    },
+    {
+     "name": "Issa Diop",
+     "position": "D",
+     "market_value": 14400000
+    },
+    {
+     "name": "Munir El Kajoui",
+     "position": "G",
+     "market_value": 770000
+    },
+    {
+     "name": "Nayef Aguerd",
+     "position": "D",
+     "market_value": 19100000
+    },
+    {
+     "name": "Neil El Aynaoui",
+     "position": "M",
+     "market_value": 14300000
+    },
+    {
+     "name": "Noussair Mazraoui",
+     "position": "D",
+     "market_value": 31000000
+    },
+    {
+     "name": "Redouane Halhal",
+     "position": "D",
+     "market_value": 335000
+    },
+    {
+     "name": "Samir El Mourabet",
+     "position": "M",
+     "market_value": 49000
+    },
+    {
+     "name": "Sofyan Amrabat",
+     "position": "M",
+     "market_value": 16399999
+    },
+    {
+     "name": "Soufiane Rahimi",
+     "position": "F",
+     "market_value": 7700000
+    },
+    {
+     "name": "Youssef Belammari",
+     "position": "D",
+     "market_value": 1500000
+    },
+    {
+     "name": "Zakaria El Ouahdi",
+     "position": "D",
+     "market_value": 16300000
+    }
+   ],
+   "total_value": 391703999
+  },
+  "Netherlands": {
+   "team_id": "tm_41792",
+   "players": [
+    {
+     "name": "Bart Verbruggen",
+     "position": "G",
+     "market_value": 37000000
+    },
+    {
+     "name": "Brian Brobbey",
+     "position": "F",
+     "market_value": 26000000
+    },
+    {
+     "name": "Cody Gakpo",
+     "position": "M",
+     "market_value": 63000000
+    },
+    {
+     "name": "Crysencio Summerville",
+     "position": "M",
+     "market_value": 33000000
+    },
+    {
+     "name": "Denzel Dumfries",
+     "position": "M",
+     "market_value": 26000000
+    },
+    {
+     "name": "Donyell Malen",
+     "position": "F",
+     "market_value": 48000000
+    },
+    {
+     "name": "Frenkie de Jong",
+     "position": "M",
+     "market_value": 42000000
+    },
+    {
+     "name": "Guus Til",
+     "position": "M",
+     "market_value": 15500000
+    },
+    {
+     "name": "Jan Paul van Hecke",
+     "position": "D",
+     "market_value": 38000000
+    },
+    {
+     "name": "Jorrel Hato",
+     "position": "D",
+     "market_value": 36000000
+    },
+    {
+     "name": "Jurriën Timber",
+     "position": "D",
+     "market_value": 73000000
+    },
+    {
+     "name": "Justin Kluivert",
+     "position": "M",
+     "market_value": 29000000
+    },
+    {
+     "name": "Lutsharel Geertruida",
+     "position": "D",
+     "market_value": 22000000
+    },
+    {
+     "name": "Mark Flekken",
+     "position": "G",
+     "market_value": 6400000
+    },
+    {
+     "name": "Marten de Roon",
+     "position": "M",
+     "market_value": 3100000
+    },
+    {
+     "name": "Mats Wieffer",
+     "position": "D",
+     "market_value": 24000000
+    },
+    {
+     "name": "Memphis Depay",
+     "position": "F",
+     "market_value": 7200000
+    },
+    {
+     "name": "Micky van de Ven",
+     "position": "D",
+     "market_value": 63000000
+    },
+    {
+     "name": "Nathan Aké",
+     "position": "D",
+     "market_value": 13700000
+    },
+    {
+     "name": "Noa Lang",
+     "position": "F",
+     "market_value": 24000000
+    },
+    {
+     "name": "Quinten Timber",
+     "position": "M",
+     "market_value": 24000000
+    },
+    {
+     "name": "Robin Roefs",
+     "position": "G",
+     "market_value": 26000000
+    },
+    {
+     "name": "Ryan Gravenberch",
+     "position": "M",
+     "market_value": 98000000
+    },
+    {
+     "name": "Teun Koopmeiners",
+     "position": "M",
+     "market_value": 13200000
+    },
+    {
+     "name": "Tijjani Reijnders",
+     "position": "M",
+     "market_value": 58000000
+    },
+    {
+     "name": "Virgil van Dijk",
+     "position": "D",
+     "market_value": 18600000
+    },
+    {
+     "name": "Wout Weghorst",
+     "position": "F",
+     "market_value": 2100000
+    }
+   ],
+   "total_value": 869800000
+  },
+  "New Zealand": {
+   "team_id": "tm_09373",
+   "players": [
+    {
+     "name": "Alex Paulsen",
+     "position": "G",
+     "market_value": 780000
+    },
+    {
+     "name": "Alex Rufer",
+     "position": "M",
+     "market_value": 655000
+    },
+    {
+     "name": "Ben Waine",
+     "position": "F",
+     "market_value": 535000
+    },
+    {
+     "name": "Benjamin Old",
+     "position": "M",
+     "market_value": 725000
+    },
+    {
+     "name": "Callan Elliot",
+     "position": "D",
+     "market_value": 325000
+    },
+    {
+     "name": "Callum McCowatt",
+     "position": "M",
+     "market_value": 1300000
+    },
+    {
+     "name": "Chris Wood",
+     "position": "F",
+     "market_value": 10400000
+    },
+    {
+     "name": "Finn Surman",
+     "position": "D",
+     "market_value": 835000
+    },
+    {
+     "name": "Francis De Vries",
+     "position": "D",
+     "market_value": 630000
+    },
+    {
+     "name": "Jesse Randall",
+     "position": "F",
+     "market_value": 360000
+    },
+    {
+     "name": "Joe Bell",
+     "position": "M",
+     "market_value": 2100000
+    },
+    {
+     "name": "Lachlan Bayliss",
+     "position": "M",
+     "market_value": 230000
+    },
+    {
+     "name": "Liberato Cacace",
+     "position": "D",
+     "market_value": 1800000
+    },
+    {
+     "name": "Marko Stamenić",
+     "position": "M",
+     "market_value": 3100000
+    },
+    {
+     "name": "Matthew Garbett",
+     "position": "M",
+     "market_value": 390000
+    },
+    {
+     "name": "Max Crocombe",
+     "position": "G",
+     "market_value": 230000
+    },
+    {
+     "name": "Michael Woud",
+     "position": "G",
+     "market_value": 190000
+    },
+    {
+     "name": "Nando Pijnaker",
+     "position": "D",
+     "market_value": 465000
+    },
+    {
+     "name": "Ryan Thomas",
+     "position": "M",
+     "market_value": 725000
+    },
+    {
+     "name": "Sarpreet Singh",
+     "position": "M",
+     "market_value": 290000
+    },
+    {
+     "name": "Tim Payne",
+     "position": "D",
+     "market_value": 440000
+    },
+    {
+     "name": "Tommy Smith",
+     "position": "D",
+     "market_value": 110000
+    },
+    {
+     "name": "Tyler Bindon",
+     "position": "D",
+     "market_value": 1200000
+    }
+   ],
+   "total_value": 27815000
+  },
+  "Norway": {
+   "team_id": "tm_41500",
+   "players": [
+    {
+     "name": "Alexander Sørloth",
+     "position": "F",
+     "market_value": 26000000
+    },
+    {
+     "name": "Andreas Schjelderup",
+     "position": "F",
+     "market_value": 15500000
+    },
+    {
+     "name": "Antonio Nusa",
+     "position": "M",
+     "market_value": 27000000
+    },
+    {
+     "name": "David Möller Wolfe",
+     "position": "D",
+     "market_value": 8300000
+    },
+    {
+     "name": "Egil Selvik",
+     "position": "G",
+     "market_value": 1600000
+    },
+    {
+     "name": "Erling Haaland",
+     "position": "F",
+     "market_value": 196000000
+    },
+    {
+     "name": "Fredrik André Bjørkan",
+     "position": "D",
+     "market_value": 2600000
+    },
+    {
+     "name": "Fredrik Aursnes",
+     "position": "M",
+     "market_value": 18700000
+    },
+    {
+     "name": "Henrik Sælebakke Falchener",
+     "position": "D",
+     "market_value": 1600000
+    },
+    {
+     "name": "Jens Petter Hauge",
+     "position": "F",
+     "market_value": 4200000
+    },
+    {
+     "name": "Julian Ryerson",
+     "position": "D",
+     "market_value": 18900000
+    },
+    {
+     "name": "Jørgen Strand Larsen",
+     "position": "F",
+     "market_value": 31000000
+    },
+    {
+     "name": "Kristian Thorstvedt",
+     "position": "M",
+     "market_value": 9300000
+    },
+    {
+     "name": "Kristoffer Ajer",
+     "position": "D",
+     "market_value": 19500000
+    },
+    {
+     "name": "Leo Østigård",
+     "position": "D",
+     "market_value": 11000000
+    },
+    {
+     "name": "Marcus Pedersen",
+     "position": "D",
+     "market_value": 2800000
+    },
+    {
+     "name": "Martin Ødegaard",
+     "position": "M",
+     "market_value": 93000000
+    },
+    {
+     "name": "Morten Thorsby",
+     "position": "M",
+     "market_value": 3300000
+    },
+    {
+     "name": "Oscar Bobb",
+     "position": "M",
+     "market_value": 24000000
+    },
+    {
+     "name": "Patrick Berg",
+     "position": "M",
+     "market_value": 5700000
+    },
+    {
+     "name": "Sander Berge",
+     "position": "M",
+     "market_value": 26000000
+    },
+    {
+     "name": "Sander Tangvik",
+     "position": "G",
+     "market_value": 3200000
+    },
+    {
+     "name": "Sondre Klingen Langås",
+     "position": "D",
+     "market_value": 2400000
+    },
+    {
+     "name": "Thelo Aasgaard",
+     "position": "M",
+     "market_value": 1800000
+    },
+    {
+     "name": "Torbjørn Heggem",
+     "position": "D",
+     "market_value": 1100000
+    },
+    {
+     "name": "Ørjan Nyland",
+     "position": "G",
+     "market_value": 930000
+    }
+   ],
+   "total_value": 555430000
+  },
+  "Panama": {
+   "team_id": "tm_05795",
+   "players": [
+    {
+     "name": "Adalberto Carrasquilla",
+     "position": "M",
+     "market_value": 3600000
+    },
+    {
+     "name": "Alberto Quintero",
+     "position": "M",
+     "market_value": 105000
+    },
+    {
+     "name": "Amir Murillo",
+     "position": "D",
+     "market_value": 7600000
+    },
+    {
+     "name": "Andrés Andrade",
+     "position": "D",
+     "market_value": 1900000
+    },
+    {
+     "name": "César Blackman",
+     "position": "D",
+     "market_value": 2400000
+    },
+    {
+     "name": "César Samudio",
+     "position": "G",
+     "market_value": 310000
+    },
+    {
+     "name": "Edgardo Fariña",
+     "position": "D",
+     "market_value": 905000
+    },
+    {
+     "name": "Fidel Escobar",
+     "position": "D",
+     "market_value": 370000
+    },
+    {
+     "name": "Ismael Díaz",
+     "position": "M",
+     "market_value": 1600000
+    },
+    {
+     "name": "Iván Anderson",
+     "position": "D",
+     "market_value": 420000
+    },
+    {
+     "name": "Jiovany Ramos",
+     "position": "D",
+     "market_value": 275000
+    },
+    {
+     "name": "Jorge Gutiérrez",
+     "position": "D",
+     "market_value": 335000
+    },
+    {
+     "name": "José Córdoba",
+     "position": "D",
+     "market_value": 4600000
+    },
+    {
+     "name": "José Fajardo",
+     "position": "F",
+     "market_value": 1100000
+    },
+    {
+     "name": "José Luis Rodríguez",
+     "position": "M",
+     "market_value": 2100000
+    },
+    {
+     "name": "Kadir Barría",
+     "position": "F",
+     "market_value": 955000
+    },
+    {
+     "name": "Luis Mejía",
+     "position": "G",
+     "market_value": 390000
+    },
+    {
+     "name": "Orlando Mosquera",
+     "position": "G",
+     "market_value": 620000
+    },
+    {
+     "name": "Roderick Miller",
+     "position": "D",
+     "market_value": 265000
+    },
+    {
+     "name": "Víctor Griffith",
+     "position": "M",
+     "market_value": 215000
+    },
+    {
+     "name": "Yoel Bárcenas",
+     "position": "M",
+     "market_value": 870000
+    }
+   ],
+   "total_value": 30935000
+  },
+  "Paraguay": {
+   "team_id": "tm_70522",
+   "players": [
+    {
+     "name": "Alejandro Romero",
+     "position": "M",
+     "market_value": 4099999
+    },
+    {
+     "name": "Alex Arce",
+     "position": "F",
+     "market_value": 4800000
+    },
+    {
+     "name": "Alexandro Maidana",
+     "position": "F",
+     "market_value": 0
+    },
+    {
+     "name": "Andrés Cubas",
+     "position": "M",
+     "market_value": 3800000
+    },
+    {
+     "name": "Antonio Sanabria",
+     "position": "F",
+     "market_value": 2600000
+    },
+    {
+     "name": "Damián Bobadilla",
+     "position": "M",
+     "market_value": 4200000
+    },
+    {
+     "name": "Diego Gómez",
+     "position": "M",
+     "market_value": 15100000
+    },
+    {
+     "name": "Gabriel Ávalos",
+     "position": "F",
+     "market_value": 970000
+    },
+    {
+     "name": "Gatito Fernández",
+     "position": "G",
+     "market_value": 275000
+    },
+    {
+     "name": "Gustavo Caballero",
+     "position": "M",
+     "market_value": 575000
+    },
+    {
+     "name": "Gustavo Gómez",
+     "position": "D",
+     "market_value": 4700000
+    },
+    {
+     "name": "Gustavo Velázquez",
+     "position": "D",
+     "market_value": 870000
+    },
+    {
+     "name": "Isidro Pitta",
+     "position": "F",
+     "market_value": 5700000
+    },
+    {
+     "name": "José Canale",
+     "position": "D",
+     "market_value": 560000
+    },
+    {
+     "name": "Juan Cáceres",
+     "position": "D",
+     "market_value": 3200000
+    },
+    {
+     "name": "Julio Enciso",
+     "position": "M",
+     "market_value": 21000000
+    },
+    {
+     "name": "Junior Alonso",
+     "position": "D",
+     "market_value": 2700000
+    },
+    {
+     "name": "Matías Galarza",
+     "position": "M",
+     "market_value": 2300000
+    },
+    {
+     "name": "Mauricio",
+     "position": "M",
+     "market_value": 12600000
+    },
+    {
+     "name": "Miguel Almirón",
+     "position": "M",
+     "market_value": 9700000
+    },
+    {
+     "name": "Omar Alderete",
+     "position": "D",
+     "market_value": 8500000
+    },
+    {
+     "name": "Orlando Gill",
+     "position": "G",
+     "market_value": 3700000
+    },
+    {
+     "name": "Ramón Sosa",
+     "position": "F",
+     "market_value": 12400000
+    }
+   ],
+   "total_value": 124349999
+  },
+  "Portugal": {
+   "team_id": "tm_09479",
+   "players": [
+    {
+     "name": "Bernardo Silva",
+     "position": "M",
+     "market_value": 26000000
+    },
+    {
+     "name": "Bruno Fernandes",
+     "position": "M",
+     "market_value": 37000000
+    },
+    {
+     "name": "Cristiano Ronaldo",
+     "position": "F",
+     "market_value": 12500000
+    },
+    {
+     "name": "Diogo Costa",
+     "position": "G",
+     "market_value": 42000000
+    },
+    {
+     "name": "Diogo Dalot",
+     "position": "D",
+     "market_value": 28000000
+    },
+    {
+     "name": "Francisco Conceição",
+     "position": "F",
+     "market_value": 28000000
+    },
+    {
+     "name": "Francisco Trincão",
+     "position": "M",
+     "market_value": 42000000
+    },
+    {
+     "name": "Gonçalo Guedes",
+     "position": "M",
+     "market_value": 5700000
+    },
+    {
+     "name": "Gonçalo Inácio",
+     "position": "D",
+     "market_value": 42000000
+    },
+    {
+     "name": "Gonçalo Ramos",
+     "position": "F",
+     "market_value": 32000000
+    },
+    {
+     "name": "José Sá",
+     "position": "G",
+     "market_value": 4800000
+    },
+    {
+     "name": "João Cancelo",
+     "position": "D",
+     "market_value": 9600000
+    },
+    {
+     "name": "João Félix",
+     "position": "F",
+     "market_value": 24000000
+    },
+    {
+     "name": "João Neves",
+     "position": "M",
+     "market_value": 148000000
+    },
+    {
+     "name": "Matheus Nunes",
+     "position": "D",
+     "market_value": 43000000
+    },
+    {
+     "name": "Nuno Mendes",
+     "position": "D",
+     "market_value": 77000000
+    },
+    {
+     "name": "Nélson Semedo",
+     "position": "D",
+     "market_value": 5500000
+    },
+    {
+     "name": "Pedro Neto",
+     "position": "M",
+     "market_value": 58000000
+    },
+    {
+     "name": "Rafael Leão",
+     "position": "F",
+     "market_value": 48000000
+    },
+    {
+     "name": "Renato Veiga",
+     "position": "D",
+     "market_value": 24000000
+    },
+    {
+     "name": "Rui Silva",
+     "position": "G",
+     "market_value": 6700000
+    },
+    {
+     "name": "Rúben Dias",
+     "position": "D",
+     "market_value": 65000000
+    },
+    {
+     "name": "Rúben Neves",
+     "position": "M",
+     "market_value": 24000000
+    },
+    {
+     "name": "Samú Costa",
+     "position": "M",
+     "market_value": 14600000
+    },
+    {
+     "name": "Tomás Araújo",
+     "position": "D",
+     "market_value": 33000000
+    },
+    {
+     "name": "Vitinha",
+     "position": "M",
+     "market_value": 102000000
+    }
+   ],
+   "total_value": 982400000
+  },
+  "Qatar": {
+   "team_id": "tm_94261",
+   "players": [
+    {
+     "name": "Abdelaziz Hatem",
+     "position": "M",
+     "market_value": 245000
+    },
+    {
+     "name": "Ahmed Al-Ganehi",
+     "position": "M",
+     "market_value": 475000
+    },
+    {
+     "name": "Ahmed Alaaeldin",
+     "position": "F",
+     "market_value": 290000
+    },
+    {
+     "name": "Ahmed Fathi",
+     "position": "M",
+     "market_value": 270000
+    },
+    {
+     "name": "Akram Afif",
+     "position": "M",
+     "market_value": 7500000
+    },
+    {
+     "name": "Alhashmi Mohialdin",
+     "position": "D",
+     "market_value": 240000
+    },
+    {
+     "name": "Almoez Ali",
+     "position": "M",
+     "market_value": 2400000
+    },
+    {
+     "name": "Assim Madibo",
+     "position": "M",
+     "market_value": 325000
+    },
+    {
+     "name": "Ayoub Al Oui",
+     "position": "D",
+     "market_value": 360000
+    },
+    {
+     "name": "Boualem Khoukhi",
+     "position": "D",
+     "market_value": 190000
+    },
+    {
+     "name": "Edmilson Junior",
+     "position": "M",
+     "market_value": 1900000
+    },
+    {
+     "name": "Hassan Al Haydos",
+     "position": "F",
+     "market_value": 330000
+    },
+    {
+     "name": "Homam Al-Amin",
+     "position": "D",
+     "market_value": 460000
+    },
+    {
+     "name": "Issa Laye",
+     "position": "D",
+     "market_value": 210000
+    },
+    {
+     "name": "Jassem Gaber Abdulsallam",
+     "position": "M",
+     "market_value": 475000
+    },
+    {
+     "name": "Karim Boudiaf",
+     "position": "M",
+     "market_value": 160000
+    },
+    {
+     "name": "Lucas Mendes",
+     "position": "D",
+     "market_value": 315000
+    },
+    {
+     "name": "Mahmud Abunad",
+     "position": "G",
+     "market_value": 420000
+    },
+    {
+     "name": "Meshaal Barsham",
+     "position": "G",
+     "market_value": 660000
+    },
+    {
+     "name": "Mohamed Naceur Almanai",
+     "position": "M",
+     "market_value": 470000
+    },
+    {
+     "name": "Mohammed Muntari",
+     "position": "F",
+     "market_value": 195000
+    },
+    {
+     "name": "Pedro Miguel",
+     "position": "D",
+     "market_value": 160000
+    },
+    {
+     "name": "Salah Zakaria",
+     "position": "G",
+     "market_value": 440000
+    },
+    {
+     "name": "Sultan Al-Brake",
+     "position": "D",
+     "market_value": 325000
+    },
+    {
+     "name": "Tahsin Mohammed Jamshid",
+     "position": "F",
+     "market_value": 210000
+    },
+    {
+     "name": "Yusuf Abdurisag",
+     "position": "F",
+     "market_value": 290000
+    }
+   ],
+   "total_value": 19315000
+  },
+  "Saudi Arabia": {
+   "team_id": "tm_09398",
+   "players": [
+    {
+     "name": "Abdulelah Al-Amri",
+     "position": "D",
+     "market_value": 1200000
+    },
+    {
+     "name": "Abdullah Al-Hamdan",
+     "position": "F",
+     "market_value": 230000
+    },
+    {
+     "name": "Abdullah Al-Khaibari",
+     "position": "M",
+     "market_value": 725000
+    },
+    {
+     "name": "Abdulquddus Atiah",
+     "position": "G",
+     "market_value": 160000
+    },
+    {
+     "name": "Abdulrahman Al Sanbi",
+     "position": "G",
+     "market_value": 310000
+    },
+    {
+     "name": "Ahmed Al-Kassar",
+     "position": "G",
+     "market_value": 260000
+    },
+    {
+     "name": "Ala'a Al-Hejji",
+     "position": "M",
+     "market_value": 170000
+    },
+    {
+     "name": "Ali Majrashi",
+     "position": "D",
+     "market_value": 935000
+    },
+    {
+     "name": "Ayman Yahya",
+     "position": "M",
+     "market_value": 1400000
+    },
+    {
+     "name": "Firas Al-Buraikan",
+     "position": "F",
+     "market_value": 4200000
+    },
+    {
+     "name": "Hassan Al Tambakti",
+     "position": "D",
+     "market_value": 1800000
+    },
+    {
+     "name": "Hassan Kadesh",
+     "position": "D",
+     "market_value": 340000
+    },
+    {
+     "name": "Jehad Thakri",
+     "position": "D",
+     "market_value": 1100000
+    },
+    {
+     "name": "Khalid Al-Ghannam",
+     "position": "M",
+     "market_value": 275000
+    },
+    {
+     "name": "Mohammed Abu Al-Shamat",
+     "position": "M",
+     "market_value": 1000000
+    },
+    {
+     "name": "Moteb Al-Harbi",
+     "position": "D",
+     "market_value": 775000
+    },
+    {
+     "name": "Musab Al Juwayr",
+     "position": "M",
+     "market_value": 4200000
+    },
+    {
+     "name": "Nasser Al-Dawsari",
+     "position": "M",
+     "market_value": 680000
+    },
+    {
+     "name": "Nawaf Boushal",
+     "position": "D",
+     "market_value": 1400000
+    },
+    {
+     "name": "Saleh Al-Shehri",
+     "position": "F",
+     "market_value": 580000
+    },
+    {
+     "name": "Saud Abdulhamid",
+     "position": "D",
+     "market_value": 2800000
+    },
+    {
+     "name": "Sultan Mandash",
+     "position": "F",
+     "market_value": 390000
+    },
+    {
+     "name": "Ziyad Aljohani",
+     "position": "M",
+     "market_value": 775000
+    }
+   ],
+   "total_value": 25705000
+  },
+  "Scotland": {
+   "team_id": "tm_41641",
+   "players": [],
+   "total_value": 0
+  },
+  "Senegal": {
+   "team_id": "tm_70995",
+   "players": [
+    {
+     "name": "Abdoulaye Seck",
+     "position": "D",
+     "market_value": 540000
+    },
+    {
+     "name": "Ahmadou Bamba Dieng",
+     "position": "F",
+     "market_value": 15500000
+    },
+    {
+     "name": "Antoine Mendy",
+     "position": "D",
+     "market_value": 5800000
+    },
+    {
+     "name": "Assane Diao",
+     "position": "F",
+     "market_value": 31000000
+    },
+    {
+     "name": "Bara Sapoko Ndiaye",
+     "position": "M",
+     "market_value": 280000
+    },
+    {
+     "name": "Cherif Ndiaye",
+     "position": "F",
+     "market_value": 5400000
+    },
+    {
+     "name": "Edouard Mendy",
+     "position": "G",
+     "market_value": 4400000
+    },
+    {
+     "name": "El Hadji Malick Diouf",
+     "position": "D",
+     "market_value": 29000000
+    },
+    {
+     "name": "Habib Diarra",
+     "position": "M",
+     "market_value": 34000000
+    },
+    {
+     "name": "Ibrahim Mbaye",
+     "position": "F",
+     "market_value": 29000000
+    },
+    {
+     "name": "Idrissa Gana Gueye",
+     "position": "M",
+     "market_value": 970000
+    },
+    {
+     "name": "Iliman Ndiaye",
+     "position": "M",
+     "market_value": 49000000
+    },
+    {
+     "name": "Ismail Jakobs",
+     "position": "D",
+     "market_value": 8700000
+    },
+    {
+     "name": "Ismaïla Sarr",
+     "position": "F",
+     "market_value": 33000000
+    },
+    {
+     "name": "Kalidou Koulibaly",
+     "position": "D",
+     "market_value": 4800000
+    },
+    {
+     "name": "Krépin Diatta",
+     "position": "M",
+     "market_value": 5800000
+    },
+    {
+     "name": "Lamine Camara",
+     "position": "M",
+     "market_value": 41000000
+    },
+    {
+     "name": "Mamadou Sarr",
+     "position": "D",
+     "market_value": 27000000
+    },
+    {
+     "name": "Mory Diaw",
+     "position": "G",
+     "market_value": 950000
+    },
+    {
+     "name": "Moussa Niakhaté",
+     "position": "D",
+     "market_value": 14600000
+    },
+    {
+     "name": "Nicolas Jackson",
+     "position": "F",
+     "market_value": 39000000
+    },
+    {
+     "name": "Pape Gueye",
+     "position": "M",
+     "market_value": 39000000
+    },
+    {
+     "name": "Pape Matar Sarr",
+     "position": "M",
+     "market_value": 30000000
+    },
+    {
+     "name": "Pathé Ismaël Ciss",
+     "position": "M",
+     "market_value": 1800000
+    },
+    {
+     "name": "Sadio Mané",
+     "position": "M",
+     "market_value": 6600000
+    },
+    {
+     "name": "Yehvann Diouf",
+     "position": "G",
+     "market_value": 6600000
+    }
+   ],
+   "total_value": 463740000
+  },
+  "South Africa": {
+   "team_id": "tm_65332",
+   "players": [
+    {
+     "name": "Bradley Cross",
+     "position": "D",
+     "market_value": 580000
+    },
+    {
+     "name": "Evidence Makgopa",
+     "position": "F",
+     "market_value": 860000
+    },
+    {
+     "name": "Ime Okon",
+     "position": "D",
+     "market_value": 825000
+    },
+    {
+     "name": "Iqraam Rayners",
+     "position": "F",
+     "market_value": 1800000
+    },
+    {
+     "name": "Jayden Adams",
+     "position": "M",
+     "market_value": 1200000
+    },
+    {
+     "name": "Kamogelo Sebelebele",
+     "position": "M",
+     "market_value": 505000
+    },
+    {
+     "name": "Khulumani Ndamane",
+     "position": "D",
+     "market_value": 110000
+    },
+    {
+     "name": "Lyle Foster",
+     "position": "F",
+     "market_value": 6200000
+    },
+    {
+     "name": "Mbekezeli Mbokazi",
+     "position": "D",
+     "market_value": 330000
+    },
+    {
+     "name": "Nkosinathi Sibisi",
+     "position": "D",
+     "market_value": 1400000
+    },
+    {
+     "name": "Oswin Appollis",
+     "position": "M",
+     "market_value": 860000
+    },
+    {
+     "name": "Relebohile Mofokeng",
+     "position": "M",
+     "market_value": 1200000
+    },
+    {
+     "name": "Ricardo Goss",
+     "position": "G",
+     "market_value": 570000
+    },
+    {
+     "name": "Ronwen Williams",
+     "position": "G",
+     "market_value": 1000000
+    },
+    {
+     "name": "Samukelo Kabini",
+     "position": "D",
+     "market_value": 1100000
+    },
+    {
+     "name": "Sphephelo Sithole",
+     "position": "M",
+     "market_value": 430000
+    },
+    {
+     "name": "Teboho Mokoena",
+     "position": "M",
+     "market_value": 2500000
+    },
+    {
+     "name": "Thalente Mbatha",
+     "position": "M",
+     "market_value": 750000
+    },
+    {
+     "name": "Thapelo Maseko",
+     "position": "M",
+     "market_value": 775000
+    },
+    {
+     "name": "Themba Zwane",
+     "position": "M",
+     "market_value": 390000
+    },
+    {
+     "name": "Tholo Thabang Matuludi",
+     "position": "D",
+     "market_value": 0
+    },
+    {
+     "name": "Tshepang Moremi",
+     "position": "M",
+     "market_value": 360000
+    }
+   ],
+   "total_value": 23745000
+  },
+  "South Korea": {
+   "team_id": "tm_41775",
+   "players": [
+    {
+     "name": "Dong-gyeong Lee",
+     "position": "M",
+     "market_value": 1600000
+    },
+    {
+     "name": "Gi-Hyuk Lee",
+     "position": "D",
+     "market_value": 825000
+    },
+    {
+     "name": "Gue-sung Cho",
+     "position": "F",
+     "market_value": 2900000
+    },
+    {
+     "name": "Han-Beom Lee",
+     "position": "D",
+     "market_value": 2800000
+    },
+    {
+     "name": "Hwang Hee-chan",
+     "position": "F",
+     "market_value": 7300000
+    },
+    {
+     "name": "Hwang In-beom",
+     "position": "M",
+     "market_value": 6400000
+    },
+    {
+     "name": "Hyeon-gyu Oh",
+     "position": "F",
+     "market_value": 16000000
+    },
+    {
+     "name": "Jae-sung Lee",
+     "position": "M",
+     "market_value": 2100000
+    },
+    {
+     "name": "Jens Castrop",
+     "position": "M",
+     "market_value": 9300000
+    },
+    {
+     "name": "Ji-sung Eom",
+     "position": "M",
+     "market_value": 1700000
+    },
+    {
+     "name": "Jin-gyu Kim",
+     "position": "M",
+     "market_value": 1200000
+    },
+    {
+     "name": "Jin-seob Park",
+     "position": "M",
+     "market_value": 1100000
+    },
+    {
+     "name": "Jo Hyeonwoo",
+     "position": "G",
+     "market_value": 630000
+    },
+    {
+     "name": "Jun-Ho Bae",
+     "position": "M",
+     "market_value": 3900000
+    },
+    {
+     "name": "Kang-in Lee",
+     "position": "M",
+     "market_value": 30000000
+    },
+    {
+     "name": "Kim Min-jae",
+     "position": "D",
+     "market_value": 21000000
+    },
+    {
+     "name": "Kim Moon-hwan",
+     "position": "D",
+     "market_value": 695000
+    },
+    {
+     "name": "Kim Seung-gyu",
+     "position": "G",
+     "market_value": 635000
+    },
+    {
+     "name": "Kim Tae-hyeon",
+     "position": "D",
+     "market_value": 655000
+    },
+    {
+     "name": "Lee Tae-seok",
+     "position": "M",
+     "market_value": 2100000
+    },
+    {
+     "name": "Seung Ho Paik",
+     "position": "M",
+     "market_value": 1900000
+    },
+    {
+     "name": "Son Heung-min",
+     "position": "F",
+     "market_value": 18600000
+    },
+    {
+     "name": "Song Bum-keun",
+     "position": "G",
+     "market_value": 965000
+    },
+    {
+     "name": "Wi-je Cho",
+     "position": "D",
+     "market_value": 390000
+    },
+    {
+     "name": "Yang Hyun-Jun",
+     "position": "F",
+     "market_value": 5300000
+    },
+    {
+     "name": "Young-woo Seol",
+     "position": "D",
+     "market_value": 5200000
+    }
+   ],
+   "total_value": 145195000
+  },
+  "Spain": {
+   "team_id": "tm_86522",
+   "players": [
+    {
+     "name": "Alejandro Grimaldo",
+     "position": "M",
+     "market_value": 19400000
+    },
+    {
+     "name": "Alex Baena",
+     "position": "M",
+     "market_value": 48000000
+    },
+    {
+     "name": "Aymeric Laporte",
+     "position": "D",
+     "market_value": 9400000
+    },
+    {
+     "name": "Borja Iglesias",
+     "position": "F",
+     "market_value": 3100000
+    },
+    {
+     "name": "Dani Olmo",
+     "position": "M",
+     "market_value": 58000000
+    },
+    {
+     "name": "David Raya",
+     "position": "G",
+     "market_value": 38000000
+    },
+    {
+     "name": "Eric García",
+     "position": "D",
+     "market_value": 34000000
+    },
+    {
+     "name": "Fabián Ruiz",
+     "position": "M",
+     "market_value": 29000000
+    },
+    {
+     "name": "Ferran Torres",
+     "position": "F",
+     "market_value": 54000000
+    },
+    {
+     "name": "Joan García",
+     "position": "G",
+     "market_value": 41000000
+    },
+    {
+     "name": "Lamine Yamal",
+     "position": "M",
+     "market_value": 215000000
+    },
+    {
+     "name": "Marc Cucurella",
+     "position": "D",
+     "market_value": 52000000
+    },
+    {
+     "name": "Marc Pubill",
+     "position": "D",
+     "market_value": 27000000
+    },
+    {
+     "name": "Marcos Llorente",
+     "position": "D",
+     "market_value": 23000000
+    },
+    {
+     "name": "Martín Zubimendi",
+     "position": "M",
+     "market_value": 82000000
+    },
+    {
+     "name": "Mikel Merino",
+     "position": "M",
+     "market_value": 31000000
+    },
+    {
+     "name": "Mikel Oyarzabal",
+     "position": "F",
+     "market_value": 27000000
+    },
+    {
+     "name": "Nico Williams",
+     "position": "M",
+     "market_value": 54000000
+    },
+    {
+     "name": "Pablo Gavi",
+     "position": "M",
+     "market_value": 31000000
+    },
+    {
+     "name": "Pau Cubarsí",
+     "position": "D",
+     "market_value": 75000000
+    },
+    {
+     "name": "Pedri",
+     "position": "M",
+     "market_value": 164000000
+    },
+    {
+     "name": "Pedro Porro",
+     "position": "D",
+     "market_value": 37000000
+    },
+    {
+     "name": "Rodri",
+     "position": "M",
+     "market_value": 59000000
+    },
+    {
+     "name": "Unai Simón",
+     "position": "G",
+     "market_value": 24000000
+    },
+    {
+     "name": "Victor Muñoz",
+     "position": "F",
+     "market_value": 19400000
+    },
+    {
+     "name": "Yéremy Pino",
+     "position": "F",
+     "market_value": 32000000
+    }
+   ],
+   "total_value": 1286300000
+  },
+  "Sweden": {
+   "team_id": "tm_86978",
+   "players": [
+    {
+     "name": "Alexander Bernhardsson",
+     "position": "F",
+     "market_value": 3200000
+    },
+    {
+     "name": "Alexander Isak",
+     "position": "F",
+     "market_value": 103000000
+    },
+    {
+     "name": "Anthony Elanga",
+     "position": "F",
+     "market_value": 38000000
+    },
+    {
+     "name": "Benjamin Nygren",
+     "position": "F",
+     "market_value": 9700000
+    },
+    {
+     "name": "Besfort Zeneli",
+     "position": "M",
+     "market_value": 4600000
+    },
+    {
+     "name": "Carl Starfelt",
+     "position": "D",
+     "market_value": 4500000
+    },
+    {
+     "name": "Daniel Svensson",
+     "position": "M",
+     "market_value": 20000000
+    },
+    {
+     "name": "Elliot Stroud",
+     "position": "M",
+     "market_value": 3100000
+    },
+    {
+     "name": "Eric Smith",
+     "position": "D",
+     "market_value": 5300000
+    },
+    {
+     "name": "Gabriel Gudmundsson",
+     "position": "D",
+     "market_value": 21000000
+    },
+    {
+     "name": "Gustaf Lagerbielke",
+     "position": "D",
+     "market_value": 10400000
+    },
+    {
+     "name": "Gustaf Nilsson",
+     "position": "F",
+     "market_value": 2200000
+    },
+    {
+     "name": "Herman Johansson",
+     "position": "M",
+     "market_value": 1700000
+    },
+    {
+     "name": "Hjalmar Ekdal",
+     "position": "D",
+     "market_value": 5600000
+    },
+    {
+     "name": "Isak Hien",
+     "position": "D",
+     "market_value": 21000000
+    },
+    {
+     "name": "Jacob Widell Zetterström",
+     "position": "G",
+     "market_value": 2400000
+    },
+    {
+     "name": "Jesper Karlström",
+     "position": "M",
+     "market_value": 4099999
+    },
+    {
+     "name": "Ken Sema",
+     "position": "M",
+     "market_value": 1000000
+    },
+    {
+     "name": "Kristoffer Nordfeldt",
+     "position": "G",
+     "market_value": 190000
+    },
+    {
+     "name": "Lucas Bergvall",
+     "position": "M",
+     "market_value": 41000000
+    },
+    {
+     "name": "Mattias Svanberg",
+     "position": "M",
+     "market_value": 8300000
+    },
+    {
+     "name": "Taha Abdi Ali",
+     "position": "M",
+     "market_value": 1100000
+    },
+    {
+     "name": "Victor Lindelöf",
+     "position": "D",
+     "market_value": 5800000
+    },
+    {
+     "name": "Viktor Gyökeres",
+     "position": "F",
+     "market_value": 61000000
+    },
+    {
+     "name": "Viktor Johansson",
+     "position": "G",
+     "market_value": 11600000
+    },
+    {
+     "name": "Yasin Ayari",
+     "position": "M",
+     "market_value": 27000000
+    }
+   ],
+   "total_value": 416789999
+  },
+  "Switzerland": {
+   "team_id": "tm_70912",
+   "players": [
+    {
+     "name": "Ardon Jashari",
+     "position": "M",
+     "market_value": 10500000
+    },
+    {
+     "name": "Aurèle Amenda",
+     "position": "D",
+     "market_value": 7700000
+    },
+    {
+     "name": "Breel Embolo",
+     "position": "F",
+     "market_value": 10900000
+    },
+    {
+     "name": "Christian Fassnacht",
+     "position": "M",
+     "market_value": 2100000
+    },
+    {
+     "name": "Cédric Itten",
+     "position": "F",
+     "market_value": 1400000
+    },
+    {
+     "name": "Dan Ndoye",
+     "position": "M",
+     "market_value": 34000000
+    },
+    {
+     "name": "Denis Zakaria",
+     "position": "M",
+     "market_value": 32000000
+    },
+    {
+     "name": "Djibril Sow",
+     "position": "M",
+     "market_value": 7100000
+    },
+    {
+     "name": "Eray Cömert",
+     "position": "D",
+     "market_value": 2200000
+    },
+    {
+     "name": "Fabian Rieder",
+     "position": "M",
+     "market_value": 5500000
+    },
+    {
+     "name": "Granit Xhaka",
+     "position": "M",
+     "market_value": 12700000
+    },
+    {
+     "name": "Gregor Kobel",
+     "position": "G",
+     "market_value": 41000000
+    },
+    {
+     "name": "Johan Manzambi",
+     "position": "M",
+     "market_value": 8700000
+    },
+    {
+     "name": "Luca Jaquez",
+     "position": "D",
+     "market_value": 6400000
+    },
+    {
+     "name": "Manuel Akanji",
+     "position": "D",
+     "market_value": 25000000
+    },
+    {
+     "name": "Marvin Keller",
+     "position": "G",
+     "market_value": 8700000
+    },
+    {
+     "name": "Michel Aebischer",
+     "position": "M",
+     "market_value": 7800000
+    },
+    {
+     "name": "Miro Muheim",
+     "position": "D",
+     "market_value": 4200000
+    },
+    {
+     "name": "Nico Elvedi",
+     "position": "D",
+     "market_value": 7300000
+    },
+    {
+     "name": "Noah Okafor",
+     "position": "F",
+     "market_value": 14300000
+    },
+    {
+     "name": "Remo Freuler",
+     "position": "M",
+     "market_value": 5200000
+    },
+    {
+     "name": "Ricardo Rodríguez",
+     "position": "D",
+     "market_value": 2200000
+    },
+    {
+     "name": "Ruben Vargas",
+     "position": "M",
+     "market_value": 6500000
+    },
+    {
+     "name": "Silvan Widmer",
+     "position": "M",
+     "market_value": 1100000
+    },
+    {
+     "name": "Yvon Mvogo",
+     "position": "G",
+     "market_value": 3100000
+    }
+   ],
+   "total_value": 267600000
+  },
+  "Tunisia": {
+   "team_id": "tm_70939",
+   "players": [
+    {
+     "name": "Adem Arous",
+     "position": "D",
+     "market_value": 390000
+    },
+    {
+     "name": "Ali Abdi",
+     "position": "D",
+     "market_value": 2300000
+    },
+    {
+     "name": "Amine Ben Hamida",
+     "position": "D",
+     "market_value": 680000
+    },
+    {
+     "name": "Anis Ben Slimane",
+     "position": "M",
+     "market_value": 2600000
+    },
+    {
+     "name": "Aymen Dahmen",
+     "position": "G",
+     "market_value": 585000
+    },
+    {
+     "name": "Elias Achouri",
+     "position": "M",
+     "market_value": 3800000
+    },
+    {
+     "name": "Elias Saad",
+     "position": "F",
+     "market_value": 4300000
+    },
+    {
+     "name": "Ellyes Skhiri",
+     "position": "M",
+     "market_value": 7700000
+    },
+    {
+     "name": "Firas Chaouat",
+     "position": "F",
+     "market_value": 450000
+    },
+    {
+     "name": "Hannibal Mejbri",
+     "position": "M",
+     "market_value": 12600000
+    },
+    {
+     "name": "Hazem Mestouri",
+     "position": "F",
+     "market_value": 380000
+    },
+    {
+     "name": "Ismael Gharbi",
+     "position": "M",
+     "market_value": 7100000
+    },
+    {
+     "name": "Khalil Ayari",
+     "position": "F",
+     "market_value": 97000
+    },
+    {
+     "name": "Mohamed Belhadj Mahmoud",
+     "position": "M",
+     "market_value": 3100000
+    },
+    {
+     "name": "Montassar Talbi",
+     "position": "D",
+     "market_value": 5700000
+    },
+    {
+     "name": "Mortadha Ben Ouanes",
+     "position": "M",
+     "market_value": 1400000
+    },
+    {
+     "name": "Moutaz Neffati",
+     "position": "D",
+     "market_value": 755000
+    },
+    {
+     "name": "Omar Rekik",
+     "position": "D",
+     "market_value": 465000
+    },
+    {
+     "name": "Raed Chikhaoui",
+     "position": "D",
+     "market_value": 77000
+    },
+    {
+     "name": "Rani Khedira",
+     "position": "M",
+     "market_value": 2600000
+    },
+    {
+     "name": "Rayan Elloumi",
+     "position": "F",
+     "market_value": 0
+    },
+    {
+     "name": "Sabri Ben Hessen",
+     "position": "G",
+     "market_value": 320000
+    },
+    {
+     "name": "Sebastian Tounekti",
+     "position": "M",
+     "market_value": 1300000
+    },
+    {
+     "name": "Yan Valery",
+     "position": "D",
+     "market_value": 1400000
+    }
+   ],
+   "total_value": 60099000
+  },
+  "Turkey": {
+   "team_id": "tm_17049",
+   "players": [
+    {
+     "name": "Abdülkerim Bardakcı",
+     "position": "D",
+     "market_value": 7700000
+    },
+    {
+     "name": "Altay Bayındır",
+     "position": "G",
+     "market_value": 7800000
+    },
+    {
+     "name": "Arda Güler",
+     "position": "M",
+     "market_value": 87000000
+    },
+    {
+     "name": "Barış Alper Yılmaz",
+     "position": "M",
+     "market_value": 27000000
+    },
+    {
+     "name": "Can Uzun",
+     "position": "M",
+     "market_value": 17500000
+    },
+    {
+     "name": "Deniz Gül",
+     "position": "F",
+     "market_value": 4099999
+    },
+    {
+     "name": "Eren Elmalı",
+     "position": "D",
+     "market_value": 6500000
+    },
+    {
+     "name": "Ferdi Kadıoğlu",
+     "position": "D",
+     "market_value": 31000000
+    },
+    {
+     "name": "Hakan Çalhanoğlu",
+     "position": "M",
+     "market_value": 31000000
+    },
+    {
+     "name": "Kaan Ayhan",
+     "position": "D",
+     "market_value": 3800000
+    },
+    {
+     "name": "Kenan Yıldız",
+     "position": "M",
+     "market_value": 48000000
+    },
+    {
+     "name": "Kerem Aktürkoğlu",
+     "position": "F",
+     "market_value": 24000000
+    },
+    {
+     "name": "Merih Demiral",
+     "position": "D",
+     "market_value": 12600000
+    },
+    {
+     "name": "Mert Günok",
+     "position": "G",
+     "market_value": 875000
+    },
+    {
+     "name": "Mert Müldür",
+     "position": "D",
+     "market_value": 6300000
+    },
+    {
+     "name": "Orkun Kökçü",
+     "position": "M",
+     "market_value": 29000000
+    },
+    {
+     "name": "Ozan Kabak",
+     "position": "D",
+     "market_value": 7300000
+    },
+    {
+     "name": "Oğuz Aydın",
+     "position": "M",
+     "market_value": 10300000
+    },
+    {
+     "name": "Salih Özcan",
+     "position": "M",
+     "market_value": 3900000
+    },
+    {
+     "name": "Samet Akaydın",
+     "position": "D",
+     "market_value": 1300000
+    },
+    {
+     "name": "Uğurcan Çakır",
+     "position": "G",
+     "market_value": 14500000
+    },
+    {
+     "name": "Yunus Akgün",
+     "position": "M",
+     "market_value": 13900000
+    },
+    {
+     "name": "Zeki Çelik",
+     "position": "D",
+     "market_value": 6200000
+    },
+    {
+     "name": "Çağlar Söyüncü",
+     "position": "D",
+     "market_value": 7200000
+    },
+    {
+     "name": "İrfan Can Kahveci",
+     "position": "M",
+     "market_value": 7300000
+    },
+    {
+     "name": "İsmail Yüksek",
+     "position": "M",
+     "market_value": 10300000
+    }
+   ],
+   "total_value": 426374999
+  },
+  "United States": {
+   "team_id": "tm_09410",
+   "players": [
+    {
+     "name": "Alex Zendejas",
+     "position": "M",
+     "market_value": 9200000
+    },
+    {
+     "name": "Alexander Freeman",
+     "position": "D",
+     "market_value": 3200000
+    },
+    {
+     "name": "Antonee Robinson",
+     "position": "D",
+     "market_value": 27000000
+    },
+    {
+     "name": "Auston Trusty",
+     "position": "D",
+     "market_value": 6300000
+    },
+    {
+     "name": "Brenden Aaronson",
+     "position": "M",
+     "market_value": 18700000
+    },
+    {
+     "name": "Chris Brady",
+     "position": "G",
+     "market_value": 2400000
+    },
+    {
+     "name": "Chris Richards",
+     "position": "D",
+     "market_value": 23000000
+    },
+    {
+     "name": "Christian Pulišić",
+     "position": "F",
+     "market_value": 43000000
+    },
+    {
+     "name": "Cristian Roldán",
+     "position": "M",
+     "market_value": 3800000
+    },
+    {
+     "name": "Folarin Balogun",
+     "position": "F",
+     "market_value": 36000000
+    },
+    {
+     "name": "Giovanni Reyna",
+     "position": "M",
+     "market_value": 4300000
+    },
+    {
+     "name": "Haji Wright",
+     "position": "F",
+     "market_value": 16600000
+    },
+    {
+     "name": "Joe Scally",
+     "position": "D",
+     "market_value": 6600000
+    },
+    {
+     "name": "Malik Tillman",
+     "position": "M",
+     "market_value": 27000000
+    },
+    {
+     "name": "Mark McKenzie",
+     "position": "D",
+     "market_value": 7300000
+    },
+    {
+     "name": "Matt Turner",
+     "position": "G",
+     "market_value": 2600000
+    },
+    {
+     "name": "Matthew Freese",
+     "position": "G",
+     "market_value": 2100000
+    },
+    {
+     "name": "Maximilian Arfsten",
+     "position": "M",
+     "market_value": 4800000
+    },
+    {
+     "name": "Miles Robinson",
+     "position": "D",
+     "market_value": 3200000
+    },
+    {
+     "name": "Ricardo Pepi",
+     "position": "F",
+     "market_value": 31000000
+    },
+    {
+     "name": "Sebastian Berhalter",
+     "position": "M",
+     "market_value": 4600000
+    },
+    {
+     "name": "Sergiño Dest",
+     "position": "D",
+     "market_value": 17200000
+    },
+    {
+     "name": "Tim Ream",
+     "position": "D",
+     "market_value": 195000
+    },
+    {
+     "name": "Tim Weah",
+     "position": "M",
+     "market_value": 18200000
+    },
+    {
+     "name": "Tyler Adams",
+     "position": "M",
+     "market_value": 26000000
+    },
+    {
+     "name": "Weston McKennie",
+     "position": "M",
+     "market_value": 31000000
+    }
+   ],
+   "total_value": 375295000
+  },
+  "Uruguay": {
+   "team_id": "tm_41769",
+   "players": [
+    {
+     "name": "Agustín Canobbio",
+     "position": "M",
+     "market_value": 5200000
+    },
+    {
+     "name": "Brian Rodríguez",
+     "position": "M",
+     "market_value": 6400000
+    },
+    {
+     "name": "Darwin Núñez",
+     "position": "F",
+     "market_value": 59000000
+    },
+    {
+     "name": "Emiliano Martínez",
+     "position": "M",
+     "market_value": 9300000
+    },
+    {
+     "name": "Facundo Pellistri",
+     "position": "M",
+     "market_value": 9700000
+    },
+    {
+     "name": "Federico Valverde",
+     "position": "M",
+     "market_value": 116000000
+    },
+    {
+     "name": "Federico Viñas",
+     "position": "F",
+     "market_value": 1800000
+    },
+    {
+     "name": "Fernando Muslera",
+     "position": "G",
+     "market_value": 730000
+    },
+    {
+     "name": "Giorgian De Arrascaeta",
+     "position": "M",
+     "market_value": 14500000
+    },
+    {
+     "name": "Joaquín Piquerez",
+     "position": "D",
+     "market_value": 14100000
+    },
+    {
+     "name": "José María Giménez",
+     "position": "D",
+     "market_value": 19200000
+    },
+    {
+     "name": "Juan Manuel Sanabria",
+     "position": "M",
+     "market_value": 5700000
+    },
+    {
+     "name": "Manuel Ugarte",
+     "position": "M",
+     "market_value": 43000000
+    },
+    {
+     "name": "Mathías Olivera",
+     "position": "D",
+     "market_value": 19300000
+    },
+    {
+     "name": "Matías Viña",
+     "position": "D",
+     "market_value": 5200000
+    },
+    {
+     "name": "Maximiliano Araújo",
+     "position": "M",
+     "market_value": 15400000
+    },
+    {
+     "name": "Nicolás de la Cruz",
+     "position": "M",
+     "market_value": 11200000
+    },
+    {
+     "name": "Rodrigo Aguirre",
+     "position": "F",
+     "market_value": 2700000
+    },
+    {
+     "name": "Rodrigo Bentancur",
+     "position": "M",
+     "market_value": 29000000
+    },
+    {
+     "name": "Rodrigo Zalazar",
+     "position": "M",
+     "market_value": 19000000
+    },
+    {
+     "name": "Ronald Araújo",
+     "position": "D",
+     "market_value": 38000000
+    },
+    {
+     "name": "Santiago Bueno",
+     "position": "D",
+     "market_value": 9200000
+    },
+    {
+     "name": "Santiago Mele",
+     "position": "G",
+     "market_value": 2300000
+    },
+    {
+     "name": "Sebastián Cáceres",
+     "position": "D",
+     "market_value": 4500000
+    },
+    {
+     "name": "Sergio Rochet",
+     "position": "G",
+     "market_value": 3800000
+    }
+   ],
+   "total_value": 464230000
+  },
+  "Uzbekistan": {
+   "team_id": "tm_53289",
+   "players": [
+    {
+     "name": "Abbosbek Fayzullaev",
+     "position": "M",
+     "market_value": 7500000
+    },
+    {
+     "name": "Abdukodir Khusanov",
+     "position": "D",
+     "market_value": 11400000
+    },
+    {
+     "name": "Akmal Mozgovoy",
+     "position": "M",
+     "market_value": 1600000
+    },
+    {
+     "name": "Avazbek Ulmasaliyev",
+     "position": "D",
+     "market_value": 515000
+    },
+    {
+     "name": "Azizjon Ganiev",
+     "position": "M",
+     "market_value": 2400000
+    },
+    {
+     "name": "Bekhruz Karimov",
+     "position": "D",
+     "market_value": 370000
+    },
+    {
+     "name": "Eldor Shomurodov",
+     "position": "F",
+     "market_value": 5300000
+    },
+    {
+     "name": "Jakhongir Urozov",
+     "position": "D",
+     "market_value": 460000
+    },
+    {
+     "name": "Jaloliddin Masharipov",
+     "position": "M",
+     "market_value": 1900000
+    },
+    {
+     "name": "Jamshid Iskandarov",
+     "position": "M",
+     "market_value": 980000
+    },
+    {
+     "name": "Khozhiakbar Alizhonov",
+     "position": "D",
+     "market_value": 835000
+    },
+    {
+     "name": "Odildzhon Khamrobekov",
+     "position": "M",
+     "market_value": 1100000
+    },
+    {
+     "name": "Oston Urunov",
+     "position": "M",
+     "market_value": 2100000
+    },
+    {
+     "name": "Otabek Shukurov",
+     "position": "M",
+     "market_value": 1700000
+    },
+    {
+     "name": "Rustam Ashurmatov",
+     "position": "D",
+     "market_value": 570000
+    },
+    {
+     "name": "Sherzod Esanov",
+     "position": "M",
+     "market_value": 330000
+    },
+    {
+     "name": "Sherzod Nasrullaev",
+     "position": "D",
+     "market_value": 1200000
+    },
+    {
+     "name": "Utkir Yusupov",
+     "position": "G",
+     "market_value": 645000
+    }
+   ],
+   "total_value": 40905000
+  }
+ }
+}

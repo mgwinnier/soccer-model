@@ -265,6 +265,19 @@ def match_player_ratings(match_id: str, ttl: float = 86400.0, cfg=None) -> dict:
 _SEASON = [None]
 
 
+def team_squad(team_id: str, ttl: float = 86400.0, cfg=None) -> list[dict]:
+    """National-team (or club) squad with market values: [{id, name, position, market_value}].
+    From /teams/{id}/players (the SquadPlayer model). Empty on miss."""
+    d = _get(f"/teams/{team_id}/players", ttl=ttl, cfg=cfg, per_page=100)
+    rows = d.get("data") if isinstance(d, dict) else (d if isinstance(d, list) else None)
+    out = []
+    for p in rows or []:
+        if p.get("id") and p.get("name"):
+            out.append({"id": p["id"], "name": p["name"], "position": p.get("position"),
+                        "market_value": p.get("market_value")})
+    return out
+
+
 def current_season_id(cfg=None) -> str | None:
     """The competition's current season id (``is_current``), cached for the process."""
     if _SEASON[0]:
