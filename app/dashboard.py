@@ -1641,6 +1641,11 @@ def _kalshi_signals(matches: list, mk: list, buy_edge: float, sell_edge: float, 
         if not book:
             continue
         match = f"{m['home']} v {m['away']}"
+        ko = _ct(m.get("date"))                      # kickoff in Central time (sortable datetime)
+        try:
+            ko = ko.tz_localize(None) if (ko is not None and ko.tzinfo) else ko
+        except Exception:  # noqa: BLE001
+            pass
         for b in m.get("bets", []):
             px = kal.price_for(book, b.market, b.selection, m["home"], m["away"])
             if not px:
@@ -1651,15 +1656,13 @@ def _kalshi_signals(matches: list, mk: list, buy_edge: float, sell_edge: float, 
             delta = (ask - prev) if (ask is not None and prev is not None) else None
             if sig["action"] == "BUY" and ask:
                 stake = min(kelly_fraction(p, 1.0 / ask) * kelly * 100.0, 2.0)
-                buys.append({"Match": match, "Market": b.market, "Pick": b.selection,
+                buys.append({"Kickoff": ko, "Match": match, "Market": b.market, "Pick": b.selection,
                              "Model": p, "Ask": ask, "Edge": p - ask, "EV": sig["ev_buy"],
                              "Δ": delta, "Stake": stake})
             elif sig["action"] == "SELL" and bid is not None:
-                sells.append({"Match": match, "Market": b.market, "Pick": b.selection,
+                sells.append({"Kickoff": ko, "Match": match, "Market": b.market, "Pick": b.selection,
                               "Model": p, "Bid": bid, "Gap": bid - p, "Fade EV": sig["ev_sell"],
                               "Δ": delta})
-    buys.sort(key=lambda r: (r["EV"] is None, -(r["EV"] or 0)))
-    sells.sort(key=lambda r: (r["Fade EV"] is None, -(r["Fade EV"] or 0)))
     return buys, sells
 
 
@@ -1681,12 +1684,15 @@ def page_kalshi(bankroll=1000, kelly=0.25, upset_temp=1.0):
                "own; the exchange spread is ~3%, so only net-of-spread edges count.", icon="🎯")
     from src.data import kalshi as kal
 
-    c = st.columns([1, 1, 1, 2])
+    c = st.columns([1, 1, 1, 1])
     buy_edge = c[0].slider("Buy edge", 0.0, 0.20, 0.05, 0.01,
                            help="BUY when model% − Kalshi ask ≥ this.")
     sell_edge = c[1].slider("Sell edge", 0.0, 0.20, 0.05, 0.01,
                             help="SELL/fade when Kalshi bid − model% ≥ this.")
-    auto = c[2].checkbox("Auto-refresh (30s)", value=True)
+    sort_by = c[2].radio("Sort by", ["Best EV", "Kickoff"], horizontal=True,
+                         help="Order the boards by edge, or by soonest kickoff. "
+                              "(You can also click any column header to sort.)")
+    auto = c[3].checkbox("Auto-refresh (30s)", value=True)
 
     today = _today_ct().strftime("%Y-%m-%d")
     try:
@@ -1711,31 +1717,43 @@ def page_kalshi(bankroll=1000, kelly=0.25, upset_temp=1.0):
                        "server). Try again shortly.")
             return
         buys, sells = _kalshi_signals(matches, mk, buy_edge, sell_edge, kelly)
+        _far = pd.Timestamp.max
+
+        def _order(rows, ev_key):
+            if sort_by == "Kickoff":
+                rows.sort(key=lambda r: r.get("Kickoff") or _far)
+            else:
+                rows.sort(key=lambda r: (r[ev_key] is None, -(r[ev_key] or 0)))
+            return rows
+
+        _kocol = {"Kickoff": st.column_config.DatetimeColumn("Kickoff", format="ddd h:mm a")}
         st.caption(f"Kalshi prices as of {now_ct} CT · {len(mk)} live contracts · "
                    f"{len(buys)} buy / {len(sells)} sell signals")
 
         st.markdown("#### 🟢 BUY — model probability beats the Kalshi ask")
         if buys:
-            df = pd.DataFrame(buys)
+            df = pd.DataFrame(_order(buys, "EV"))
             disp = pd.DataFrame({
-                "Match": df["Match"], "Market": df["Market"], "Pick": df["Pick"],
-                "Model %": df["Model"].map(_fmt_pct), "Buy @": df["Ask"].map(_fmt_cent),
+                "Kickoff": df["Kickoff"], "Match": df["Match"], "Market": df["Market"],
+                "Pick": df["Pick"], "Model %": df["Model"].map(_fmt_pct),
+                "Buy @": df["Ask"].map(_fmt_cent),
                 "Edge": df["Edge"].map(_fmt_pct), "EV": df["EV"].map(_fmt_pct),
                 "Δ": df["Δ"].map(_fmt_signed_cent),
                 "Stake": df["Stake"].map(lambda u: f"{u:.1f}u" if u > 0.05 else "—")})
-            st.dataframe(disp, hide_index=True, use_container_width=True)
+            st.dataframe(disp, hide_index=True, use_container_width=True, column_config=_kocol)
         else:
             st.caption("No buy signal clears your edge right now.")
 
         st.markdown("#### 🔴 SELL / fade — the Kalshi bid is richer than the model")
         if sells:
-            df = pd.DataFrame(sells)
+            df = pd.DataFrame(_order(sells, "Fade EV"))
             disp = pd.DataFrame({
-                "Match": df["Match"], "Market": df["Market"], "Pick": df["Pick"],
-                "Model %": df["Model"].map(_fmt_pct), "Sell @": df["Bid"].map(_fmt_cent),
+                "Kickoff": df["Kickoff"], "Match": df["Match"], "Market": df["Market"],
+                "Pick": df["Pick"], "Model %": df["Model"].map(_fmt_pct),
+                "Sell @": df["Bid"].map(_fmt_cent),
                 "Over-priced by": df["Gap"].map(_fmt_pct),
                 "Fade EV": df["Fade EV"].map(_fmt_pct), "Δ": df["Δ"].map(_fmt_signed_cent)})
-            st.dataframe(disp, hide_index=True, use_container_width=True)
+            st.dataframe(disp, hide_index=True, use_container_width=True, column_config=_kocol)
             st.caption("**Sell @** is the bid you'd receive — if you hold this pick, sell to lock value. "
                        "**Fade EV** is the model's edge on the opposite side at its current price.")
         else:
