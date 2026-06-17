@@ -722,9 +722,17 @@ def _brief_facts(m: dict) -> dict:
     cands = _qualifying_bets(m, min_ev=0.03, min_prob_edge=0.02)
     if cands:
         b = max(cands, key=lambda x: x.ev)
+        book_txt = ""
+        try:
+            from src.data.odds import decimal_to_american
+            bdec = _book_dec(b, m, get_book_odds(m["home"], m["away"], str(m["date"])[:10]))
+            if bdec:
+                book_txt = f"; your book {_am(decimal_to_american(bdec))}"
+        except Exception:  # noqa: BLE001
+            pass
         f["Best bet (model)"] = (f"{b.market}: {b.selection} at {_am(b.american)} — model "
                                  f"{b.model_p*100:.0f}% vs market {(b.fair_p or 0)*100:.0f}%, "
-                                 f"EV {b.ev*100:+.0f}%")
+                                 f"EV {b.ev*100:+.0f}%{book_txt}")
     return f
 
 
