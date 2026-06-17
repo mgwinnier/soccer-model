@@ -18,13 +18,15 @@ from ..config import load_secrets
 
 _ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
 _SYSTEM = (
-    "You are a sharp, concise football analyst writing a 2-3 sentence match brief for a "
-    "prediction/betting dashboard. Use ONLY the facts provided. Do NOT invent or add anything "
-    "not explicitly given — no history, head-to-head trends, form not listed, injuries, reasons "
-    "for absences, tactics, or statistics. If a fact isn't provided, omit it; never speculate "
-    "about WHY a player is missing. Be specific, readable, neutral. Lead with the model's lean, "
-    "weave in the standout lineup/value angle if present, and end with the single best bet if one "
-    "is given. No preamble, no bullet points, no headers — just the 2-3 sentences."
+    "You are a sharp football analyst writing a short match brief for a prediction/betting "
+    "dashboard. The card below already shows the numbers — your job is to ADD real CONTEXT the "
+    "numbers don't capture, using Google Search for current, verifiable information: actual team "
+    "news, the real reason a listed player is out (only if a source states it), genuine recent "
+    "form or head-to-head, and the tactical/formation matchup.\n"
+    "STRICT RULES: state ONLY facts supported by the card data or a search result. If you cannot "
+    "verify something, do not say it. NEVER guess why a player is missing or invent history, "
+    "stats, or trends. Prefer recent, reputable sources. Write 3-4 tight, specific sentences that "
+    "add insight beyond the raw numbers — no preamble, no bullet points, no headers."
 )
 
 
@@ -49,22 +51,51 @@ def _render(facts: dict) -> str:
     return "\n".join(lines)
 
 
-def brief(facts: dict, timeout: float = 20.0) -> str | None:
-    """A grounded 2-3 sentence brief from ``facts``, or None (no key / error / empty)."""
+def _call(key: str, prompt: str, search: bool, timeout: float):
+    body = {"contents": [{"parts": [{"text": prompt}]}],
+            "generationConfig": {"temperature": 0.3, "maxOutputTokens": 320, "topP": 0.9}}
+    if search:
+        body["tools"] = [{"google_search": {}}]      # live grounding (real, citable)
+    return requests.post(_ENDPOINT.format(model=_model()), params={"key": key},
+                         json=body, timeout=timeout)
+
+
+def _parse(resp) -> dict | None:
+    cand = (resp.json().get("candidates") or [{}])[0]
+    text = "".join(p.get("text", "") for p in ((cand.get("content") or {}).get("parts") or []))
+    text = text.strip()
+    if not text:
+        return None
+    sources = []
+    for c in ((cand.get("groundingMetadata") or {}).get("groundingChunks") or []):
+        w = c.get("web") or {}
+        if w.get("uri"):
+            sources.append({"title": w.get("title") or w["uri"], "uri": w["uri"]})
+    # dedupe by uri, keep order
+    seen, uniq = set(), []
+    for s in sources:
+        if s["uri"] not in seen:
+            seen.add(s["uri"])
+            uniq.append(s)
+    return {"text": text, "sources": uniq[:5]}
+
+
+def brief(facts: dict, timeout: float = 25.0) -> dict | None:
+    """A context-adding brief grounded in Google Search, or None.
+
+    Returns ``{"text", "sources":[{title,uri}]}``. Uses live search so it fills gaps the card
+    doesn't show with REAL, citable info — and is told to state only what the data or a search
+    result supports. Falls back to no-search synthesis if the search tool isn't available."""
     key = api_key()
     if not key or not facts:
         return None
-    prompt = f"{_SYSTEM}\n\nFACTS:\n{_render(facts)}\n\nWrite the brief now:"
-    body = {"contents": [{"parts": [{"text": prompt}]}],
-            "generationConfig": {"temperature": 0.3, "maxOutputTokens": 200, "topP": 0.9}}
+    prompt = f"{_SYSTEM}\n\nCARD DATA:\n{_render(facts)}\n\nWrite the brief now:"
     try:
-        r = requests.post(_ENDPOINT.format(model=_model()), params={"key": key},
-                          json=body, timeout=timeout)
+        r = _call(key, prompt, search=True, timeout=timeout)
+        if r.status_code in (400, 403):              # search tool not enabled -> plain synthesis
+            r = _call(key, prompt, search=False, timeout=timeout)
         if r.status_code != 200:
             return None
-        cand = (r.json().get("candidates") or [{}])[0]
-        parts = ((cand.get("content") or {}).get("parts") or [{}])
-        text = "".join(p.get("text", "") for p in parts).strip()
-        return text or None
+        return _parse(r)
     except Exception:  # noqa: BLE001 — any failure degrades to no brief
         return None

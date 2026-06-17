@@ -808,9 +808,13 @@ def render_match(m: dict, live: dict | None = None, min_ev: float = 0.03,
                     st.session_state[bkey] = True
                 if st.session_state.get(bkey):
                     import json as _json
-                    txt = get_match_brief(_json.dumps(_brief_facts(m), sort_keys=True))
-                    if txt:
-                        theme.callout(txt, "info")
+                    res = get_match_brief(_json.dumps(_brief_facts(m), sort_keys=True))
+                    if res and res.get("text"):
+                        theme.callout(res["text"], "info")
+                        srcs = res.get("sources") or []
+                        if srcs:
+                            st.caption("Sources: " + " · ".join(
+                                f"[{s['title'][:38]}]({s['uri']})" for s in srcs))
                     else:
                         st.caption("Brief unavailable right now (Gemini error or no key).")
             if played:
