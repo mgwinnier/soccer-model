@@ -138,7 +138,8 @@ def build_predictions(cfg: dict | None = None, anchor_w: float = 0.5,
             if dec is None:
                 continue
             rows.append({
-                "date": r.date, "league": r.league, "market": market,
+                "date": r.date, "league": r.league, "game_id": getattr(r, "game_id", None),
+                "market": market,
                 "type": _grade_type(code), "american": am, "dec": dec,
                 "model_p": mp, "fair_p": fair, "result": _grade(code, hs, as_),
                 "cons_edge": code_edge_vs_consensus(cons, code, dec),
