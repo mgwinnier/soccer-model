@@ -233,6 +233,18 @@ def get_lineup_status(home: str, away: str, date: str):
         return None
 
 
+@st.cache_data(ttl=300, show_spinner=False)
+def get_espn_lineups(game_id):
+    """Confirmed XIs from ESPN (usually posted earlier than TheStatsAPI), or None."""
+    if not game_id:
+        return None
+    try:
+        from src.data.odds import fetch_lineups
+        return fetch_lineups(str(game_id))
+    except Exception:  # noqa: BLE001
+        return None
+
+
 def _hours_to_ko(date) -> float | None:
     try:
         ko = pd.to_datetime(date, utc=True)
@@ -242,17 +254,40 @@ def _hours_to_ko(date) -> float | None:
         return None
 
 
+def _espn_lineup_fallback(m: dict) -> bool:
+    """Render the confirmed XI from ESPN (fast source) when TheStatsAPI hasn't posted it.
+    Returns True if it rendered something."""
+    el = get_espn_lineups(m.get("game_id"))
+    if not el:
+        return False
+    st.markdown("**Confirmed lineups** · ESPN")
+    c1, c2 = st.columns(2)
+    for col, side, team in ((c1, "home", m["home"]), (c2, "away", m["away"])):
+        s = el.get(side) or {}
+        with col:
+            st.markdown(f"**{team_with_flag(team, 16, True)}** · {s.get('formation') or '?'}",
+                        unsafe_allow_html=True)
+            rows = [{"#": p.get("jersey") or "", "Starter": p.get("name"), "Pos": p.get("pos") or ""}
+                    for p in s.get("xi", [])]
+            if rows:
+                st.dataframe(pd.DataFrame(rows), hide_index=True, use_container_width=True)
+    st.caption("Confirmed XI from ESPN. Player ratings + the 'out vs last XI' flag appear once "
+               "TheStatsAPI posts its sheet.")
+    return True
+
+
 def lineup_block(m: dict):
-    """Confirmed XI + flagged absences — only when the sheet could be posted (played / near KO)."""
+    """Confirmed XI + flagged absences — only when the sheet could be posted (played / near KO).
+    TheStatsAPI is primary (it adds ratings + the missing-starter flag); ESPN is the faster
+    fallback so the XI shows as soon as it's announced."""
     hrs = _hours_to_ko(m.get("date"))
     if not (m.get("played") or (hrs is not None and hrs <= 6)):
         return
     ls = get_lineup_status(m["home"], m["away"], str(m["date"])[:10])
-    if not ls:
-        return
-    if not ls.get("posted"):
-        if not m.get("played"):
-            st.caption("Confirmed XI not posted yet (TheStatsAPI posts it ≈75 min before kick).")
+    if not (ls and ls.get("posted")):
+        # TheStatsAPI not ready -> show ESPN's confirmed XI (usually earlier)
+        if not _espn_lineup_fallback(m) and not m.get("played"):
+            st.caption("Confirmed XI not posted yet (appears here as soon as it's announced).")
         return
     played = ls.get("played")
     st.markdown("**Confirmed lineups**")

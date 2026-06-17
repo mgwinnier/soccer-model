@@ -67,6 +67,37 @@ def fetch_summary_odds(game_id: str, league: str = "fifa.world",
     }
 
 
+def fetch_lineups(game_id: str, league: str = "fifa.world", cfg=None) -> dict | None:
+    """Confirmed starting XIs from ESPN's summary ``rosters`` — usually posted EARLIER than
+    TheStatsAPI. Returns ``{'home': {team, formation, xi:[{name,pos,jersey}]}, 'away': {...}}`` or
+    None. Fresh fetch (XIs change up to kickoff); best-effort, never raises."""
+    from .team_names import normalize_team
+    try:
+        resp = requests.get(ESPN_SUMMARY.format(league=league), params={"event": game_id},
+                            headers=_HEADERS, timeout=20)
+        resp.raise_for_status()
+        data = resp.json()
+    except Exception:  # noqa: BLE001
+        return None
+    out: dict = {}
+    for r in data.get("rosters") or []:
+        side = r.get("homeAway")
+        if side not in ("home", "away"):
+            continue
+        xi = []
+        for p in r.get("roster") or []:
+            if not p.get("starter"):
+                continue
+            ath = p.get("athlete") or {}
+            xi.append({"name": ath.get("displayName"),
+                       "pos": (p.get("position") or {}).get("abbreviation"),
+                       "jersey": p.get("jersey")})
+        if xi:
+            out[side] = {"team": normalize_team((r.get("team") or {}).get("displayName")),
+                         "formation": r.get("formation"), "xi": xi}
+    return out if out.get("home") and out.get("away") else None
+
+
 def _pick_odds_entry(data: dict) -> dict | None:
     """Choose a usable odds entry, preferring Bet365, from pickcenter or odds."""
     pools = list(data.get("pickcenter") or []) + list(data.get("odds") or [])
