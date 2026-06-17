@@ -175,9 +175,15 @@ div[role="radiogroup"] > label:has(input:checked) p {{ color: #06160d !important
     h1, h2, h3 {{ font-size: 1.15rem !important; }}
     /* let wide dataframes scroll instead of overflow */
     [data-testid="stDataFrame"] {{ overflow-x: auto; }}
-    /* keep the sidebar usable when expanded */
-    section[data-testid="stSidebar"] {{ min-width: 16rem; }}
 }}
+
+/* never let custom CSS swallow the sidebar expand/collapse control — keep the
+   reopen arrow visible and clickable above everything (mobile + desktop) */
+[data-testid="stSidebarCollapsedControl"],
+[data-testid="collapsedControl"],
+[data-testid="stSidebarCollapseButton"] {{
+    display: flex !important; visibility: visible !important; opacity: 1 !important;
+    z-index: 2147483000 !important; }}
 </style>
 """, unsafe_allow_html=True)
 
