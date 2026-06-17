@@ -956,48 +956,52 @@ def main():
     if page not in _NAV_SLUGS:
         page = "matches"
     render_topnav(page)
-    with st.expander("⚙️  Staking & filters", expanded=False):
-        st.markdown(
-            '<div style="padding:6px 2px 10px 2px">'
-            '<div style="font-family:Oswald;font-size:22px;font-weight:700;line-height:1.05;'
-            'text-transform:uppercase;letter-spacing:.5px">🏆 FIFA World&nbsp;Cup'
-            '<span style="color:#1ec773"> 2026</span></div>'
-            '<div style="font-family:Oswald;font-size:15px;color:#8b93a7;'
-            'letter-spacing:2px;text-transform:uppercase">Soccer Model</div></div>',
-            unsafe_allow_html=True)
-        st.caption("Dixon-Coles · Elo · LightGBM ensemble · live ESPN data")
-        labels = [f"{icon} {name}" for icon, name, _ in NAV]
-        st.divider()
-        st.markdown("**⚙️ Staking** &nbsp; <span style='color:#8b93a7;font-size:12px'>"
-                    "1 unit = 1% of bankroll</span>", unsafe_allow_html=True)
-        bankroll = st.number_input("Bankroll ($)", 10, 1_000_000, 1000, step=50)
-        kelly = st.slider("Kelly fraction", 0.0, 1.0, 0.25, 0.05,
-                          help="0.25 = quarter Kelly (default, conservative). 0.5 = half. "
-                               "1.0 = full Kelly (aggressive). Stakes + tracker units scale "
-                               "with this.")
-        min_ev = st.slider("Min EV", 0.0, 0.30, 0.05, 0.01)
-        min_edge = st.slider("Min edge (model − market)", 0.0, 0.10, 0.02, 0.005,
-                             help="The model must beat the de-vigged price by at least this "
-                                  "much — a REAL disagreement, not EV leverage on long odds. "
-                                  "This is what stops the underdog/longshot junk.")
-        max_exp = st.slider("Max total exposure (× bankroll)", 0.1, 2.0, 1.0, 0.1)
-        st.divider()
-        st.markdown("**⚡ Upset sensitivity**", help=None)
-        upset_temp = st.slider("Upset sensitivity (τ)", 1.0, 2.0, 1.0, 0.05,
-                               label_visibility="collapsed",
-                               help="1.0 = the model's calibrated, most-accurate forecast. "
-                                    "Higher spreads probability toward underdogs/draws to surface "
-                                    "more upset value — it does NOT change the model's actual pick, "
-                                    "only how it shares probability.")
-        if upset_temp > 1.0:
-            st.caption(f"τ={upset_temp:.2f}: more upset value, lower precision. "
-                       "Backtest cost — pooled WC RPS 0.196→~0.201 at 1.5 (worse); "
-                       "upset-recall 30%→37%. Pick is unchanged.")
-        else:
-            st.caption("τ=1.0 — calibrated forecast (deployed accuracy).")
-        st.caption("⚠ EV/Kelly are only as good as the model's probabilities. The **min-edge "
-                   "gate** drops leverage-driven longshot flags. **Not betting advice** · "
-                   "independent model, not affiliated with FIFA.")
+    # staking/filters only matter on the betting pages
+    show_filters = page in ("matches", "value", "clv")
+    bankroll, kelly, min_ev, min_edge, max_exp, upset_temp = 1000, 0.25, 0.05, 0.02, 1.0, 1.0
+    if show_filters:
+        with st.expander("⚙️  Staking & filters", expanded=False):
+            st.markdown(
+                '<div style="padding:6px 2px 10px 2px">'
+                '<div style="font-family:Oswald;font-size:22px;font-weight:700;line-height:1.05;'
+                'text-transform:uppercase;letter-spacing:.5px">🏆 FIFA World&nbsp;Cup'
+                '<span style="color:#1ec773"> 2026</span></div>'
+                '<div style="font-family:Oswald;font-size:15px;color:#8b93a7;'
+                'letter-spacing:2px;text-transform:uppercase">Soccer Model</div></div>',
+                unsafe_allow_html=True)
+            st.caption("Dixon-Coles · Elo · LightGBM ensemble · live ESPN data")
+            labels = [f"{icon} {name}" for icon, name, _ in NAV]
+            st.divider()
+            st.markdown("**⚙️ Staking** &nbsp; <span style='color:#8b93a7;font-size:12px'>"
+                        "1 unit = 1% of bankroll</span>", unsafe_allow_html=True)
+            bankroll = st.number_input("Bankroll ($)", 10, 1_000_000, 1000, step=50)
+            kelly = st.slider("Kelly fraction", 0.0, 1.0, 0.25, 0.05,
+                              help="0.25 = quarter Kelly (default, conservative). 0.5 = half. "
+                                   "1.0 = full Kelly (aggressive). Stakes + tracker units scale "
+                                   "with this.")
+            min_ev = st.slider("Min EV", 0.0, 0.30, 0.05, 0.01)
+            min_edge = st.slider("Min edge (model − market)", 0.0, 0.10, 0.02, 0.005,
+                                 help="The model must beat the de-vigged price by at least this "
+                                      "much — a REAL disagreement, not EV leverage on long odds. "
+                                      "This is what stops the underdog/longshot junk.")
+            max_exp = st.slider("Max total exposure (× bankroll)", 0.1, 2.0, 1.0, 0.1)
+            st.divider()
+            st.markdown("**⚡ Upset sensitivity**", help=None)
+            upset_temp = st.slider("Upset sensitivity (τ)", 1.0, 2.0, 1.0, 0.05,
+                                   label_visibility="collapsed",
+                                   help="1.0 = the model's calibrated, most-accurate forecast. "
+                                        "Higher spreads probability toward underdogs/draws to surface "
+                                        "more upset value — it does NOT change the model's actual pick, "
+                                        "only how it shares probability.")
+            if upset_temp > 1.0:
+                st.caption(f"τ={upset_temp:.2f}: more upset value, lower precision. "
+                           "Backtest cost — pooled WC RPS 0.196→~0.201 at 1.5 (worse); "
+                           "upset-recall 30%→37%. Pick is unchanged.")
+            else:
+                st.caption("τ=1.0 — calibrated forecast (deployed accuracy).")
+            st.caption("⚠ EV/Kelly are only as good as the model's probabilities. The **min-edge "
+                       "gate** drops leverage-driven longshot flags. **Not betting advice** · "
+                       "independent model, not affiliated with FIFA.")
 
     if page == "matches":
         page_matches(bankroll, kelly, min_ev, min_edge, upset_temp)
