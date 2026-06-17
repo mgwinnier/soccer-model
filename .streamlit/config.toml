@@ -1,10 +1,10 @@
-# Streamlit configuration — "Stadium Night" theme.
+# Streamlit configuration — modern graphite theme (matches app/theme.py).
 [theme]
 base = "dark"
-primaryColor = "#1ec773"            # pitch green
-backgroundColor = "#0b0f19"         # deep navy
-secondaryBackgroundColor = "#151b2b"  # glassy card
-textColor = "#e6e9f0"
+primaryColor = "#34d39a"            # emerald accent
+backgroundColor = "#0b0c0e"         # graphite base
+secondaryBackgroundColor = "#15171c"  # card surface
+textColor = "#e8eaed"
 font = "sans serif"
 
 [server]

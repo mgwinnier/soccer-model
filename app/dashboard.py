@@ -577,7 +577,7 @@ def market_table(title: str, bets: list, key_note: str | None = None, m: dict | 
     from src.predict.betting import expected_value
     st.markdown(f"**{title}**")
     if angle:
-        tone = {"support": GREEN, "undercut": RED, "neutral": "#8b93a7"}.get(angle.get("read"), "#8b93a7")
+        tone = {"support": GREEN, "undercut": RED, "neutral": MUTED}.get(angle.get("read"), MUTED)
         st.markdown(f'<div class="angle-note">AI · <b style="color:{tone}">'
                     f'{angle.get("read", "neutral")}</b>: {angle.get("why", "")}</div>',
                     unsafe_allow_html=True)
@@ -721,7 +721,7 @@ def best_bet_block(m: dict, min_ev: float = 0.03, min_prob_edge: float = 0.02):
     cands = _qualifying_bets(m, min_ev, min_prob_edge)
     if not cands:
         st.markdown('<div class="bbet"><span class="h">Best bet</span> &nbsp; '
-                    '<span style="color:#8b93a7">no edge here — pass</span></div>',
+                    '<span style="color:#969aa6">no edge here — pass</span></div>',
                     unsafe_allow_html=True)
         return
     b = max(cands, key=lambda x: x.ev)
@@ -1023,7 +1023,7 @@ def render_match(m: dict, live: dict | None = None, min_ev: float = 0.03,
 # --------------------------------------------------------------------- pages
 def page_matches(bankroll, kelly, min_ev=0.03, min_prob_edge=0.02, upset_temp=1.0):
     theme.hero("Matches", "Model vs market across every priced market — flags, probabilities, "
-               "and the single best bet per game.", icon="⚽")
+               "and the single best bet per game.")
     c1, c2, c3 = st.columns([1, 1, 1])
     day = c1.date_input("From date", value=_today_ct())
     days = c2.slider("Days ahead", 1, 7, 3)
@@ -1058,16 +1058,14 @@ def page_matches(bankroll, kelly, min_ev=0.03, min_prob_edge=0.02, upset_temp=1.
     except Exception:  # noqa: BLE001 — cards still render without the stakes block
         live = None
     if upcoming:
-        st.markdown("### ⚽ Upcoming")
+        theme.section("Upcoming")
         for m in sorted(upcoming, key=lambda x: pd.to_datetime(x["date"])):
             render_match(m, live, min_ev, min_prob_edge)
     if played:
         hits = sum(1 for m in played
                    if m["result"] == OUTCOMES[int(np.argmax(list(_display_probs(m).values())))])
-        st.markdown(f"### ✅ Recent results &nbsp; "
-                    f"<span style='font-size:14px;color:#8b93a7'>model called "
-                    f"{hits}/{len(played)} ({hits/len(played)*100:.0f}%)</span>",
-                    unsafe_allow_html=True)
+        theme.section("Recent results",
+                      right=f"model called {hits}/{len(played)} ({hits/len(played)*100:.0f}%)")
         for m in sorted(played, key=lambda x: pd.to_datetime(x["date"]), reverse=True):
             render_match(m, live, min_ev, min_prob_edge)
     theme.footer()
@@ -1075,7 +1073,7 @@ def page_matches(bankroll, kelly, min_ev=0.03, min_prob_edge=0.02, upset_temp=1.
 
 def page_value_board(bankroll, kelly, min_ev, max_exposure, min_prob_edge=0.02, upset_temp=1.0):
     theme.hero("Value Board", "Every +EV bet across the slate, ranked — staked by fractional "
-               "Kelly and capped to your max exposure.", icon="💰")
+               "Kelly and capped to your max exposure.")
     day = st.date_input("From date", value=_today_ct(), key="vb_date")
     days = st.slider("Days ahead", 1, 7, 3, key="vb_days")
     res = get_bets(day.strftime("%Y-%m-%d"), days, bankroll, kelly, upset_temp)
@@ -1122,7 +1120,7 @@ def _group_color(row):
 
 def page_tournament():
     theme.hero("Tournament", "Live group standings + Monte-Carlo qualification and title odds — "
-               "results locked in, team strength updating from 2026 form.", icon="🏆")
+               "results locked in, team strength updating from 2026 form.")
     cc1, cc2 = st.columns([1, 4])
     if cc1.button("🔄 Refresh results"):
         get_live_state.clear()
@@ -1145,7 +1143,7 @@ def page_tournament():
         {"label": "Teams alive", "value": int((qual["advance"] > 0.001).sum()),
          "sub": "still able to reach the knockouts", "accent": theme.BLUE},
     ])
-    st.markdown("#### 🏆 Championship probability")
+    theme.section("Championship probability")
     chart = alt.Chart(top).mark_bar(color=GREEN, cornerRadiusEnd=4).encode(
         x=alt.X("champion:Q", axis=alt.Axis(format="%"), title="Championship probability"),
         y=alt.Y("team:N", sort="-x", title=None),
@@ -1168,7 +1166,7 @@ def page_tournament():
                          "Kalshi ask": ask, "Edge": float(r["champion"]) - ask, "EV": ev})
         if rows:
             kdf = pd.DataFrame(rows).sort_values("EV", ascending=False)
-            st.markdown("#### 🎯 Model vs Kalshi — tournament winner (tradeable)")
+            theme.section("Model vs Kalshi — tournament winner", sub="tradeable on Kalshi")
             thr = float(st.session_state.get("kalshi_alert_ev", 0.08))
             n_val = int((kdf["EV"] >= thr).sum())
             disp = pd.DataFrame({
@@ -1183,7 +1181,7 @@ def page_tournament():
                        "Tradeable on Kalshi; an edge ≠ a guaranteed win.")
 
     # --- live group leaderboards with flags + P(advance) ---
-    st.markdown("#### Group standings & qualification odds")
+    theme.section("Group standings & qualification odds")
     st.caption("🟢 top-2 (auto-qualify) · 🟡 3rd (best-third bubble) · ⚪ bottom. "
                "**Adv%** = model probability of reaching the knockouts.")
     adv = qual[["team", "advance", "win_group"]]
@@ -1216,7 +1214,7 @@ def page_tournament():
 def page_performance():
     theme.hero("Performance", "How the model actually scores — its 2026 record so far, "
                "walk-forward accuracy on 7 past World Cups (1998–2022), and an honest betting "
-               "backtest of the 2022 tournament.", icon="📊")
+               "backtest of the 2022 tournament.")
 
     # --- 2026 World Cup so far: the model's live record on already-played matches ---
     try:
@@ -1230,7 +1228,7 @@ def page_performance():
         # average goal error (model expected total vs actual)
         gerr = np.mean([abs(sum(m["analysis"]["expected_goals"])
                             - (m["home_score"] + m["away_score"])) for m in played26])
-        st.markdown("#### 🔴 2026 World Cup — live so far")
+        theme.section("2026 World Cup — live so far")
         theme.kpi_row([
             {"label": "Matches played", "value": n, "accent": theme.GREEN},
             {"label": "Result called", "value": f"{hits}/{n} ({hits/n*100:.0f}%)",
@@ -1246,7 +1244,7 @@ def page_performance():
     if not xiv.empty:
         from src.backtest.xi_value_2026 import summarize
         s = summarize(xiv)
-        st.markdown("#### Does the stronger (by market value) starting XI win?")
+        theme.section("Does the stronger (by market value) starting XI win?")
         if "value_fav_winrate" in s:
             theme.kpi_row([
                 {"label": "Higher-value XI won", "value": f"{s['value_fav_winrate']*100:.0f}%",
@@ -1288,7 +1286,7 @@ def page_performance():
                 {"label": "vs Elo-only", "value": (f"{elo_rps:.4f}" if elo_rps else "—"),
                  "sub": "the model beats it", "accent": theme.BLUE},
             ])
-        st.markdown("#### Accuracy — walk-forward over 7 World Cups, 1998–2022 (lower RPS is better)")
+        theme.section("Accuracy", sub="walk-forward over 7 World Cups, 1998–2022 · lower RPS is better")
         st.caption("The exact live pipeline, market-independent. Leak-free: for each World "
                    "Cup the model is trained only on matches before it.")
         comp = pooled.reset_index()
@@ -1309,11 +1307,11 @@ def page_performance():
     else:
         bt = load_csv("backtest_pooled.csv")
         if not bt.empty:
-            st.markdown("#### Accuracy — pooled over 2010–2022 World Cups (lower RPS is better)")
+            theme.section("Accuracy", sub="pooled over 2010–2022 World Cups · lower RPS is better")
             st.dataframe(bt.round(4), use_container_width=True, hide_index=True)
     cal = load_csv("calibration.csv")
     if not cal.empty:
-        st.markdown("#### Calibration — predicted vs observed")
+        theme.section("Calibration", sub="predicted vs observed")
         diag = alt.Chart(pd.DataFrame({"x": [0, 1], "y": [0, 1]})).mark_line(
             strokeDash=[4, 4], color=GREY).encode(x="x", y="y")
         pts = alt.Chart(cal).mark_circle(size=90, color=GREEN).encode(
@@ -1324,12 +1322,12 @@ def page_performance():
         st.altair_chart(diag + pts, use_container_width=True)
     abl = load_csv("ablation.csv")
     if not abl.empty:
-        st.markdown("#### Ablation — does each block lower RPS?")
+        theme.section("Ablation", sub="does each block lower RPS?")
         st.dataframe(abl.round(4), use_container_width=True, hide_index=True)
 
     wc = load_csv("wc2022_backtest.csv")
     if not wc.empty:
-        st.markdown("#### 🏆 2022 World Cup — how our betting model would have done")
+        theme.section("2022 World Cup", sub="how our betting model would have done")
         st.caption("Exactly how the model bets: its own market-independent probabilities, the "
                    "quality gate (≥3% EV, ≥2% edge, odds ≤ +500), staked at **quarter-Kelly** "
                    "(1 unit = 1% of bankroll). Out-of-sample — the model was trained only on data "
@@ -1377,8 +1375,7 @@ def page_performance():
 
 def page_team():
     theme.hero("Team Explorer", "Pick any two nations and get the model's full read — "
-               "win/draw/win, expected goals, scoreline heatmap, form and head-to-head.",
-               icon="🔎")
+               "win/draw/win, expected goals, scoreline heatmap, form and head-to-head.")
     pred = get_predictor()
     teams = sorted(pred.known_teams)
     c1, c2, c3 = st.columns([2, 2, 1])
@@ -1463,7 +1460,7 @@ def _kelly_units(df: pd.DataFrame, frac: float, cap_u: float = 2.0):
 def page_clv(min_ev=0.03, kelly=0.25):
     theme.hero("Live Tracker", f"Every +EV pick recorded at the offered price, then settled "
                f"vs the result and the closing line. Staked at {kelly:.2f}× Kelly, capped at 2u "
-               f"(2% of bankroll) per bet.", icon="📈")
+               f"(2% of bankroll) per bet.")
     from src.predict import clv
     today = _today_ct().strftime("%Y-%m-%d")
 
@@ -1560,7 +1557,7 @@ def page_clv(min_ev=0.03, kelly=0.25):
                              "ROI %": round(float(gp.sum() / gs.sum() * 100), 1) if gs.sum() else 0.0,
                              "avg CLV %": round(float(gc["clv"].mean()) * 100, 2) if len(gc) else float("nan")})
         if sys_rows:
-            st.subheader("Tracked systems (forward, observational)")
+            theme.section("Tracked systems", sub="forward, observational")
             st.dataframe(pd.DataFrame(sys_rows), hide_index=True, use_container_width=True)
             st.caption("`pickem_ml_2_3` = the even-money moneyline candidate from v8 — tracked, "
                        "**not** a deployed bet (it failed the pre-registered backtest bar).")
@@ -1584,7 +1581,7 @@ def page_clv(min_ev=0.03, kelly=0.25):
             bw = int((bb["result"] == "win").sum())
             bl = int((bb["result"] == "loss").sum())
             bcol = theme.GREEN if bnet > 0 else (theme.RED if bnet < 0 else theme.TEXT)
-            st.subheader("⭐ Best bets — the model's strongest call per match")
+            theme.section("Best bets", sub="the model's strongest call per match")
             theme.kpi_row([
                 {"label": "Best bets settled", "value": len(bb),
                  "sub": f"{bw}-{bl}", "accent": theme.BLUE},
@@ -1603,7 +1600,7 @@ def page_clv(min_ev=0.03, kelly=0.25):
                        "the model has **no proven betting edge**, this is a track record, not a promise.")
 
     if not op.empty:
-        st.subheader(f"⏳ Pending ({len(op)}) — awaiting results")
+        theme.section(f"Pending ({len(op)})", sub="awaiting results")
         cols = [c for c in ["match", "market", "selection", "american", "ev", "system"]
                 if c in op.columns]
         st.dataframe(op[cols], hide_index=True, use_container_width=True)
@@ -1611,7 +1608,7 @@ def page_clv(min_ev=0.03, kelly=0.25):
     if not settled.empty:
         # units by category — same layout as the Performance 2022 table
         if "stake_u" in settled.columns:
-            st.subheader("📊 Units by category")
+            theme.section("Units by category")
 
             def _boot(pnl: np.ndarray, n: int = 1000):
                 if len(pnl) == 0:
@@ -1644,7 +1641,7 @@ def page_clv(min_ev=0.03, kelly=0.25):
             st.caption("Kelly = how the model actually stakes (current fraction, 1u = 1% of "
                        "bankroll); flat = 1u per bet, for reference.")
 
-        st.subheader("✅ Settled")
+        theme.section("Settled")
         cols = [c for c in ["match_date", "match", "market", "selection", "american",
                             "result", "stake_u", "pnl_u", "clv", "system"]
                 if c in settled.columns]
@@ -1707,7 +1704,7 @@ def _fmt_signed_cent(x):
 def page_kalshi(bankroll=1000, kelly=0.25, upset_temp=1.0):
     theme.hero("Kalshi", "Live exchange prices vs the model — when to <b>buy</b> (model beats the ask) "
                "and when to <b>sell</b> (the bid runs richer than the model). Prices refresh on their "
-               "own; the exchange spread is ~3%, so only net-of-spread edges count.", icon="🎯")
+               "own; the exchange spread is ~3%, so only net-of-spread edges count.")
     from src.data import kalshi as kal
 
     c = st.columns([1, 1, 1, 1])
@@ -1756,7 +1753,7 @@ def page_kalshi(bankroll=1000, kelly=0.25, upset_temp=1.0):
         st.caption(f"Kalshi prices as of {now_ct} CT · {len(mk)} live contracts · "
                    f"{len(buys)} buy / {len(sells)} sell signals")
 
-        st.markdown("#### 🟢 BUY — model probability beats the Kalshi ask")
+        theme.section("🟢 BUY — model probability beats the Kalshi ask")
         if buys:
             df = pd.DataFrame(_order(buys, "EV"))
             disp = pd.DataFrame({
@@ -1770,7 +1767,7 @@ def page_kalshi(bankroll=1000, kelly=0.25, upset_temp=1.0):
         else:
             st.caption("No buy signal clears your edge right now.")
 
-        st.markdown("#### 🔴 SELL / fade — the Kalshi bid is richer than the model")
+        theme.section("🔴 SELL / fade — the Kalshi bid is richer than the model")
         if sells:
             df = pd.DataFrame(_order(sells, "Fade EV"))
             disp = pd.DataFrame({
@@ -1848,14 +1845,14 @@ def main():
                 '<div style="padding:6px 2px 10px 2px">'
                 '<div style="font-family:Oswald;font-size:22px;font-weight:700;line-height:1.05;'
                 'text-transform:uppercase;letter-spacing:.5px">🏆 FIFA World&nbsp;Cup'
-                '<span style="color:#1ec773"> 2026</span></div>'
-                '<div style="font-family:Oswald;font-size:15px;color:#8b93a7;'
+                f'<span style="color:{GREEN}"> 2026</span></div>'
+                '<div style="font-family:inherit;font-size:15px;color:#969aa6;'
                 'letter-spacing:2px;text-transform:uppercase">Soccer Model</div></div>',
                 unsafe_allow_html=True)
             st.caption("Dixon-Coles · Elo · LightGBM ensemble · live ESPN data")
             labels = [f"{icon} {name}" for icon, name, _ in NAV]
             st.divider()
-            st.markdown("**⚙️ Staking** &nbsp; <span style='color:#8b93a7;font-size:12px'>"
+            st.markdown("**⚙️ Staking** &nbsp; <span style='color:#969aa6;font-size:12px'>"
                         "1 unit = 1% of bankroll</span>", unsafe_allow_html=True)
             bankroll = st.number_input("Bankroll ($)", 10, 1_000_000, 1000, step=50)
             kelly = st.slider("Kelly fraction", 0.0, 1.0, 0.25, 0.05,
@@ -1869,10 +1866,10 @@ def main():
                                       "This is what stops the underdog/longshot junk.")
             max_exp = st.slider("Max total exposure (× bankroll)", 0.1, 2.0, 1.0, 0.1)
             st.session_state["kalshi_alert_ev"] = st.slider(
-                "🎯 Kalshi alert EV", 0.0, 0.30, 0.08, 0.01,
+                "Kalshi alert EV", 0.0, 0.30, 0.08, 0.01,
                 help="Fire a 🔔 on a match card when the model's edge at the Kalshi ask clears this.")
             st.divider()
-            st.markdown("**⚡ Upset sensitivity**", help=None)
+            st.markdown("**Upset sensitivity**", help=None)
             upset_temp = st.slider("Upset sensitivity (τ)", 1.0, 2.0, 1.0, 0.05,
                                    label_visibility="collapsed",
                                    help="1.0 = the model's calibrated, most-accurate forecast. "

@@ -33,7 +33,7 @@ def test_theme_components_return_html():
     bar = theme.prob_bar(0.5, 0.3, 0.2, "A", "B")
     assert "pbar" in bar and "A 50%" in bar
     assert theme.GREEN.startswith("#") and theme.GOLD.startswith("#")
-    cfg = theme._stadium_theme()
+    cfg = theme._modern_theme()
     assert "config" in cfg and cfg["config"]["background"] == "transparent"
 
 
