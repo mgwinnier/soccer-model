@@ -128,7 +128,7 @@ def lineup_status(home: str, away: str, date, cfg=None, cands: list | None = Non
     if not ts.is_available():
         return None
     try:
-        if cands is None:
+        if not cands:           # None or empty -> fetch our own (don't silently no-op)
             sid = ts.current_season_id(cfg=cfg)
             cands = ts.matches(competition_id=ts.WC_COMP, season_id=sid, cfg=cfg)
         m = fixture_map.find_match(home, away, fixture_map._to_ymd(date), cands)

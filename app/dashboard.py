@@ -125,8 +125,12 @@ def _resolve_mid(home: str, away: str, date: str):
     """Resolve a fixture to a TheStatsAPI match_id via the shared cached match list (no extra
     /matches pull)."""
     from src.data import fixture_map as _fm
+    from src.data import thestatsapi as _ts
     cands = get_wc_cands()
-    return _fm.find_match_id(home, away, str(date)[:10], cands) if cands else None
+    if cands:
+        return _fm.find_match_id(home, away, str(date)[:10], cands)
+    # shared list empty (transient) -> fall back to a direct per-fixture resolve
+    return _ts.match_id_for_fixture(home, away, str(date)[:10], cfg=CFG)
 
 
 @st.cache_data(ttl=3600, show_spinner=False)
@@ -184,6 +188,36 @@ def match_stats_block(m: dict):
                     f'color:{GREY};margin-bottom:2px"><span style="color:{GREEN}">{m["home"]}</span>'
                     f'<span style="color:{GOLD}">{m["away"]}</span></div>'
                     + theme.stat_bars(rows), unsafe_allow_html=True)
+
+
+@st.cache_data(ttl=240, show_spinner=False)
+def get_book_odds(home: str, away: str, date: str = ""):
+    """The user's PPH book line (DST, open — no auth) for a fixture: moneyline/totals/BTTS, or
+    None. This is the price you'd actually bet, shown alongside the model."""
+    try:
+        from src.data import dst
+        return dst.book_odds(home, away)
+    except Exception:  # noqa: BLE001
+        return None
+
+
+def _book_dec(b, m: dict, book: dict | None):
+    """The user's book decimal price for one bet selection, or None."""
+    if not book:
+        return None
+    if b.market == "Match Result":
+        code = "H" if b.selection == m["home"] else ("A" if b.selection == m["away"] else "D")
+        return (book.get("moneyline") or {}).get(code)
+    if b.market == "Total Goals":
+        import re
+        mt = re.search(r"[\d.]+", b.selection)
+        if not mt:
+            return None
+        t = (book.get("totals") or {}).get(float(mt.group())) or {}
+        return t.get("over" if b.selection.startswith("Over") else "under")
+    if b.market == "BTTS":
+        return (book.get("btts") or {}).get("yes" if "Yes" in b.selection else "no")
+    return None
 
 
 @st.cache_data(ttl=600, show_spinner=False)
@@ -345,10 +379,13 @@ _GRADE_MARK = {"win": "✅ Win", "loss": "❌ Loss", "push": "➖ Push"}
 
 
 def market_table(title: str, bets: list, key_note: str | None = None, m: dict | None = None):
-    """Render one market's selections with model%, fair%, price, break-even, EV, stake.
-    For a played match (``m`` with played=True), append a graded Result column."""
+    """Render one market's selections: model%, fair%, the ESPN price + EV, and — when available —
+    **your book** (DST) price + the model's EV at *that* price. Played matches get a Result col."""
+    from src.data.odds import decimal_to_american
+    from src.predict.betting import expected_value
     st.markdown(f"**{title}**")
     played = bool(m and m.get("played"))
+    book = get_book_odds(m["home"], m["away"], str(m.get("date"))[:10]) if m else None
     rows = []
     for b in bets:
         units = b.kelly_used * 100  # 1 unit = 1% of bankroll
@@ -357,20 +394,32 @@ def market_table(title: str, bets: list, key_note: str | None = None, m: dict | 
             "Model": _pct(b.model_p),
             "Fair (no-vig)": _pct(b.fair_p),
             "Price": _am(b.american),
-            "Break-even": _implied_pct(b.american),
             "EV": f"{b.ev*100:+.0f}%",
-            "Stake": f"{units:.1f}u" if units > 0.05 else "—",
         }
+        if book:
+            bdec = _book_dec(b, m, book)
+            row["Your book"] = _am(decimal_to_american(bdec)) if bdec else "—"
+            row["Book EV"] = f"{expected_value(b.model_p, bdec)*100:+.0f}%" if bdec else "—"
+        row["Stake"] = f"{units:.1f}u" if units > 0.05 else "—"
         if played:
             row["Result"] = _GRADE_MARK.get(_grade_bet(b, m), "—")
         rows.append(row)
     df = pd.DataFrame(rows)
 
+    ev_cols = {"EV", "Book EV"}
+
     def _style(row):
-        # color EV cell
-        ev = float(row["EV"].rstrip("%")) / 100
-        return ["" if c != "EV" else f"color:{_ev_color(ev)};font-weight:600"
-                for c in row.index]
+        out = []
+        for c in row.index:
+            if c in ev_cols:
+                try:
+                    ev = float(str(row[c]).rstrip("%")) / 100
+                except ValueError:
+                    ev = 0.0
+                out.append(f"color:{_ev_color(ev)};font-weight:600")
+            else:
+                out.append("")
+        return out
 
     st.dataframe(df.style.apply(_style, axis=1), hide_index=True,
                  use_container_width=True)
@@ -599,8 +648,9 @@ def render_match(m: dict, live: dict | None = None, min_ev: float = 0.03,
                             f"(no line available — info only)")
             st.caption("**Model** = our pure probability, calibrated to historical results, "
                        "**independent of the market** · **Fair** = de-vigged market · "
-                       "**Break-even** = the offered price's implied %. EV is positive only when "
-                       "Model > Break-even.")
+                       "**Price/EV** = ESPN line · **Your book** = your buckeye (DST) price and "
+                       "**Book EV** = the model's EV at *that* price — the number that matters for "
+                       "what you actually bet.")
 
         with tab_scores:
             heatmap(a["scoreline_matrix"], m["home"], m["away"])
