@@ -12,6 +12,7 @@ secrets/
 data/raw/fifa_players/
 data/raw/odds/
 data/raw/thestatsapi/
+data/raw/odds_feed/
 
 # Tracker: COMMIT the settled ledger (the backfilled tournament record persists on
 # the hosted site, which has an ephemeral filesystem). Open/pending tickets stay
