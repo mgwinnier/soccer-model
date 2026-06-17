@@ -43,7 +43,8 @@ def load_secrets() -> dict[str, bool]:
     # the offline pipeline (no streamlit / no secrets file) is unaffected.
     try:
         import streamlit as _st
-        for _k in ("THESTATSAPI_KEY", "API_FOOTBALL_KEY", "KAGGLE_USERNAME", "KAGGLE_KEY"):
+        for _k in ("THESTATSAPI_KEY", "API_FOOTBALL_KEY", "KAGGLE_USERNAME", "KAGGLE_KEY",
+                   "ACTIONNETWORK_FEED_URL"):
             if not os.environ.get(_k) and _k in _st.secrets:
                 os.environ[_k] = str(_st.secrets[_k])
     except Exception:  # noqa: BLE001 — streamlit absent or no secrets configured
