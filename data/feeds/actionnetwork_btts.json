@@ -1,7 +1,7 @@
 {
  "source": "actionnetwork",
  "league": "worldcup",
- "generated_at": "2026-06-17T14:49:03Z",
+ "generated_at": "2026-06-17T15:03:48Z",
  "games": [
   {
    "game_id": 287931,
@@ -27,8 +27,8 @@
      "no": -185
     },
     "PointsBet": {
-     "yes": 128,
-     "no": -164
+     "yes": 132,
+     "no": -168
     },
     "Bet365": {
      "yes": 150,
@@ -59,7 +59,7 @@
     },
     "BetMGM": {
      "yes": 104,
-     "no": -132
+     "no": -134
     },
     "Caesars": {
      "yes": -105,
@@ -97,8 +97,8 @@
      "no": -125
     },
     "BetMGM": {
-     "yes": 106,
-     "no": -136
+     "yes": 107,
+     "no": -137
     },
     "Caesars": {
      "yes": -105,
@@ -114,7 +114,7 @@
     }
    },
    "btts_best": {
-    "yes": 106,
+    "yes": 107,
     "yes_book": "BetMGM",
     "no": -120,
     "no_book": "Caesars"
@@ -157,6 +157,1726 @@
     "yes_book": "BetMGM",
     "no": -152,
     "no_book": "FanDuel"
+   }
+  },
+  {
+   "game_id": 287932,
+   "start_time": "2026-06-18T16:00:00.000Z",
+   "status": "scheduled",
+   "home": "Czechia",
+   "away": "South Africa",
+   "btts": {
+    "DraftKings": {
+     "yes": -103,
+     "no": -129
+    },
+    "FanDuel": {
+     "yes": -104,
+     "no": -134
+    },
+    "BetMGM": {
+     "yes": 101,
+     "no": -129
+    },
+    "Caesars": {
+     "yes": -105,
+     "no": -120
+    },
+    "PointsBet": {
+     "yes": -100,
+     "no": -128
+    },
+    "Bet365": {
+     "yes": -102,
+     "no": -130
+    }
+   },
+   "btts_best": {
+    "yes": 101,
+    "yes_book": "BetMGM",
+    "no": -120,
+    "no_book": "Caesars"
+   }
+  },
+  {
+   "game_id": 287933,
+   "start_time": "2026-06-18T19:00:00.000Z",
+   "status": "scheduled",
+   "home": "Switzerland",
+   "away": "Bosnia and Herzegovina",
+   "btts": {
+    "DraftKings": {
+     "yes": 110,
+     "no": -149
+    },
+    "FanDuel": {
+     "yes": -102,
+     "no": -135
+    },
+    "BetMGM": {
+     "yes": 120,
+     "no": -154
+    },
+    "Caesars": {
+     "yes": 110,
+     "no": -145
+    },
+    "PointsBet": {
+     "yes": 108,
+     "no": -136
+    },
+    "Bet365": {
+     "yes": 115,
+     "no": -150
+    }
+   },
+   "btts_best": {
+    "yes": 120,
+    "yes_book": "BetMGM",
+    "no": -135,
+    "no_book": "FanDuel"
+   }
+  },
+  {
+   "game_id": 284369,
+   "start_time": "2026-06-18T22:00:00.000Z",
+   "status": "scheduled",
+   "home": "Canada",
+   "away": "Qatar",
+   "btts": {
+    "DraftKings": {
+     "yes": 137,
+     "no": -183
+    },
+    "FanDuel": {
+     "yes": 150,
+     "no": -205
+    },
+    "BetMGM": {
+     "yes": 133,
+     "no": -173
+    },
+    "Caesars": {
+     "yes": 140,
+     "no": -175
+    },
+    "PointsBet": {
+     "yes": 142,
+     "no": -182
+    },
+    "Bet365": {
+     "yes": 138,
+     "no": -185
+    }
+   },
+   "btts_best": {
+    "yes": 150,
+    "yes_book": "FanDuel",
+    "no": -173,
+    "no_book": "BetMGM"
+   }
+  },
+  {
+   "game_id": 284370,
+   "start_time": "2026-06-19T01:00:00.000Z",
+   "status": "scheduled",
+   "home": "Mexico",
+   "away": "South Korea",
+   "btts": {
+    "DraftKings": {
+     "yes": 105,
+     "no": -137
+    },
+    "FanDuel": {
+     "yes": 102,
+     "no": -140
+    },
+    "BetMGM": {
+     "yes": 114,
+     "no": -145
+    },
+    "Caesars": {
+     "yes": 105,
+     "no": -135
+    },
+    "PointsBet": {
+     "yes": 104,
+     "no": -132
+    },
+    "Bet365": {
+     "yes": 110,
+     "no": -140
+    }
+   },
+   "btts_best": {
+    "yes": 114,
+    "yes_book": "BetMGM",
+    "no": -132,
+    "no_book": "PointsBet"
+   }
+  },
+  {
+   "game_id": 284371,
+   "start_time": "2026-06-19T19:00:00.000Z",
+   "status": "scheduled",
+   "home": "USA",
+   "away": "Australia",
+   "btts": {
+    "DraftKings": {
+     "yes": 101,
+     "no": -130
+    },
+    "FanDuel": {
+     "yes": -108,
+     "no": -122
+    },
+    "Caesars": {
+     "yes": 100,
+     "no": -130
+    },
+    "PointsBet": {
+     "yes": 104,
+     "no": -132
+    },
+    "Bet365": {
+     "yes": -102,
+     "no": -125
+    }
+   },
+   "btts_best": {
+    "yes": 104,
+    "yes_book": "PointsBet",
+    "no": -122,
+    "no_book": "FanDuel"
+   }
+  },
+  {
+   "game_id": 284372,
+   "start_time": "2026-06-19T22:00:00.000Z",
+   "status": "scheduled",
+   "home": "Scotland",
+   "away": "Morocco",
+   "btts": {
+    "DraftKings": {
+     "yes": 110,
+     "no": -145
+    },
+    "FanDuel": {
+     "yes": -102,
+     "no": -133
+    },
+    "BetMGM": {
+     "yes": 115,
+     "no": -148
+    },
+    "Caesars": {
+     "yes": 110,
+     "no": -140
+    },
+    "PointsBet": {
+     "yes": 106,
+     "no": -134
+    },
+    "Bet365": {
+     "yes": 110,
+     "no": -145
+    }
+   },
+   "btts_best": {
+    "yes": 115,
+    "yes_book": "BetMGM",
+    "no": -133,
+    "no_book": "FanDuel"
+   }
+  },
+  {
+   "game_id": 284373,
+   "start_time": "2026-06-20T00:30:00.000Z",
+   "status": "scheduled",
+   "home": "Brazil",
+   "away": "Haiti",
+   "btts": {
+    "DraftKings": {
+     "yes": 133,
+     "no": -175
+    },
+    "FanDuel": {
+     "yes": 168,
+     "no": -205
+    },
+    "BetMGM": {
+     "yes": 134,
+     "no": -173
+    },
+    "Caesars": {
+     "yes": 135,
+     "no": -175
+    },
+    "PointsBet": {
+     "yes": 114,
+     "no": -154
+    },
+    "Bet365": {
+     "yes": 135,
+     "no": -175
+    }
+   },
+   "btts_best": {
+    "yes": 168,
+    "yes_book": "FanDuel",
+    "no": -154,
+    "no_book": "PointsBet"
+   }
+  },
+  {
+   "game_id": 287934,
+   "start_time": "2026-06-20T03:00:00.000Z",
+   "status": "scheduled",
+   "home": "Turkiye",
+   "away": "Paraguay",
+   "btts": {
+    "DraftKings": {
+     "yes": -112,
+     "no": -117
+    },
+    "FanDuel": {
+     "yes": -105,
+     "no": -126
+    },
+    "Caesars": {
+     "yes": -120,
+     "no": -105
+    },
+    "PointsBet": {
+     "yes": -110,
+     "no": -116
+    },
+    "Bet365": {
+     "yes": -110,
+     "no": -118
+    }
+   },
+   "btts_best": {
+    "yes": -105,
+    "yes_book": "FanDuel",
+    "no": -105,
+    "no_book": "Caesars"
+   }
+  },
+  {
+   "game_id": 287935,
+   "start_time": "2026-06-20T17:00:00.000Z",
+   "status": "scheduled",
+   "home": "Netherlands",
+   "away": "Sweden",
+   "btts": {
+    "DraftKings": {
+     "yes": -120,
+     "no": -110
+    },
+    "FanDuel": {
+     "yes": -112,
+     "no": -123
+    },
+    "Caesars": {
+     "yes": -120,
+     "no": -105
+    },
+    "PointsBet": {
+     "yes": -124,
+     "no": -102
+    },
+    "Bet365": {
+     "yes": -118,
+     "no": -110
+    }
+   },
+   "btts_best": {
+    "yes": -112,
+    "yes_book": "FanDuel",
+    "no": -102,
+    "no_book": "PointsBet"
+   }
+  },
+  {
+   "game_id": 284374,
+   "start_time": "2026-06-20T20:00:00.000Z",
+   "status": "scheduled",
+   "home": "Germany",
+   "away": "Ivory Coast",
+   "btts": {
+    "DraftKings": {
+     "yes": -135,
+     "no": 105
+    },
+    "FanDuel": {
+     "yes": -114,
+     "no": -115
+    },
+    "Caesars": {
+     "yes": -135,
+     "no": 110
+    },
+    "PointsBet": {
+     "yes": -128,
+     "no": 102
+    },
+    "Bet365": {
+     "yes": -135,
+     "no": 105
+    }
+   },
+   "btts_best": {
+    "yes": -114,
+    "yes_book": "FanDuel",
+    "no": 110,
+    "no_book": "Caesars"
+   }
+  },
+  {
+   "game_id": 284375,
+   "start_time": "2026-06-21T00:00:00.000Z",
+   "status": "scheduled",
+   "home": "Ecuador",
+   "away": "Curacao",
+   "btts": {
+    "DraftKings": {
+     "yes": 200,
+     "no": -277
+    },
+    "FanDuel": {
+     "yes": 150,
+     "no": -202
+    },
+    "Caesars": {
+     "yes": 220,
+     "no": -290
+    },
+    "PointsBet": {
+     "yes": 200,
+     "no": -280
+    },
+    "Bet365": {
+     "yes": 200,
+     "no": -275
+    }
+   },
+   "btts_best": {
+    "yes": 220,
+    "yes_book": "Caesars",
+    "no": -202,
+    "no_book": "FanDuel"
+   }
+  },
+  {
+   "game_id": 284376,
+   "start_time": "2026-06-21T04:00:00.000Z",
+   "status": "scheduled",
+   "home": "Tunisia",
+   "away": "Japan",
+   "btts": {
+    "DraftKings": {
+     "yes": 115,
+     "no": -154
+    },
+    "FanDuel": {
+     "yes": -100,
+     "no": -138
+    },
+    "Caesars": {
+     "yes": 115,
+     "no": -145
+    },
+    "PointsBet": {
+     "yes": 104,
+     "no": -134
+    },
+    "Bet365": {
+     "yes": 120,
+     "no": -155
+    }
+   },
+   "btts_best": {
+    "yes": 120,
+    "yes_book": "Bet365",
+    "no": -134,
+    "no_book": "PointsBet"
+   }
+  },
+  {
+   "game_id": 284377,
+   "start_time": "2026-06-21T16:00:00.000Z",
+   "status": "scheduled",
+   "home": "Spain",
+   "away": "Saudi Arabia",
+   "btts": {
+    "DraftKings": {
+     "yes": 197,
+     "no": -275
+    },
+    "FanDuel": {
+     "yes": 180,
+     "no": -250
+    },
+    "BetMGM": {
+     "yes": 189,
+     "no": -250
+    },
+    "Caesars": {
+     "yes": 190,
+     "no": -245
+    },
+    "PointsBet": {
+     "yes": 250,
+     "no": -370
+    },
+    "Bet365": {
+     "yes": 195,
+     "no": -275
+    }
+   },
+   "btts_best": {
+    "yes": 250,
+    "yes_book": "PointsBet",
+    "no": -245,
+    "no_book": "Caesars"
+   }
+  },
+  {
+   "game_id": 284378,
+   "start_time": "2026-06-21T19:00:00.000Z",
+   "status": "scheduled",
+   "home": "Belgium",
+   "away": "Iran",
+   "btts": {
+    "DraftKings": {
+     "yes": 108,
+     "no": -144
+    },
+    "FanDuel": {
+     "yes": 110,
+     "no": -149
+    },
+    "BetMGM": {
+     "yes": 110,
+     "no": -139
+    },
+    "Caesars": {
+     "yes": 105,
+     "no": -135
+    },
+    "PointsBet": {
+     "yes": 104,
+     "no": -134
+    },
+    "Bet365": {
+     "yes": 110,
+     "no": -145
+    }
+   },
+   "btts_best": {
+    "yes": 110,
+    "yes_book": "FanDuel",
+    "no": -134,
+    "no_book": "PointsBet"
+   }
+  },
+  {
+   "game_id": 284379,
+   "start_time": "2026-06-21T22:00:00.000Z",
+   "status": "scheduled",
+   "home": "Uruguay",
+   "away": "Cape Verde",
+   "btts": {
+    "DraftKings": {
+     "yes": 140,
+     "no": -185
+    },
+    "FanDuel": {
+     "yes": 106,
+     "no": -147
+    },
+    "BetMGM": {
+     "yes": 139,
+     "no": -179
+    },
+    "Caesars": {
+     "yes": 140,
+     "no": -180
+    },
+    "PointsBet": {
+     "yes": 160,
+     "no": -210
+    },
+    "Bet365": {
+     "yes": 145,
+     "no": -190
+    }
+   },
+   "btts_best": {
+    "yes": 160,
+    "yes_book": "PointsBet",
+    "no": -147,
+    "no_book": "FanDuel"
+   }
+  },
+  {
+   "game_id": 284380,
+   "start_time": "2026-06-22T01:00:00.000Z",
+   "status": "scheduled",
+   "home": "New Zealand",
+   "away": "Egypt",
+   "btts": {
+    "DraftKings": {
+     "yes": 120,
+     "no": -157
+    },
+    "FanDuel": {
+     "yes": 105,
+     "no": -150
+    },
+    "BetMGM": {
+     "yes": 123,
+     "no": -157
+    },
+    "Caesars": {
+     "yes": 120,
+     "no": -155
+    },
+    "PointsBet": {
+     "yes": 130,
+     "no": -166
+    },
+    "Bet365": {
+     "yes": 120,
+     "no": -155
+    }
+   },
+   "btts_best": {
+    "yes": 130,
+    "yes_book": "PointsBet",
+    "no": -150,
+    "no_book": "FanDuel"
+   }
+  },
+  {
+   "game_id": 284381,
+   "start_time": "2026-06-22T17:00:00.000Z",
+   "status": "scheduled",
+   "home": "Argentina",
+   "away": "Austria",
+   "btts": {
+    "DraftKings": {
+     "yes": -102,
+     "no": -129
+    },
+    "FanDuel": {
+     "yes": -110,
+     "no": -122
+    },
+    "Caesars": {
+     "yes": -105,
+     "no": -120
+    },
+    "PointsBet": {
+     "yes": -106,
+     "no": -122
+    },
+    "Bet365": {
+     "yes": 100,
+     "no": -135
+    }
+   },
+   "btts_best": {
+    "yes": 100,
+    "yes_book": "Bet365",
+    "no": -120,
+    "no_book": "Caesars"
+   }
+  },
+  {
+   "game_id": 287936,
+   "start_time": "2026-06-22T21:00:00.000Z",
+   "status": "scheduled",
+   "home": "France",
+   "away": "Iraq",
+   "btts": {
+    "DraftKings": {
+     "yes": 180,
+     "no": -237
+    },
+    "FanDuel": {
+     "yes": 182,
+     "no": -262
+    },
+    "Caesars": {
+     "yes": 175,
+     "no": -225
+    },
+    "PointsBet": {
+     "yes": 166,
+     "no": -215
+    },
+    "Bet365": {
+     "yes": 188,
+     "no": -250
+    }
+   },
+   "btts_best": {
+    "yes": 188,
+    "yes_book": "Bet365",
+    "no": -215,
+    "no_book": "PointsBet"
+   }
+  },
+  {
+   "game_id": 284382,
+   "start_time": "2026-06-23T00:00:00.000Z",
+   "status": "scheduled",
+   "home": "Norway",
+   "away": "Senegal",
+   "btts": {
+    "DraftKings": {
+     "yes": -139,
+     "no": 105
+    },
+    "FanDuel": {
+     "yes": -133,
+     "no": 104
+    },
+    "Caesars": {
+     "yes": -135,
+     "no": 110
+    },
+    "PointsBet": {
+     "yes": -140,
+     "no": 110
+    },
+    "Bet365": {
+     "yes": -140,
+     "no": 105
+    }
+   },
+   "btts_best": {
+    "yes": -133,
+    "yes_book": "FanDuel",
+    "no": 110,
+    "no_book": "Caesars"
+   }
+  },
+  {
+   "game_id": 284383,
+   "start_time": "2026-06-23T03:00:00.000Z",
+   "status": "scheduled",
+   "home": "Jordan",
+   "away": "Algeria",
+   "btts": {
+    "DraftKings": {
+     "yes": -101,
+     "no": -127
+    },
+    "FanDuel": {
+     "yes": -101,
+     "no": -133
+    },
+    "Caesars": {
+     "yes": 100,
+     "no": -125
+    },
+    "PointsBet": {
+     "yes": -102,
+     "no": -124
+    },
+    "Bet365": {
+     "yes": 100,
+     "no": -130
+    }
+   },
+   "btts_best": {
+    "yes": 100,
+    "yes_book": "Caesars",
+    "no": -124,
+    "no_book": "PointsBet"
+   }
+  },
+  {
+   "game_id": 284384,
+   "start_time": "2026-06-23T17:00:00.000Z",
+   "status": "scheduled",
+   "home": "Portugal",
+   "away": "Uzbekistan",
+   "btts": {
+    "DraftKings": {
+     "yes": 117,
+     "no": -156
+    },
+    "FanDuel": {
+     "yes": 103,
+     "no": -141
+    },
+    "Caesars": {
+     "yes": 120,
+     "no": -155
+    },
+    "PointsBet": {
+     "yes": 124,
+     "no": -158
+    },
+    "Bet365": {
+     "yes": 110,
+     "no": -160
+    }
+   },
+   "btts_best": {
+    "yes": 124,
+    "yes_book": "PointsBet",
+    "no": -141,
+    "no_book": "FanDuel"
+   }
+  },
+  {
+   "game_id": 284385,
+   "start_time": "2026-06-23T20:00:00.000Z",
+   "status": "scheduled",
+   "home": "England",
+   "away": "Ghana",
+   "btts": {
+    "DraftKings": {
+     "yes": 111,
+     "no": -152
+    },
+    "FanDuel": {
+     "yes": 110,
+     "no": -152
+    },
+    "Caesars": {
+     "yes": 115,
+     "no": -145
+    },
+    "PointsBet": {
+     "yes": 122,
+     "no": -154
+    },
+    "Bet365": {
+     "yes": 110,
+     "no": -160
+    }
+   },
+   "btts_best": {
+    "yes": 122,
+    "yes_book": "PointsBet",
+    "no": -145,
+    "no_book": "Caesars"
+   }
+  },
+  {
+   "game_id": 284386,
+   "start_time": "2026-06-23T23:00:00.000Z",
+   "status": "scheduled",
+   "home": "Panama",
+   "away": "Croatia",
+   "btts": {
+    "DraftKings": {
+     "yes": 107,
+     "no": -145
+    },
+    "FanDuel": {
+     "yes": 106,
+     "no": -148
+    },
+    "Caesars": {
+     "yes": 110,
+     "no": -135
+    },
+    "PointsBet": {
+     "yes": 118,
+     "no": -150
+    },
+    "Bet365": {
+     "yes": 105,
+     "no": -145
+    }
+   },
+   "btts_best": {
+    "yes": 118,
+    "yes_book": "PointsBet",
+    "no": -135,
+    "no_book": "Caesars"
+   }
+  },
+  {
+   "game_id": 287937,
+   "start_time": "2026-06-24T02:00:00.000Z",
+   "status": "scheduled",
+   "home": "Colombia",
+   "away": "DR Congo",
+   "btts": {
+    "DraftKings": {
+     "yes": 137,
+     "no": -194
+    },
+    "FanDuel": {
+     "yes": 134,
+     "no": -185
+    },
+    "Caesars": {
+     "yes": 140,
+     "no": -180
+    },
+    "PointsBet": {
+     "yes": 130,
+     "no": -166
+    },
+    "Bet365": {
+     "yes": 135,
+     "no": -200
+    }
+   },
+   "btts_best": {
+    "yes": 140,
+    "yes_book": "Caesars",
+    "no": -166,
+    "no_book": "PointsBet"
+   }
+  },
+  {
+   "game_id": 284387,
+   "start_time": "2026-06-24T19:00:00.000Z",
+   "status": "scheduled",
+   "home": "Switzerland",
+   "away": "Canada",
+   "btts": {
+    "DraftKings": {
+     "yes": -116,
+     "no": -111
+    },
+    "FanDuel": {
+     "yes": -115,
+     "no": -113
+    },
+    "Caesars": {
+     "yes": -115,
+     "no": -110
+    },
+    "PointsBet": {
+     "yes": -112,
+     "no": -112
+    },
+    "Bet365": {
+     "yes": -120,
+     "no": -118
+    }
+   },
+   "btts_best": {
+    "yes": -112,
+    "yes_book": "PointsBet",
+    "no": -110,
+    "no_book": "Caesars"
+   }
+  },
+  {
+   "game_id": 287938,
+   "start_time": "2026-06-24T19:00:00.000Z",
+   "status": "scheduled",
+   "home": "Bosnia and Herzegovina",
+   "away": "Qatar",
+   "btts": {
+    "DraftKings": {
+     "yes": 105,
+     "no": -144
+    },
+    "FanDuel": {
+     "yes": 105,
+     "no": -141
+    },
+    "Caesars": {
+     "yes": 105,
+     "no": -135
+    },
+    "PointsBet": {
+     "yes": -100,
+     "no": -128
+    },
+    "Bet365": {
+     "yes": 105,
+     "no": -145
+    }
+   },
+   "btts_best": {
+    "yes": 105,
+    "yes_book": "DraftKings",
+    "no": -128,
+    "no_book": "PointsBet"
+   }
+  },
+  {
+   "game_id": 284388,
+   "start_time": "2026-06-24T22:00:00.000Z",
+   "status": "scheduled",
+   "home": "Morocco",
+   "away": "Haiti",
+   "btts": {
+    "DraftKings": {
+     "yes": 110,
+     "no": -152
+    },
+    "FanDuel": {
+     "yes": 110,
+     "no": -150
+    },
+    "Caesars": {
+     "yes": 110,
+     "no": -140
+    },
+    "PointsBet": {
+     "yes": 122,
+     "no": -156
+    },
+    "Bet365": {
+     "yes": 110,
+     "no": -155
+    }
+   },
+   "btts_best": {
+    "yes": 122,
+    "yes_book": "PointsBet",
+    "no": -140,
+    "no_book": "Caesars"
+   }
+  },
+  {
+   "game_id": 284389,
+   "start_time": "2026-06-24T22:00:00.000Z",
+   "status": "scheduled",
+   "home": "Scotland",
+   "away": "Brazil",
+   "btts": {
+    "DraftKings": {
+     "yes": 101,
+     "no": -140
+    },
+    "FanDuel": {
+     "yes": -101,
+     "no": -137
+    },
+    "Caesars": {
+     "yes": 110,
+     "no": -140
+    },
+    "PointsBet": {
+     "yes": -102,
+     "no": -126
+    },
+    "Bet365": {
+     "yes": 100,
+     "no": -140
+    }
+   },
+   "btts_best": {
+    "yes": 110,
+    "yes_book": "Caesars",
+    "no": -126,
+    "no_book": "PointsBet"
+   }
+  },
+  {
+   "game_id": 284390,
+   "start_time": "2026-06-25T01:00:00.000Z",
+   "status": "scheduled",
+   "home": "South Africa",
+   "away": "South Korea",
+   "btts": {
+    "DraftKings": {
+     "yes": 101,
+     "no": -140
+    },
+    "FanDuel": {
+     "yes": -112,
+     "no": -122
+    },
+    "Caesars": {
+     "yes": 100,
+     "no": -130
+    },
+    "PointsBet": {
+     "yes": 110,
+     "no": -140
+    },
+    "Bet365": {
+     "yes": -102,
+     "no": -140
+    }
+   },
+   "btts_best": {
+    "yes": 110,
+    "yes_book": "PointsBet",
+    "no": -122,
+    "no_book": "FanDuel"
+   }
+  },
+  {
+   "game_id": 287939,
+   "start_time": "2026-06-25T01:00:00.000Z",
+   "status": "scheduled",
+   "home": "Czechia",
+   "away": "Mexico",
+   "btts": {
+    "DraftKings": {
+     "yes": -103,
+     "no": -131
+    },
+    "FanDuel": {
+     "yes": -109,
+     "no": -123
+    },
+    "Caesars": {
+     "yes": -105,
+     "no": -120
+    },
+    "PointsBet": {
+     "yes": -102,
+     "no": -124
+    },
+    "Bet365": {
+     "yes": -110,
+     "no": -135
+    }
+   },
+   "btts_best": {
+    "yes": -102,
+    "yes_book": "PointsBet",
+    "no": -120,
+    "no_book": "Caesars"
+   }
+  },
+  {
+   "game_id": 284391,
+   "start_time": "2026-06-25T20:00:00.000Z",
+   "status": "scheduled",
+   "home": "Curacao",
+   "away": "Ivory Coast",
+   "btts": {
+    "DraftKings": {
+     "yes": 150,
+     "no": -212
+    },
+    "FanDuel": {
+     "yes": 150,
+     "no": -195
+    },
+    "Caesars": {
+     "yes": 160,
+     "no": -205
+    },
+    "PointsBet": {
+     "yes": 122,
+     "no": -174
+    },
+    "Bet365": {
+     "yes": 150,
+     "no": -220
+    }
+   },
+   "btts_best": {
+    "yes": 160,
+    "yes_book": "Caesars",
+    "no": -174,
+    "no_book": "PointsBet"
+   }
+  },
+  {
+   "game_id": 284392,
+   "start_time": "2026-06-25T20:00:00.000Z",
+   "status": "scheduled",
+   "home": "Ecuador",
+   "away": "Germany",
+   "btts": {
+    "DraftKings": {
+     "yes": -122,
+     "no": -111
+    },
+    "FanDuel": {
+     "yes": -120,
+     "no": -109
+    },
+    "Caesars": {
+     "yes": -120,
+     "no": -105
+    },
+    "PointsBet": {
+     "yes": -118,
+     "no": -108
+    },
+    "Bet365": {
+     "yes": -125,
+     "no": -115
+    }
+   },
+   "btts_best": {
+    "yes": -118,
+    "yes_book": "PointsBet",
+    "no": -105,
+    "no_book": "Caesars"
+   }
+  },
+  {
+   "game_id": 284393,
+   "start_time": "2026-06-25T23:00:00.000Z",
+   "status": "scheduled",
+   "home": "Tunisia",
+   "away": "Netherlands",
+   "btts": {
+    "DraftKings": {
+     "yes": 106,
+     "no": -147
+    },
+    "FanDuel": {
+     "yes": 101,
+     "no": -133
+    },
+    "Caesars": {
+     "yes": 110,
+     "no": -140
+    },
+    "PointsBet": {
+     "yes": 108,
+     "no": -160
+    },
+    "Bet365": {
+     "yes": 105,
+     "no": -145
+    }
+   },
+   "btts_best": {
+    "yes": 110,
+    "yes_book": "Caesars",
+    "no": -133,
+    "no_book": "FanDuel"
+   }
+  },
+  {
+   "game_id": 287940,
+   "start_time": "2026-06-25T23:00:00.000Z",
+   "status": "scheduled",
+   "home": "Japan",
+   "away": "Sweden",
+   "btts": {
+    "DraftKings": {
+     "yes": -120,
+     "no": -110
+    },
+    "FanDuel": {
+     "yes": -120,
+     "no": -110
+    },
+    "Caesars": {
+     "yes": -120,
+     "no": -105
+    },
+    "PointsBet": {
+     "yes": -116,
+     "no": -110
+    },
+    "Bet365": {
+     "yes": -125,
+     "no": -115
+    }
+   },
+   "btts_best": {
+    "yes": -116,
+    "yes_book": "PointsBet",
+    "no": -105,
+    "no_book": "Caesars"
+   }
+  },
+  {
+   "game_id": 284394,
+   "start_time": "2026-06-26T02:00:00.000Z",
+   "status": "scheduled",
+   "home": "Paraguay",
+   "away": "Australia",
+   "btts": {
+    "DraftKings": {
+     "yes": -105,
+     "no": -128
+    },
+    "FanDuel": {
+     "yes": -107,
+     "no": -124
+    },
+    "Caesars": {
+     "yes": -105,
+     "no": -120
+    },
+    "PointsBet": {
+     "yes": -100,
+     "no": -128
+    },
+    "Bet365": {
+     "yes": -110,
+     "no": -135
+    }
+   },
+   "btts_best": {
+    "yes": -100,
+    "yes_book": "PointsBet",
+    "no": -120,
+    "no_book": "Caesars"
+   }
+  },
+  {
+   "game_id": 287941,
+   "start_time": "2026-06-26T02:00:00.000Z",
+   "status": "scheduled",
+   "home": "Turkiye",
+   "away": "USA",
+   "btts": {
+    "DraftKings": {
+     "yes": -149,
+     "no": 106
+    },
+    "FanDuel": {
+     "yes": -145,
+     "no": 106
+    },
+    "Caesars": {
+     "yes": -150,
+     "no": 120
+    },
+    "PointsBet": {
+     "yes": -136,
+     "no": 108
+    },
+    "Bet365": {
+     "yes": -155,
+     "no": 105
+    }
+   },
+   "btts_best": {
+    "yes": -136,
+    "yes_book": "PointsBet",
+    "no": 120,
+    "no_book": "Caesars"
+   }
+  },
+  {
+   "game_id": 284395,
+   "start_time": "2026-06-26T19:00:00.000Z",
+   "status": "scheduled",
+   "home": "Norway",
+   "away": "France",
+   "btts": {
+    "DraftKings": {
+     "yes": -134,
+     "no": 101
+    },
+    "FanDuel": {
+     "yes": -120,
+     "no": -111
+    },
+    "Caesars": {
+     "yes": -135,
+     "no": 105
+    },
+    "PointsBet": {
+     "yes": -130,
+     "no": 102
+    },
+    "Bet365": {
+     "yes": -140,
+     "no": 100
+    }
+   },
+   "btts_best": {
+    "yes": -120,
+    "yes_book": "FanDuel",
+    "no": 105,
+    "no_book": "Caesars"
+   }
+  },
+  {
+   "game_id": 287942,
+   "start_time": "2026-06-26T19:00:00.000Z",
+   "status": "scheduled",
+   "home": "Senegal",
+   "away": "Iraq",
+   "btts": {
+    "DraftKings": {
+     "yes": 133,
+     "no": -175
+    },
+    "FanDuel": {
+     "yes": 110,
+     "no": -149
+    },
+    "Caesars": {
+     "yes": 135,
+     "no": -175
+    },
+    "PointsBet": {
+     "yes": 132,
+     "no": -168
+    },
+    "Bet365": {
+     "yes": 135,
+     "no": -190
+    }
+   },
+   "btts_best": {
+    "yes": 135,
+    "yes_book": "Caesars",
+    "no": -149,
+    "no_book": "FanDuel"
+   }
+  },
+  {
+   "game_id": 284396,
+   "start_time": "2026-06-27T00:00:00.000Z",
+   "status": "scheduled",
+   "home": "Cape Verde",
+   "away": "Saudi Arabia",
+   "btts": {
+    "DraftKings": {
+     "yes": -110,
+     "no": -116
+    },
+    "FanDuel": {
+     "yes": -116,
+     "no": -112
+    },
+    "Caesars": {
+     "yes": -110,
+     "no": -115
+    },
+    "PointsBet": {
+     "yes": -108,
+     "no": -118
+    },
+    "Bet365": {
+     "yes": -120,
+     "no": -115
+    }
+   },
+   "btts_best": {
+    "yes": -108,
+    "yes_book": "PointsBet",
+    "no": -112,
+    "no_book": "FanDuel"
+   }
+  },
+  {
+   "game_id": 284397,
+   "start_time": "2026-06-27T00:00:00.000Z",
+   "status": "scheduled",
+   "home": "Uruguay",
+   "away": "Spain",
+   "btts": {
+    "DraftKings": {
+     "yes": -110,
+     "no": -123
+    },
+    "FanDuel": {
+     "yes": -116,
+     "no": -117
+    },
+    "Caesars": {
+     "yes": -105,
+     "no": -120
+    },
+    "PointsBet": {
+     "yes": -112,
+     "no": -112
+    },
+    "Bet365": {
+     "yes": -115,
+     "no": -125
+    }
+   },
+   "btts_best": {
+    "yes": -105,
+    "yes_book": "Caesars",
+    "no": -112,
+    "no_book": "PointsBet"
+   }
+  },
+  {
+   "game_id": 284398,
+   "start_time": "2026-06-27T03:00:00.000Z",
+   "status": "scheduled",
+   "home": "Egypt",
+   "away": "Iran",
+   "btts": {
+    "DraftKings": {
+     "yes": 110,
+     "no": -148
+    },
+    "FanDuel": {
+     "yes": 108,
+     "no": -146
+    },
+    "Caesars": {
+     "yes": 110,
+     "no": -140
+    },
+    "PointsBet": {
+     "yes": 114,
+     "no": -146
+    },
+    "Bet365": {
+     "yes": 110,
+     "no": -155
+    }
+   },
+   "btts_best": {
+    "yes": 114,
+    "yes_book": "PointsBet",
+    "no": -140,
+    "no_book": "Caesars"
+   }
+  },
+  {
+   "game_id": 284399,
+   "start_time": "2026-06-27T03:00:00.000Z",
+   "status": "scheduled",
+   "home": "New Zealand",
+   "away": "Belgium",
+   "btts": {
+    "DraftKings": {
+     "yes": 130,
+     "no": -184
+    },
+    "FanDuel": {
+     "yes": 111,
+     "no": -152
+    },
+    "Caesars": {
+     "yes": 130,
+     "no": -170
+    },
+    "PointsBet": {
+     "yes": 140,
+     "no": -180
+    },
+    "Bet365": {
+     "yes": 130,
+     "no": -190
+    }
+   },
+   "btts_best": {
+    "yes": 140,
+    "yes_book": "PointsBet",
+    "no": -152,
+    "no_book": "FanDuel"
+   }
+  },
+  {
+   "game_id": 284400,
+   "start_time": "2026-06-27T21:00:00.000Z",
+   "status": "scheduled",
+   "home": "Croatia",
+   "away": "Ghana",
+   "btts": {
+    "DraftKings": {
+     "yes": 102,
+     "no": -141
+    },
+    "FanDuel": {
+     "yes": 103,
+     "no": -141
+    },
+    "Caesars": {
+     "yes": 100,
+     "no": -130
+    },
+    "PointsBet": {
+     "yes": 104,
+     "no": -132
+    },
+    "Bet365": {
+     "yes": 100,
+     "no": -145
+    }
+   },
+   "btts_best": {
+    "yes": 104,
+    "yes_book": "PointsBet",
+    "no": -130,
+    "no_book": "Caesars"
+   }
+  },
+  {
+   "game_id": 284401,
+   "start_time": "2026-06-27T21:00:00.000Z",
+   "status": "scheduled",
+   "home": "Panama",
+   "away": "England",
+   "btts": {
+    "DraftKings": {
+     "yes": 112,
+     "no": -154
+    },
+    "FanDuel": {
+     "yes": 111,
+     "no": -150
+    },
+    "Caesars": {
+     "yes": 120,
+     "no": -155
+    },
+    "PointsBet": {
+     "yes": 114,
+     "no": -146
+    },
+    "Bet365": {
+     "yes": 110,
+     "no": -160
+    }
+   },
+   "btts_best": {
+    "yes": 120,
+    "yes_book": "Caesars",
+    "no": -146,
+    "no_book": "PointsBet"
+   }
+  },
+  {
+   "game_id": 284402,
+   "start_time": "2026-06-27T23:30:00.000Z",
+   "status": "scheduled",
+   "home": "Colombia",
+   "away": "Portugal",
+   "btts": {
+    "DraftKings": {
+     "yes": -121,
+     "no": -111
+    },
+    "FanDuel": {
+     "yes": -121,
+     "no": -110
+    },
+    "Caesars": {
+     "yes": -120,
+     "no": -105
+    },
+    "PointsBet": {
+     "yes": -122,
+     "no": -106
+    },
+    "Bet365": {
+     "yes": -125,
+     "no": -115
+    }
+   },
+   "btts_best": {
+    "yes": -120,
+    "yes_book": "Caesars",
+    "no": -105,
+    "no_book": "Caesars"
+   }
+  },
+  {
+   "game_id": 287943,
+   "start_time": "2026-06-27T23:30:00.000Z",
+   "status": "scheduled",
+   "home": "DR Congo",
+   "away": "Uzbekistan",
+   "btts": {
+    "DraftKings": {
+     "yes": -109,
+     "no": -125
+    },
+    "FanDuel": {
+     "yes": -109,
+     "no": -123
+    },
+    "Caesars": {
+     "yes": -110,
+     "no": -115
+    },
+    "PointsBet": {
+     "yes": -108,
+     "no": -118
+    },
+    "Bet365": {
+     "yes": -110,
+     "no": -130
+    }
+   },
+   "btts_best": {
+    "yes": -108,
+    "yes_book": "PointsBet",
+    "no": -115,
+    "no_book": "Caesars"
+   }
+  },
+  {
+   "game_id": 284403,
+   "start_time": "2026-06-28T02:00:00.000Z",
+   "status": "scheduled",
+   "home": "Algeria",
+   "away": "Austria",
+   "btts": {
+    "DraftKings": {
+     "yes": -131,
+     "no": -100
+    },
+    "FanDuel": {
+     "yes": -120,
+     "no": -109
+    },
+    "Caesars": {
+     "yes": -135,
+     "no": 105
+    },
+    "PointsBet": {
+     "yes": -132,
+     "no": 104
+    },
+    "Bet365": {
+     "yes": -130,
+     "no": -110
+    }
+   },
+   "btts_best": {
+    "yes": -120,
+    "yes_book": "FanDuel",
+    "no": 105,
+    "no_book": "Caesars"
+   }
+  },
+  {
+   "game_id": 284404,
+   "start_time": "2026-06-28T02:00:00.000Z",
+   "status": "scheduled",
+   "home": "Jordan",
+   "away": "Argentina",
+   "btts": {
+    "DraftKings": {
+     "yes": 126,
+     "no": -175
+    },
+    "FanDuel": {
+     "yes": 132,
+     "no": -185
+    },
+    "Caesars": {
+     "yes": 140,
+     "no": -175
+    },
+    "PointsBet": {
+     "yes": 126,
+     "no": -160
+    },
+    "Bet365": {
+     "yes": 120,
+     "no": -175
+    }
+   },
+   "btts_best": {
+    "yes": 140,
+    "yes_book": "Caesars",
+    "no": -160,
+    "no_book": "PointsBet"
    }
   }
  ]

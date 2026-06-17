@@ -106,18 +106,29 @@ def _btts_for_game(game_id) -> dict | None:
     return {"by_book": by_book, "best": {"yes": yb, "yes_book": ybk, "no": nb, "no_book": nbk}}
 
 
-def harvest(now_iso: str | None = None) -> dict:
-    board = _get(f"{BASE}/scoreboard/soccer?period=event") or {}
-    games = [g for g in board.get("games", []) if g.get("league_id") == WC_LEAGUE_ID]
+def harvest(now_iso: str | None = None, days: int = 10) -> dict:
+    """Collect WC games across today..+``days`` (AN's scoreboard is per-day via ``?date=``),
+    dedup by game id, and attach BTTS for each game that has it posted."""
+    from datetime import datetime, timezone, timedelta
+    base_day = datetime.now(timezone.utc).date()
+    seen: dict = {}
+    for i in range(days + 1):
+        day = (base_day + timedelta(days=i)).strftime("%Y%m%d")
+        board = _get(f"{BASE}/scoreboard/soccer?period=event&date={day}") or {}
+        for g in board.get("games", []):
+            gid = g.get("id")
+            if g.get("league_id") == WC_LEAGUE_ID and gid is not None and gid not in seen:
+                seen[gid] = g
+        time.sleep(0.3)
     out = []
-    for g in games:
+    for g in seen.values():
         gid = g.get("id")
         home, away = _team_names(g)
         if not (home and away and gid):
             continue
         bt = _btts_for_game(gid)
         time.sleep(0.4)                       # be gentle
-        if not bt:
+        if not bt:                            # BTTS not posted yet for this game -> skip
             continue
         out.append({"game_id": gid, "start_time": g.get("start_time"),
                     "status": g.get("status"), "home": home, "away": away,
@@ -131,8 +142,9 @@ def main() -> int:
     ap.add_argument("--out", default=str(Path(__file__).resolve().parents[1]
                                          / "data" / "feeds" / "actionnetwork_btts.json"))
     ap.add_argument("--now", default=None, help="ISO8601 timestamp to stamp (UTC)")
+    ap.add_argument("--days", type=int, default=10, help="days ahead to harvest (incl. today)")
     args = ap.parse_args()
-    feed = harvest(now_iso=args.now)
+    feed = harvest(now_iso=args.now, days=args.days)
     p = Path(args.out)
     p.parent.mkdir(parents=True, exist_ok=True)
     p.write_text(json.dumps(feed, indent=1), encoding="utf-8")
