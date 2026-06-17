@@ -62,10 +62,11 @@ def test_brief_falls_back_without_search_tool(monkeypatch):
     assert out["text"] == "plain" and calls["n"] == 2
 
 
-def test_brief_none_on_error(monkeypatch):
+def test_brief_surfaces_error(monkeypatch):
     monkeypatch.setattr(mb, "api_key", lambda: "k")
-    monkeypatch.setattr(mb.requests, "post",
-                        lambda *a, **k: type("R", (), {"status_code": 500,
-                                                       "json": staticmethod(lambda: {})})())
-    assert mb.brief({"Match": "A vs B"}) is None
-    assert mb.brief({}) is None                      # empty facts
+    monkeypatch.setattr(mb.requests, "post", lambda *a, **k: type(
+        "R", (), {"status_code": 500, "text": "",
+                  "json": staticmethod(lambda: {"error": {"message": "boom"}})})())
+    out = mb.brief({"Match": "A vs B"})
+    assert out and "500" in out["error"] and "boom" in out["error"]   # error surfaced for the UI
+    assert mb.brief({}) is None                                       # empty facts -> None

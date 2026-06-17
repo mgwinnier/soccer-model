@@ -82,22 +82,37 @@ def _parse(resp) -> dict | None:
     return {"text": text, "sources": uniq[:5]}
 
 
-def brief(facts: dict, timeout: float = 25.0) -> dict | None:
-    """A context-adding brief grounded in Google Search, or None.
+def _err(resp) -> str:
+    try:
+        e = resp.json().get("error") or {}
+        return e.get("message") or resp.text[:160]
+    except Exception:  # noqa: BLE001
+        return (getattr(resp, "text", "") or "")[:160]
 
-    Returns ``{"text", "sources":[{title,uri}]}``. Uses live search so it fills gaps the card
-    doesn't show with REAL, citable info — and is told to state only what the data or a search
-    result supports. Falls back to no-search synthesis if the search tool isn't available."""
+
+def brief(facts: dict, timeout: float = 25.0) -> dict | None:
+    """A context-adding brief grounded in Google Search.
+
+    Returns ``{"text", "sources":[{title,uri}]}`` on success, ``{"error": ...}`` on an API failure
+    (so the UI can show why), or ``None`` only when there's no key / no facts. Falls back to
+    no-search synthesis on ANY error from the grounded call (e.g. search tool/billing not enabled)."""
     key = api_key()
     if not key or not facts:
         return None
     prompt = f"{_SYSTEM}\n\nCARD DATA:\n{_render(facts)}\n\nWrite the brief now:"
     try:
         r = _call(key, prompt, search=True, timeout=timeout)
-        if r.status_code in (400, 403):              # search tool not enabled -> plain synthesis
-            r = _call(key, prompt, search=False, timeout=timeout)
-        if r.status_code != 200:
-            return None
-        return _parse(r)
-    except Exception:  # noqa: BLE001 — any failure degrades to no brief
-        return None
+        if r.status_code == 200:
+            parsed = _parse(r)
+            if parsed:
+                return parsed
+        # grounded call failed or returned no text -> retry plain synthesis
+        r2 = _call(key, prompt, search=False, timeout=timeout)
+        if r2.status_code == 200:
+            parsed = _parse(r2)
+            if parsed:
+                return parsed
+            return {"error": "model returned no text (possibly safety-filtered)"}
+        return {"error": f"HTTP {r2.status_code}: {_err(r2)}"}
+    except Exception as e:  # noqa: BLE001
+        return {"error": f"{type(e).__name__}: {str(e)[:140]}"}

@@ -823,8 +823,10 @@ def render_match(m: dict, live: dict | None = None, min_ev: float = 0.03,
                         if srcs:
                             st.caption("Sources: " + " · ".join(
                                 f"[{s['title'][:38]}]({s['uri']})" for s in srcs))
+                    elif res and res.get("error"):
+                        st.caption(f"Gemini: {res['error']}")
                     else:
-                        st.caption("Brief unavailable right now (Gemini error or no key).")
+                        st.caption("Brief unavailable (no key detected).")
             if played:
                 axg = get_fixture_xg(m["home"], m["away"], str(m["date"])[:10])
                 if axg is not None:
