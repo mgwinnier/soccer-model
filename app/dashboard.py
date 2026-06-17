@@ -672,6 +672,73 @@ def _display_probs(m: dict) -> dict:
     return {k: v / s for k, v in p.items()}
 
 
+def _brief_facts(m: dict) -> dict:
+    """Assemble the REAL facts for the AI brief (model, form, H2H, lineups+formations+values,
+    result/stats when played, best bet) — nothing invented; the brief may use only these."""
+    from src.data import squad_values as sv
+    a = m["analysis"]
+    probs = _display_probs(m)
+    pick = OUTCOMES[int(np.argmax([probs["H"], probs["D"], probs["A"]]))]
+    pick_name = {"H": m["home"], "D": "Draw", "A": m["away"]}[pick]
+    eg = a["expected_goals"]
+    top = a["top_scorelines"][0][0] if a.get("top_scorelines") else "?"
+    f = {"Match": f"{m['home']} vs {m['away']} "
+                  f"({'neutral site' if m['neutral'] else m['home'] + ' at home'})",
+         "Model": (f"{m['home']} {probs['H']*100:.0f}% / Draw {probs['D']*100:.0f}% / "
+                   f"{m['away']} {probs['A']*100:.0f}%, leans {pick_name}; expected goals "
+                   f"{m['home']} {eg[0]:.1f}, {m['away']} {eg[1]:.1f} ({eg[0]+eg[1]:.1f} total); "
+                   f"BTTS {a['btts']*100:.0f}%; most likely score {top}")}
+    hc, ac, h2h = a.get("home_context") or {}, a.get("away_context") or {}, a.get("h2h") or {}
+    if hc.get("form") or ac.get("form"):
+        f["Recent form"] = f"{m['home']} {hc.get('form', '?')}, {m['away']} {ac.get('form', '?')}"
+    if h2h.get("n"):
+        f["Head-to-head"] = (f"last {h2h['n']} meetings: {m['home']} {h2h.get('home_wins', 0)}-"
+                             f"{h2h.get('draws', 0)}-{h2h.get('away_wins', 0)} {m['away']}")
+    el = get_espn_lineups(m.get("game_id"))
+    if el:
+        parts = []
+        for side, team in (("home", m["home"]), ("away", m["away"])):
+            s = el.get(side) or {}
+            names = [p.get("name") for p in s.get("xi", [])]
+            val, share = sv.xi_value(team, names)
+            ko = sv.key_absentees(team, names, top_n=3)
+            seg = f"{team} {s.get('formation') or '?'}"
+            if share is not None:
+                seg += f" (XI {_value_str(val)}, {share*100:.0f}% of squad value)"
+            if ko:
+                seg += f", missing {', '.join(x['name'] + ' ' + _value_str(x['market_value']) for x in ko)}"
+            parts.append(seg)
+        f["Confirmed lineups"] = " | ".join(parts)
+    if m.get("played"):
+        f["Result"] = (f"FINAL {m['home_score']}-{m['away_score']} "
+                       f"({'model called it' if m['result'] == pick else 'upset vs the model'})")
+        sx = get_match_stats(m["home"], m["away"], str(m["date"])[:10])
+        if sx.get("ball_possession"):
+            def _ha(k):
+                v = sx.get(k) or {}
+                return f"{v.get('home', '?')}-{v.get('away', '?')}"
+            f["Match stats"] = (f"possession {_ha('ball_possession')}, xG "
+                                f"{_ha('expected_goals')}, shots {_ha('total_shots')}")
+    cands = _qualifying_bets(m, min_ev=0.03, min_prob_edge=0.02)
+    if cands:
+        b = max(cands, key=lambda x: x.ev)
+        f["Best bet (model)"] = (f"{b.market}: {b.selection} at {_am(b.american)} — model "
+                                 f"{b.model_p*100:.0f}% vs market {(b.fair_p or 0)*100:.0f}%, "
+                                 f"EV {b.ev*100:+.0f}%")
+    return f
+
+
+@st.cache_data(ttl=3600, show_spinner="Writing the brief…")
+def get_match_brief(facts_json: str):
+    """Cached grounded brief (one Gemini call per game, reused)."""
+    import json
+    try:
+        from src.ai import match_brief as mb
+        return mb.brief(json.loads(facts_json))
+    except Exception:  # noqa: BLE001
+        return None
+
+
 def render_match(m: dict, live: dict | None = None, min_ev: float = 0.03,
                  min_prob_edge: float = 0.02):
     a = m["analysis"]
@@ -733,6 +800,19 @@ def render_match(m: dict, live: dict | None = None, min_ev: float = 0.03,
         tab_insights, tab_markets, tab_scores = st.tabs(["Insights", "Markets", "Scorelines"])
 
         with tab_insights:
+            from src.ai import match_brief as _mb
+            if _mb.is_available():
+                bkey = f"brief_{m.get('game_id') or (m['home'] + m['away'])}"
+                if st.button("✨ AI match brief", key=bkey + "_btn",
+                             help="A grounded 2–3 sentence preview from this card's data (Gemini)."):
+                    st.session_state[bkey] = True
+                if st.session_state.get(bkey):
+                    import json as _json
+                    txt = get_match_brief(_json.dumps(_brief_facts(m), sort_keys=True))
+                    if txt:
+                        theme.callout(txt, "info")
+                    else:
+                        st.caption("Brief unavailable right now (Gemini error or no key).")
             if played:
                 axg = get_fixture_xg(m["home"], m["away"], str(m["date"])[:10])
                 if axg is not None:

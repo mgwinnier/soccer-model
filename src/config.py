@@ -44,7 +44,7 @@ def load_secrets() -> dict[str, bool]:
     try:
         import streamlit as _st
         for _k in ("THESTATSAPI_KEY", "API_FOOTBALL_KEY", "KAGGLE_USERNAME", "KAGGLE_KEY",
-                   "ACTIONNETWORK_FEED_URL"):
+                   "ACTIONNETWORK_FEED_URL", "GEMINI_API_KEY", "GEMINI_MODEL"):
             if not os.environ.get(_k) and _k in _st.secrets:
                 os.environ[_k] = str(_st.secrets[_k])
     except Exception:  # noqa: BLE001 — streamlit absent or no secrets configured
