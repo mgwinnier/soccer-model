@@ -60,6 +60,8 @@ def _bet_code(market: str, selection: str, home: str, away: str, analysis: dict)
         line = analysis.get("spread", {}).get("home_line")
         return (f"cover_home@{line}" if selection.startswith(home)
                 else f"cover_away@{line}")
+    if market == "BTTS":
+        return "btts_yes" if "Yes" in selection else "btts_no"
     return "?"
 
 
@@ -225,17 +227,28 @@ def _closing_price(code: str, od: dict):
     elif code.startswith("cover_away@"):
         am = od.get("spread_away_odds")
     else:
-        return None
+        return None                              # BTTS (no ESPN line) / unknown -> no close
     return american_to_decimal(am)
 
 
-def _result(code: str, hs: int, as_: int) -> str:
+def _result(code: str, hs: int, as_: int) -> str | None:
+    """Settle a ticket code against the final score. Returns 'win'/'loss'/'push', or **None** for an
+    unknown/unparseable code (so a bad ticket can never crash grade())."""
     tot, margin = hs + as_, hs - as_
     if code in ("H", "D", "A"):
         actual = "H" if hs > as_ else ("D" if hs == as_ else "A")
         return "win" if code == actual else "loss"
+    if code == "btts_yes":
+        return "win" if (hs > 0 and as_ > 0) else "loss"
+    if code == "btts_no":
+        return "win" if not (hs > 0 and as_ > 0) else "loss"
+    if "@" not in code:
+        return None                              # unknown code -> ungradable, not a crash
     kind, line = code.split("@")
-    line = float(line)
+    try:
+        line = float(line)
+    except (TypeError, ValueError):
+        return None
     if kind == "over":
         return "push" if tot == line else ("win" if tot > line else "loss")
     if kind == "under":
@@ -243,11 +256,27 @@ def _result(code: str, hs: int, as_: int) -> str:
     adj = margin + line
     if kind == "cover_home":
         return "push" if abs(adj) < 1e-9 else ("win" if adj > 0 else "loss")
-    return "push" if abs(adj) < 1e-9 else ("win" if adj < 0 else "loss")
+    if kind == "cover_away":
+        return "push" if abs(adj) < 1e-9 else ("win" if adj < 0 else "loss")
+    return None                                  # unknown kind -> ungradable
+
+
+def _repair_code(market, code, selection) -> str | None:
+    """Heal a missing/unparseable ticket code from its market+selection. Returns a gradable code or
+    None. Fixes the legacy ``?`` BTTS tickets already in clv_open.csv without a manual migration."""
+    code = "" if code is None or (isinstance(code, float) and pd.isna(code)) else str(code)
+    if code and code != "?":
+        return code
+    if str(market) == "BTTS":
+        return "btts_yes" if "Yes" in str(selection) else "btts_no"
+    return None
 
 
 def grade(cfg: dict | None = None, now: str | None = None) -> int:
-    """Settle finished tickets: compute CLV + P&L, move them to the ledger."""
+    """Settle finished tickets: compute CLV + P&L, move them to the ledger.
+
+    Every ticket is settled inside its own try/except: a single malformed/ungradable ticket is left
+    open (and logged), never aborts the whole run — so the tracker can't silently freeze again."""
     cfg = cfg or load_config()
     op = _open_path(cfg)
     if not op.exists():
@@ -262,24 +291,37 @@ def grade(cfg: dict | None = None, now: str | None = None) -> int:
     scores = {e["game_id"]: e for e in fetch_espn_range(lo, hi, cfg=cfg, use_cache=False)
               if e["status"] == "post" and e["home_score"] is not None}
 
-    graded, remaining = [], []
+    graded, remaining, errors = [], [], 0
     for t in opendf.to_dict("records"):
         ev = scores.get(str(t["game_id"])) or scores.get(t["game_id"])
         if not ev:
             remaining.append(t)
             continue
-        od = fetch_summary_odds(str(t["game_id"]), cfg=cfg)
-        close_dec = _closing_price(t["code"], od) if od else None
-        res = _result(t["code"], ev["home_score"], ev["away_score"])
-        pnl = 0.0 if res == "push" else (t["decimal"] - 1 if res == "win" else -1.0)
-        clv = (t["decimal"] / close_dec - 1.0) if close_dec else np.nan
-        graded.append({**t, "segment": t.get("segment") or segment_from_code(t["code"]),
-                       "system": t.get("system") or _system_tag(t.get("market", ""), t.get("decimal")),
-                       "score": f"{ev['home_score']}-{ev['away_score']}",
-                       "closing_decimal": round(close_dec, 3) if close_dec else None,
-                       "clv": round(clv, 4) if close_dec else None,
-                       "result": res, "pnl": round(pnl, 3),
-                       "graded_time": now or datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")})
+        try:
+            code = _repair_code(t.get("market"), t.get("code"), t.get("selection"))
+            res = _result(code, ev["home_score"], ev["away_score"]) if code else None
+            if res is None:                      # ungradable code -> keep open, don't crash
+                remaining.append(t)
+                continue
+            od = fetch_summary_odds(str(t["game_id"]), cfg=cfg)
+            close_dec = _closing_price(code, od) if od else None
+            pnl = 0.0 if res == "push" else (t["decimal"] - 1 if res == "win" else -1.0)
+            clv = (t["decimal"] / close_dec - 1.0) if close_dec else np.nan
+            graded.append({**t, "code": code,
+                           "segment": t.get("segment") or segment_from_code(code),
+                           "system": t.get("system") or _system_tag(t.get("market", ""), t.get("decimal")),
+                           "score": f"{ev['home_score']}-{ev['away_score']}",
+                           "closing_decimal": round(close_dec, 3) if close_dec else None,
+                           "clv": round(clv, 4) if close_dec else None,
+                           "result": res, "pnl": round(pnl, 3),
+                           "graded_time": now or datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")})
+        except Exception as e:  # noqa: BLE001 — one bad ticket must never freeze the tracker
+            errors += 1
+            print(f"[clv] skip ungradable ticket {t.get('match')} {t.get('code')}: "
+                  f"{type(e).__name__}: {e}")
+            remaining.append(t)
+    if errors:
+        print(f"[clv] {errors} ticket(s) skipped (left open)")
     if graded:
         led = pd.DataFrame(graded)
         if _ledger_path(cfg).exists():

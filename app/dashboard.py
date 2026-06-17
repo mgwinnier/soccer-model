@@ -1288,15 +1288,16 @@ def clv_sync(day: str, min_ev: float) -> dict:
     manual refresh too. Snapshot dedupes, so repeated calls are safe."""
     from src.predict import clv
     added = graded = 0
+    errs = []
     try:
         added = clv.snapshot(day, days=3, min_ev=min_ev, cfg=CFG)
-    except Exception:  # noqa: BLE001
-        pass
+    except Exception as e:  # noqa: BLE001
+        errs.append(f"snapshot: {type(e).__name__}: {e}")
     try:
         graded = clv.grade(CFG)
-    except Exception:  # noqa: BLE001
-        pass
-    return {"added": added, "graded": graded}
+    except Exception as e:  # noqa: BLE001 — grade() is per-ticket-guarded; surface anything that escapes
+        errs.append(f"grade: {type(e).__name__}: {e}")
+    return {"added": added, "graded": graded, "error": " · ".join(errs)}
 
 
 def _read_fresh(path) -> pd.DataFrame:
@@ -1334,6 +1335,8 @@ def page_clv(min_ev=0.03, kelly=0.25):
     if auto:
         s = clv_sync(today, min_ev)
         cc[2].caption(f"Synced · +{s['added']} new picks recorded · {s['graded']} just settled")
+        if s.get("error"):
+            cc[2].caption(f"⚠️ sync error — {s['error']}")
 
     # read FRESH (not via cached load_csv — the tracker writes to these during the session)
     led = _read_fresh(clv._ledger_path(CFG))

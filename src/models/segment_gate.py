@@ -41,6 +41,10 @@ def segment_from_code(code: str) -> str:
         return "SP:home"
     if code.startswith("cover_away@"):
         return "SP:away"
+    if code == "btts_yes":
+        return "BTTS:yes"
+    if code == "btts_no":
+        return "BTTS:no"
     return code
 
 
