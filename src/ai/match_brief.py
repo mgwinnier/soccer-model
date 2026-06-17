@@ -49,7 +49,7 @@ def is_available() -> bool:
 
 
 def _model() -> str:
-    return os.environ.get("GEMINI_MODEL") or "gemini-2.0-flash"
+    return os.environ.get("GEMINI_MODEL") or "gemini-2.5-flash"
 
 
 def _render(facts: dict) -> str:
@@ -62,7 +62,10 @@ def _render(facts: dict) -> str:
 
 def _call(key: str, prompt: str, search: bool, timeout: float):
     body = {"contents": [{"parts": [{"text": prompt}]}],
-            "generationConfig": {"temperature": 0.3, "maxOutputTokens": 320, "topP": 0.9}}
+            "generationConfig": {"temperature": 0.3, "maxOutputTokens": 600, "topP": 0.9,
+                                 # 2.5+ "thinking" tokens otherwise eat the output budget and
+                                 # truncate the brief — turn it off for a short synthesis task.
+                                 "thinkingConfig": {"thinkingBudget": 0}}}
     if search:
         body["tools"] = [{"google_search": {}}]      # live grounding (real, citable)
     return requests.post(_ENDPOINT.format(model=_model()), params={"key": key},
