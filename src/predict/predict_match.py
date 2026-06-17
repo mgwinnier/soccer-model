@@ -61,8 +61,14 @@ class MatchPredictor:
         raise ValueError(f"Unknown team '{name}'.{suffix}")
 
     def _compute(self, home: str, away: str, neutral: bool,
-                 home_avail: float, away_avail: float):
-        """Shared core: returns (blend probs, lam, mu, scoreline matrix)."""
+                 home_avail: float, away_avail: float, upset_temp: float = 1.0):
+        """Shared core: returns (blend probs, lam, mu, scoreline matrix).
+
+        ``upset_temp`` (τ ≥ 1) is the optional "upset sensitivity" dial: it tempers the
+        final W/D/L blend (``p**(1/τ)`` renormalized), raising the underdog/draw chance —
+        most on the games the model is most sure of. τ=1 is a no-op (deployed default);
+        τ>1 deliberately trades calibration/accuracy for more upset calls. The expected
+        goals and scoreline matrix are NOT tempered (totals stay calibrated)."""
         from ..models.base import scoreline_to_outcome_probs
         lam, mu = self.dc.expected_goals(home, away, neutral)
         lam, mu = lam * home_avail, mu * away_avail
@@ -87,6 +93,8 @@ class MatchPredictor:
             cal3 = np.array([self.calibrators.calibrate("mr", float(x)) for x in blend])
             if cal3.sum() > 0:
                 blend = cal3 / cal3.sum()
+        if upset_temp and upset_temp != 1.0:
+            blend = _temper(blend, upset_temp)
         return blend, lam, mu, mat
 
     def predict(self, home: str, away: str, neutral: bool = True,
@@ -111,13 +119,16 @@ class MatchPredictor:
 
     def analyze(self, home: str, away: str, neutral: bool = True,
                 market_total: float = 2.5, spread_home_line: float | None = None,
-                home_avail: float = 1.0, away_avail: float = 1.0) -> dict:
+                home_avail: float = 1.0, away_avail: float = 1.0,
+                upset_temp: float = 1.0) -> dict:
         """Rich analysis: W/D/L + scoreline matrix + O/U ladder + spread cover +
-        BTTS + team context. Built on the same scoreline distribution as predict()
-        (expected goals already corrected for the WC scoring environment via
-        ``WC_GOALS_SCALE`` in ``_compute``)."""
+        BTTS + team context + a ``signals`` block (upset/shootout potential). Built on
+        the same scoreline distribution as predict() (expected goals already corrected
+        for the WC scoring environment in ``_compute``). ``upset_temp`` is the optional
+        upset-sensitivity dial (default 1.0 = no change)."""
         home, away = self._validate(home), self._validate(away)
-        blend, lam, mu, mat = self._compute(home, away, neutral, home_avail, away_avail)
+        blend, lam, mu, mat = self._compute(home, away, neutral, home_avail, away_avail,
+                                            upset_temp)
         scores = sorted(
             (((i, j), float(mat[i, j])) for i in range(mat.shape[0])
              for j in range(mat.shape[1])), key=lambda kv: -kv[1])
@@ -139,6 +150,7 @@ class MatchPredictor:
             "home_context": self.team_context(home),
             "away_context": self.team_context(away),
             "h2h": self.head_to_head(home, away),
+            "signals": _variance_signals(blend, ladder.get(3.5), lam + mu),
         }
         if spread_home_line is not None:
             ph_raw, push, _ = _cover_prob(mat, spread_home_line)
@@ -198,6 +210,38 @@ class MatchPredictor:
             recent.append(f"{r.home_team[:3]} {hs}-{as_} {r.away_team[:3]}")
         return {"home_wins": hw, "away_wins": aw, "draws": dr,
                 "n": len(h2h), "recent": recent}
+
+
+def _temper(p: np.ndarray, tau: float) -> np.ndarray:
+    """Temperature-flatten a probability vector: ``p**(1/τ)`` renormalized.
+
+    τ=1 returns p unchanged. τ>1 flattens toward uniform — raising the underdog/draw
+    probability, most where the model is most confident (the heavy-favorite games where
+    the craziest upsets live). τ<1 sharpens. Always sums to 1."""
+    p = np.clip(np.asarray(p, dtype=float), 1e-12, None)
+    q = p ** (1.0 / float(tau))
+    return q / q.sum()
+
+
+def _variance_signals(blend, p_over_35, expected_total) -> dict:
+    """Surface the upset / high-scoring potential the model already encodes — purely
+    descriptive, derived from the (untempered or tempered) blend and the calibrated
+    over-3.5 probability. Changes no model output; it's a read of the distribution."""
+    pH, pD, pA = (float(blend[0]), float(blend[1]), float(blend[2]))
+    underdog_win = min(pH, pA)                      # P(the weaker side wins outright)
+    ps = np.clip([pH, pD, pA], 1e-12, None)
+    entropy = float(-(ps * np.log(ps)).sum() / np.log(3))   # 0..1, higher = closer game
+    sp = float(p_over_35) if p_over_35 is not None else None
+    return {
+        "upset_risk": round(underdog_win, 4),       # weaker side wins
+        "draw_risk": round(pD, 4),
+        "competitiveness": round(entropy, 4),       # coin-flip-ness
+        "shootout_potential": (round(sp, 4) if sp is not None else None),  # calibrated P(4+ goals)
+        "expected_total": round(float(expected_total), 2),
+        # convenience flags for "show me the wild games"
+        "high_upset": bool(underdog_win >= 0.30),
+        "high_scoring": bool(sp is not None and sp >= 0.30),
+    }
 
 
 def _over_prob(mat: np.ndarray, line: float) -> float:

@@ -70,10 +70,12 @@ def load_csv(name: str) -> pd.DataFrame:
 
 
 @st.cache_data(ttl=600, show_spinner="Pulling live odds + analysing…")
-def get_bets(day: str, days: int, bankroll: float, kelly: float) -> dict:
+def get_bets(day: str, days: int, bankroll: float, kelly: float,
+             upset_temp: float = 1.0) -> dict:
     return value_mod.build_bets(day, days=days, bankroll=bankroll,
                                 kelly_fraction=kelly, cfg=CFG,
-                                predictor=get_predictor(), use_cache=False)
+                                predictor=get_predictor(), use_cache=False,
+                                upset_temp=upset_temp)
 
 
 @st.cache_data(ttl=300, show_spinner="Computing live group state + qualification odds…")
@@ -294,6 +296,22 @@ def render_match(m: dict, live: dict | None = None, min_ev: float = 0.03,
         st.caption(f"Venue: {'neutral' if m['neutral'] else m['home'] + ' home'} · "
                    f"expected goals: {m['home']} {eg[0]:.1f}, {m['away']} {eg[1]:.1f} "
                    f"(**{eg[0] + eg[1]:.1f} total**) · odds: {m['provider'] or 'n/a'}{move_txt}")
+        # variance meters — the upset / high-scoring potential the model already encodes
+        sig = a.get("signals") or {}
+        chips = []
+        ur = sig.get("upset_risk")
+        if ur is not None:
+            chips.append(theme.pill(f"⚡ Upset risk {ur * 100:.0f}%",
+                                    "gold" if sig.get("high_upset") else "grey"))
+        sp, et = sig.get("shootout_potential"), sig.get("expected_total")
+        if sp is not None:
+            chips.append(theme.pill(f"🔥 High-scoring {sp * 100:.0f}% · {et:.1f} xG",
+                                    "gold" if sig.get("high_scoring") else "grey"))
+        if chips:
+            st.markdown('<div style="text-align:center;margin:2px 0 6px">'
+                        + " &nbsp; ".join(chips) + '</div>', unsafe_allow_html=True)
+            st.caption("⚡ = model's own P(underdog wins) (well-calibrated) · 🔥 = rough P(4+ goals); "
+                       "specific high-scorers are hard to pin even for the model.")
         motivation_block(m, live)
         context_strip(m)
         st.divider()
@@ -321,13 +339,13 @@ def render_match(m: dict, live: dict | None = None, min_ev: float = 0.03,
 
 
 # --------------------------------------------------------------------- pages
-def page_matches(bankroll, kelly, min_ev=0.03, min_prob_edge=0.02):
+def page_matches(bankroll, kelly, min_ev=0.03, min_prob_edge=0.02, upset_temp=1.0):
     theme.hero("Matches", "Model vs market across every priced market — flags, probabilities, "
                "and the single best bet per game.", icon="⚽")
     c1, c2 = st.columns([1, 1])
     day = c1.date_input("From date", value=date.today())
     days = c2.slider("Days ahead", 1, 7, 3)
-    res = get_bets(day.strftime("%Y-%m-%d"), days, bankroll, kelly)
+    res = get_bets(day.strftime("%Y-%m-%d"), days, bankroll, kelly, upset_temp)
     matches = res["matches"]
     if not matches:
         theme.callout("No upcoming fixtures with odds in this window — ESPN nulls odds once a "
@@ -354,12 +372,12 @@ def page_matches(bankroll, kelly, min_ev=0.03, min_prob_edge=0.02):
     theme.footer()
 
 
-def page_value_board(bankroll, kelly, min_ev, max_exposure, min_prob_edge=0.02):
+def page_value_board(bankroll, kelly, min_ev, max_exposure, min_prob_edge=0.02, upset_temp=1.0):
     theme.hero("Value Board", "Every +EV bet across the slate, ranked — staked by fractional "
                "Kelly and capped to your max exposure.", icon="💰")
     day = st.date_input("From date", value=date.today(), key="vb_date")
     days = st.slider("Days ahead", 1, 7, 3, key="vb_days")
-    res = get_bets(day.strftime("%Y-%m-%d"), days, bankroll, kelly)
+    res = get_bets(day.strftime("%Y-%m-%d"), days, bankroll, kelly, upset_temp)
     bb = value_mod.best_bets(res["bets"], min_ev=min_ev, min_prob_edge=min_prob_edge)
     if bb.empty:
         theme.callout("No bets clear the EV threshold for this window.", "info")
@@ -776,14 +794,27 @@ def main():
                                   "This is what stops the underdog/longshot junk.")
         max_exp = st.slider("Max total exposure (× bankroll)", 0.1, 2.0, 1.0, 0.1)
         st.divider()
+        st.markdown("**⚡ Upset sensitivity**", help=None)
+        upset_temp = st.slider("Upset sensitivity (τ)", 1.0, 2.0, 1.0, 0.05,
+                               label_visibility="collapsed",
+                               help="1.0 = the model's calibrated, most-accurate forecast. "
+                                    "Higher spreads probability toward underdogs/draws to surface "
+                                    "more upset value — it does NOT change the model's actual pick, "
+                                    "only how it shares probability.")
+        if upset_temp > 1.0:
+            st.caption(f"τ={upset_temp:.2f}: more upset value, lower precision. "
+                       "Backtest cost — pooled WC RPS 0.196→~0.201 at 1.5 (worse); "
+                       "upset-recall 30%→37%. Pick is unchanged.")
+        else:
+            st.caption("τ=1.0 — calibrated forecast (deployed accuracy).")
         st.caption("⚠ EV/Kelly are only as good as the model's probabilities. The **min-edge "
                    "gate** drops leverage-driven longshot flags. **Not betting advice** · "
                    "independent model, not affiliated with FIFA.")
 
     if page == "matches":
-        page_matches(bankroll, kelly, min_ev, min_edge)
+        page_matches(bankroll, kelly, min_ev, min_edge, upset_temp)
     elif page == "value":
-        page_value_board(bankroll, kelly, min_ev, max_exp, min_edge)
+        page_value_board(bankroll, kelly, min_ev, max_exp, min_edge, upset_temp)
     elif page == "clv":
         page_clv(min_ev, kelly)
     elif page == "tournament":

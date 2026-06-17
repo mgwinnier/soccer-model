@@ -37,7 +37,8 @@ def build_bets(start: str, days: int = 3, bankroll: float = 100.0,
                predictor: MatchPredictor | None = None,
                use_cache: bool = True, anchor_w: float | None = None,
                recenter: bool = False, recenter_shrink: float = 0.8,
-               league: str = "fifa.world", consensus_ref: bool = True) -> dict:
+               league: str = "fifa.world", consensus_ref: bool = True,
+               upset_temp: float = 1.0) -> dict:
     """Return {'matches': [rich per-match dicts], 'bets': DataFrame of all bets}.
 
     The model's probabilities are **pure** — the DC+Elo blend calibrated to historical
@@ -75,7 +76,8 @@ def build_bets(start: str, days: int = 3, bankroll: float = 100.0,
             neutral = _host_neutral(home)
             a = predictor.analyze(home, away, neutral=neutral, market_total=total_line,
                                   spread_home_line=spread_line,
-                                  home_avail=h_avail, away_avail=a_avail)
+                                  home_avail=h_avail, away_avail=a_avail,
+                                  upset_temp=upset_temp)
         except ValueError:
             continue  # unknown team — skip, never fabricate
 
