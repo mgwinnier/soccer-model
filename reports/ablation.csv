@@ -1,10 +1,10 @@
 ablation,variant,rps,n
 members,Elo only,0.2061913317885854,256
 members,DC goals only,0.20612671253699066,256
-members,DC+Elo+GBM (v1),0.20264413717640611,256
-members,+ xG-DC (v2),0.20267288695708646,256
-gbm_features,+elo,0.21168678173949676,256
-gbm_features,+form,0.21599861127096892,256
-gbm_features,+squad,0.21599861127096892,256
-gbm_features,+context,0.2074245511279051,256
-gbm_features,+xg_style,0.21006042556342736,256
+members,DC+Elo+GBM (v1),0.20442109678099518,256
+members,+ xG-DC (v2),0.20449022693667224,256
+gbm_features,+elo,0.2056839202105782,256
+gbm_features,+form,0.2080716282293371,256
+gbm_features,+squad,0.2080716282293371,256
+gbm_features,+context,0.2046391655689645,256
+gbm_features,+xg_style,0.20589490609356476,256
