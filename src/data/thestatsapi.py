@@ -222,6 +222,21 @@ def xg_for_fixture(home: str, away: str, date, *, competition_id: str = WC_COMP,
     return match_xg(mid, cfg=cfg)
 
 
+def match_player_ratings(match_id: str, ttl: float = 86400.0, cfg=None) -> dict:
+    """{player_id: {name, rating, started, minutes, position, team_id}} for a match, or {}.
+    One call returns both squads' per-player match ratings (e.g. 6.82)."""
+    d = _get(f"/matches/{match_id}/player-stats", ttl=ttl, cfg=cfg)
+    rows = d.get("data") if isinstance(d, dict) else (d if isinstance(d, list) else None)
+    out: dict = {}
+    for p in rows or []:
+        pid = p.get("player_id")
+        if pid:
+            out[pid] = {"name": p.get("player_name"), "rating": p.get("rating"),
+                        "started": bool(p.get("started")), "minutes": p.get("minutes_played"),
+                        "position": p.get("position"), "team_id": p.get("team_id")}
+    return out
+
+
 _SEASON = [None]
 
 

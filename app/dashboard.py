@@ -157,24 +157,41 @@ def lineup_block(m: dict):
         if not m.get("played"):
             st.caption("🚑 Confirmed XI not posted yet (TheStatsAPI posts it ≈75 min before kick).")
         return
+    played = ls.get("played")
+    st.markdown("**🚑 Confirmed lineups**")
     c1, c2 = st.columns(2)
     flagged = False
     for col, side, team in ((c1, "home", m["home"]), (c2, "away", m["away"])):
         s = ls.get(side) or {}
         form = s.get("formation") or "?"
-        miss = s.get("missing_starters") or []
         with col:
+            st.markdown(f"**{team_with_flag(team, 16, True)}** · {form}", unsafe_allow_html=True)
+            rows = []
+            for p in s.get("xi", []):
+                recent = " · ".join(f"{r:.1f}" for r in (p.get("recent") or [])[:3]) or "—"
+                row = {"#": "", "Starter": p.get("name"), "Pos": p.get("position") or "",
+                       "Form (last 3)": recent, "Avg": (f"{p['avg']:.2f}" if p.get("avg") else "—")}
+                if played:
+                    row["Today"] = f"{p['today']:.1f}" if p.get("today") is not None else "—"
+                rows.append(row)
+            if rows:
+                st.dataframe(pd.DataFrame(rows).drop(columns=["#"]),
+                             hide_index=True, use_container_width=True)
+            miss = s.get("missing_starters") or []
             if miss:
                 flagged = True
-                st.markdown(f"**{team}** · {form}<br><span style='color:{GOLD}'>⚠️ out vs last XI: "
-                            f"{', '.join(miss)}</span>", unsafe_allow_html=True)
+                names = ", ".join(f"{x['name']}" + (f" ({x['avg']:.1f})" if x.get("avg") else "")
+                                  for x in miss)
+                st.markdown(f"<span style='color:{GOLD}'>⚠️ out vs last XI: {names}</span>",
+                            unsafe_allow_html=True)
             elif s.get("had_prior_xi"):
-                st.caption(f"**{team}** · {form} — same starters as last match")
-            else:
-                st.caption(f"**{team}** · {form} — XI confirmed")
-    st.caption("⚠️ = started this team's **previous** match but isn't in today's confirmed XI "
-               "(injury / suspension / rotation)." if flagged else
-               "Confirmed XI posted; no regular starter dropped vs the last match.")
+                st.caption("same starters as last match")
+    cap = ("Ratings are each starter's recent **previous-match** form (today's game isn't played "
+           "yet); **Avg** = mean of the last 3. " if not played else
+           "**Today** = this match's player rating; **Form** = the prior 3 matches. ")
+    cap += ("⚠️ = started the **previous** match but isn't in today's XI (injury/suspension/"
+            "rotation)." if flagged else "")
+    st.caption(cap)
 
 
 @st.cache_data(ttl=300, show_spinner="Grading the 2026 World Cup so far…")
