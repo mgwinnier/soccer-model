@@ -132,6 +132,12 @@ section[data-testid="stSidebar"] div[role="radiogroup"] label > div:first-child 
     border-radius: 12px; padding: 12px 14px; margin-top: 8px; }}
 .bbet .h {{ font-family:'Oswald'; font-size: 14px; letter-spacing: 1px; text-transform: uppercase; color: var(--gold); }}
 
+.angle {{ border: 1px solid var(--border); border-radius: 10px; padding: 8px 11px; margin: 6px 0;
+    background: rgba(255,255,255,.02); }}
+.angle-h {{ font-size: 13px; }}
+.angle-why {{ font-size: 12px; color: var(--muted); margin-top: 2px; }}
+.angle-note {{ font-size: 12px; color: var(--muted); margin: 2px 0 8px; }}
+
 .mcard-head {{ display:flex; align-items:center; gap: 10px; font-family:'Oswald';
     flex-wrap: wrap; justify-content: center; }}
 
@@ -311,6 +317,19 @@ def stat_bars(rows: list[dict], home_color: str = GREEN, away_color: str = GOLD)
             f'<div class="sbbar"><span style="width:{hp:.0f}%;background:{home_color}"></span>'
             f'<span style="width:{100 - hp:.0f}%;background:{away_color}"></span></div></div>')
     return "".join(out)
+
+
+_READ_TONE = {"support": "green", "undercut": "red", "neutral": "grey"}
+_READ_LABEL = {"support": "supports", "undercut": "undercuts", "neutral": "neutral"}
+
+
+def angle_chip(market: str, lean: str, read: str, why: str) -> str:
+    """One AI betting angle as a compact row: market · lean · support/undercut pill · grounded why."""
+    tone = _READ_TONE.get(read, "grey")
+    label = _READ_LABEL.get(read, read)
+    head = f"<b>{market}</b>" + (f" · {lean}" if lean else "")
+    return (f'<div class="angle"><div class="angle-h">{head} &nbsp;{pill(label, tone)}</div>'
+            f'<div class="angle-why">{why}</div></div>')
 
 
 def callout(text: str, tone: str = "info") -> None:

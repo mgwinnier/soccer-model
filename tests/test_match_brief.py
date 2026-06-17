@@ -1,5 +1,19 @@
-"""Tests for the grounded Gemini match brief (network mocked; key-gated)."""
+"""Tests for the betting-tuned, structured Gemini brief (network mocked; key-gated)."""
+import json
+
 from src.ai import match_brief as mb
+
+
+def _resp(payload: dict, code: int = 200):
+    class _R:
+        status_code = code
+
+        @staticmethod
+        def json():
+            return payload
+
+        text = ""
+    return _R()
 
 
 def test_noop_without_key(monkeypatch):
@@ -14,52 +28,77 @@ def test_render_facts_lists_only_provided():
     assert "Empty" not in txt                       # blank facts dropped
 
 
-def test_brief_parses_text_and_sources(monkeypatch):
+def test_extract_json_from_fenced_text():
+    raw = ('Here is the read.\n```json\n{"summary": "s", "angles": [], '
+           '"confidence": "high", "watch": "w"}\n```\nthanks')
+    obj = mb._extract_json(raw)
+    assert obj["summary"] == "s" and obj["confidence"] == "high"
+
+
+def test_clean_angles_filters_offschema():
+    angles = mb._clean_angles([
+        {"market": "Total Goals", "lean": "Over 2.5", "read": "support", "why": "wind low, sourced"},
+        {"market": "Cards", "lean": "x", "read": "support", "why": "off-vocab market dropped"},
+        {"market": "BTTS", "lean": "Yes", "read": "wild", "why": "bad read coerced to neutral"},
+        {"market": "Match Result", "lean": "England", "read": "undercut", "why": ""},  # no why → drop
+    ])
+    markets = [a["market"] for a in angles]
+    assert markets == ["Total Goals", "BTTS"]
+    assert angles[1]["read"] == "neutral"           # invalid read coerced
+
+
+def test_brief_parses_structured_and_sources(monkeypatch):
     monkeypatch.setattr(mb, "api_key", lambda: "k")
-
-    class _R:
-        status_code = 200
-
-        @staticmethod
-        def json():
-            return {"candidates": [{
-                "content": {"parts": [{"text": "A real, cited preview."}]},
-                "groundingMetadata": {"groundingChunks": [
-                    {"web": {"uri": "https://bbc.com/x", "title": "BBC"}},
-                    {"web": {"uri": "https://bbc.com/x", "title": "BBC dup"}},  # deduped
-                ]}}]}
-
+    payload = {"candidates": [{
+        "content": {"parts": [{"text": json.dumps({
+            "summary": "England missing Saka; leans under.",
+            "angles": [{"market": "Total Goals", "lean": "Under 2.5", "read": "support",
+                        "why": "Saka out per BBC; attack weakened"}],
+            "confidence": "medium", "watch": "if Saka is named to start"})}]},
+        "groundingMetadata": {"groundingChunks": [
+            {"web": {"uri": "https://bbc.com/x", "title": "BBC"}},
+            {"web": {"uri": "https://bbc.com/x", "title": "BBC dup"}},  # deduped
+        ]}}]}
     captured = {}
 
     def _post(url, params=None, json=None, timeout=None):
         captured["body"] = json
-        return _R()
+        return _resp(payload)
     monkeypatch.setattr(mb.requests, "post", _post)
-    out = mb.brief({"Match": "A vs B", "Model": "A 60%"})
-    assert out["text"] == "A real, cited preview."
+
+    out = mb.brief({"Match": "Eng vs Cro", "Flagged bets": "Total Goals: Under 2.5 ...",
+                    "Variance": "upset risk 30%"})
+    assert out["summary"].startswith("England missing Saka")
+    assert out["text"] == out["summary"]            # back-compat alias
+    assert out["angles"][0]["market"] == "Total Goals" and out["angles"][0]["read"] == "support"
+    assert out["confidence"] == "medium" and out["watch"]
     assert out["sources"] == [{"title": "BBC", "uri": "https://bbc.com/x"}]   # deduped to 1
-    # search grounding requested + the card data is in the prompt
+    # search grounding requested + the betting facts reached the prompt
     assert captured["body"]["tools"] == [{"google_search": {}}]
-    assert "A 60%" in captured["body"]["contents"][0]["parts"][0]["text"]
+    prompt = captured["body"]["contents"][0]["parts"][0]["text"]
+    assert "Flagged bets" in prompt and "Variance" in prompt
+
+
+def test_brief_degrades_nonjson_to_summary(monkeypatch):
+    monkeypatch.setattr(mb, "api_key", lambda: "k")
+    payload = {"candidates": [{"content": {"parts": [{"text": "Just a plain sentence, no JSON."}]}}]}
+    monkeypatch.setattr(mb.requests, "post", lambda *a, **k: _resp(payload))
+    out = mb.brief({"Match": "A vs B"})
+    assert out["summary"] == "Just a plain sentence, no JSON." and out["angles"] == []
 
 
 def test_brief_falls_back_without_search_tool(monkeypatch):
     monkeypatch.setattr(mb, "api_key", lambda: "k")
     calls = {"n": 0}
-
-    class _R:
-        def __init__(self, code):
-            self.status_code = code
-        def json(self):
-            return {"candidates": [{"content": {"parts": [{"text": "plain"}]}}]}
+    good = {"candidates": [{"content": {"parts": [{"text": '{"summary":"plain","angles":[]}'}]}}]}
 
     def _post(url, params=None, json=None, timeout=None):
         calls["n"] += 1
         # first call (with search tool) 400s -> retried without tools -> 200
-        return _R(400) if "tools" in json else _R(200)
+        return _resp(good) if "tools" not in json else _resp({}, 400)
     monkeypatch.setattr(mb.requests, "post", _post)
     out = mb.brief({"Match": "A vs B"})
-    assert out["text"] == "plain" and calls["n"] == 2
+    assert out["summary"] == "plain" and calls["n"] == 2
 
 
 def test_brief_surfaces_error(monkeypatch):

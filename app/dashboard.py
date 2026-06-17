@@ -499,12 +499,19 @@ def _grade_bet(b, m: dict):
 _GRADE_MARK = {"win": "✅ Win", "loss": "❌ Loss", "push": "➖ Push"}
 
 
-def market_table(title: str, bets: list, key_note: str | None = None, m: dict | None = None):
+def market_table(title: str, bets: list, key_note: str | None = None, m: dict | None = None,
+                 angle: dict | None = None):
     """Render one market's selections: model%, fair%, the ESPN price + EV, and — when available —
-    **your book** (DST) price + the model's EV at *that* price. Played matches get a Result col."""
+    **your book** (DST) price + the model's EV at *that* price. Played matches get a Result col.
+    ``angle`` (optional) is the AI's grounded read for THIS market, shown as a one-line note."""
     from src.data.odds import decimal_to_american
     from src.predict.betting import expected_value
     st.markdown(f"**{title}**")
+    if angle:
+        tone = {"support": GREEN, "undercut": RED, "neutral": "#8b93a7"}.get(angle.get("read"), "#8b93a7")
+        st.markdown(f'<div class="angle-note">AI · <b style="color:{tone}">'
+                    f'{angle.get("read", "neutral")}</b>: {angle.get("why", "")}</div>',
+                    unsafe_allow_html=True)
     played = bool(m and m.get("played"))
     book = get_book_odds(m["home"], m["away"], str(m.get("date"))[:10]) if m else None
     rows = []
@@ -719,9 +726,15 @@ def _brief_facts(m: dict) -> dict:
                 return f"{v.get('home', '?')}-{v.get('away', '?')}"
             f["Match stats"] = (f"possession {_ha('ball_possession')}, xG "
                                 f"{_ha('expected_goals')}, shots {_ha('total_shots')}")
+    sig = a.get("signals") or {}
+    if sig:
+        f["Variance"] = (f"upset risk {sig.get('upset_risk', 0)*100:.0f}%, shootout "
+                         f"{sig.get('shootout_potential', 0)*100:.0f}%, expected total "
+                         f"{sig.get('expected_total', eg[0]+eg[1]):.1f}")
     cands = _qualifying_bets(m, min_ev=0.03, min_prob_edge=0.02)
     if cands:
-        b = max(cands, key=lambda x: x.ev)
+        cands = sorted(cands, key=lambda x: x.ev, reverse=True)
+        b = cands[0]
         book_txt = ""
         try:
             from src.data.odds import decimal_to_american
@@ -733,6 +746,10 @@ def _brief_facts(m: dict) -> dict:
         f["Best bet (model)"] = (f"{b.market}: {b.selection} at {_am(b.american)} — model "
                                  f"{b.model_p*100:.0f}% vs market {(b.fair_p or 0)*100:.0f}%, "
                                  f"EV {b.ev*100:+.0f}%{book_txt}")
+        # All flagged +EV selections — the list the AI judges support/undercut against.
+        f["Flagged bets"] = " | ".join(
+            f"{x.market}: {x.selection} at {_am(x.american)} (model {x.model_p*100:.0f}% vs "
+            f"market {(x.fair_p or 0)*100:.0f}%, EV {x.ev*100:+.0f}%)" for x in cands[:6])
     return f
 
 
@@ -811,24 +828,39 @@ def render_match(m: dict, live: dict | None = None, min_ev: float = 0.03,
         by_market: dict[str, list] = {}
         for b in m["bets"]:
             by_market.setdefault(b.market, []).append(b)
+        brief_angles: list[dict] = []           # AI angles, surfaced per-market in tab_markets
         tab_insights, tab_markets, tab_scores = st.tabs(["Insights", "Markets", "Scorelines"])
 
         with tab_insights:
             from src.ai import match_brief as _mb
             if _mb.is_available():
                 bkey = f"brief_{m.get('game_id') or (m['home'] + m['away'])}"
-                if st.button("✨ AI match brief", key=bkey + "_btn",
-                             help="A grounded 2–3 sentence preview from this card's data (Gemini)."):
+                if st.button("✨ AI betting angles", key=bkey + "_btn",
+                             help="Grounded team-news + per-bet read (Gemini + Google Search)."):
                     st.session_state[bkey] = True
                 if st.session_state.get(bkey):
-                    with st.spinner("Writing the brief…"):
+                    with st.spinner("Searching the news + reading the bets…"):
                         res = get_match_brief(_brief_facts(m))
                     if res and res.get("text"):
-                        theme.callout(res["text"], "info")
+                        theme.callout(res.get("summary") or res["text"], "info")
+                        brief_angles = res.get("angles") or []
+                        for ang in brief_angles:
+                            st.markdown(theme.angle_chip(ang.get("market", ""), ang.get("lean", ""),
+                                                         ang.get("read", "neutral"), ang.get("why", "")),
+                                        unsafe_allow_html=True)
+                        tail = []
+                        if res.get("confidence"):
+                            tail.append(f"confidence: {res['confidence']}")
+                        if res.get("watch"):
+                            tail.append(f"watch: {res['watch']}")
+                        if tail:
+                            st.caption(" · ".join(tail))
                         srcs = res.get("sources") or []
                         if srcs:
                             st.caption("Sources: " + " · ".join(
                                 f"[{s['title'][:38]}]({s['uri']})" for s in srcs))
+                        st.caption("AI adds *sourced context*; it never invents an edge — the model's "
+                                   "EV is unchanged.")
                     elif res and res.get("error"):
                         st.caption(f"Gemini: {res['error']}")
                     else:
@@ -854,16 +886,17 @@ def render_match(m: dict, live: dict | None = None, min_ev: float = 0.03,
             lineup_block(m)
 
         with tab_markets:
+            _ang = {a.get("market"): a for a in brief_angles if a.get("market")}
             for mk in ["Match Result", "Total Goals", "Spread"]:
                 if mk in by_market:
-                    market_table(mk, by_market[mk], m=m)
+                    market_table(mk, by_market[mk], m=m, angle=_ang.get(mk))
             if "BTTS" in by_market:
                 book = m.get("btts_book") or "book"
                 src = m.get("btts_source")
                 tag = ("pre-match · best of US books" if src == "actionnetwork"
                        else "settled/closing" if src == "thestatsapi" else "line")
                 market_table("Both Teams To Score", by_market["BTTS"], m=m,
-                             key_note=f"Line: {book} · {tag}.")
+                             key_note=f"Line: {book} · {tag}.", angle=_ang.get("BTTS"))
             elif "Match Result" in by_market or "Total Goals" in by_market:
                 st.markdown(f"**Both Teams To Score** — model **{_pct(a['btts'])}** "
                             f"(no line available — info only)")
