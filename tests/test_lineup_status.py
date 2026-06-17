@@ -50,6 +50,20 @@ def test_lineup_status_not_posted(monkeypatch):
     assert out is None or out.get("posted") is False
 
 
+def test_availability_from_status_bounded():
+    assert ls.availability_from_status({"missing_starters": []}) == 1.0
+    # two ~7.5 regulars out -> saturates near the 10% cap, never below 0.90
+    big = {"missing_starters": [{"name": "A", "avg": 7.5}, {"name": "B", "avg": 7.5}]}
+    mult = ls.availability_from_status(big)
+    assert 0.90 <= mult < 1.0
+    assert ls.availability_from_status({"missing_starters": [{"name": "C", "avg": 6.1}]}) > 0.99
+
+
+def test_lineup_availability_noop_when_not_posted():
+    assert ls.lineup_availability("A", "B", "2026-06-18",
+                                  status={"posted": False}) == (1.0, 1.0)
+
+
 def test_lineup_status_noop_without_key(monkeypatch):
     monkeypatch.setattr(ts, "is_available", lambda: False)
     assert ls.lineup_status("A", "B", "2026-06-18") is None

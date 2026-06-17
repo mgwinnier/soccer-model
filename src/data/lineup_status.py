@@ -90,6 +90,33 @@ def _side_status(team_id: str, side_lineup: dict, before_utc: str, cands: list[d
             "matches_used": used}
 
 
+def availability_from_status(side: dict, cap: float = 0.10) -> float:
+    """A bounded strength multiplier in ``[1-cap, 1.0]`` from a side's missing regular starters.
+
+    Each starter missing from today's XI (vs the previous match) costs a share of ``cap`` scaled
+    by how strong they were (recent avg rating above a 6.0 baseline, normalized): a benched 7.5-rated
+    regular hurts more than a 6.2 one. 0 missing -> 1.0. Honest + capped (v2 found availability
+    ~neutral on RPS), so this is a small, labeled nudge, never a big swing."""
+    miss = (side or {}).get("missing_starters") or []
+    if not miss:
+        return 1.0
+    # weight = max(0, avg-6.0); a top regular (~7.5) ~= 1.5, a fringe one ~0. Cap the total.
+    weight = sum(max(0.0, (x.get("avg") or 6.0) - 6.0) for x in miss)
+    pen = min(cap, cap * weight / 3.0)        # ~3.0 weight (e.g. two ~7.5 regulars) saturates
+    return round(1.0 - pen, 4)
+
+
+def lineup_availability(home: str, away: str, date, cfg=None,
+                        status: dict | None = None) -> tuple[float, float]:
+    """(home_mult, away_mult) bounded strength multipliers from confirmed-XI absences, or
+    (1.0, 1.0) when the sheet isn't posted / no key missing. Pass ``status`` to reuse a fetched
+    ``lineup_status`` and avoid a second call."""
+    ls = status if status is not None else lineup_status(home, away, date, cfg=cfg)
+    if not ls or not ls.get("posted"):
+        return (1.0, 1.0)
+    return (availability_from_status(ls.get("home")), availability_from_status(ls.get("away")))
+
+
 def lineup_status(home: str, away: str, date, cfg=None) -> dict | None:
     """Confirmed-XI status for a fixture, or None if unresolved.
 

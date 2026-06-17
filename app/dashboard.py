@@ -234,6 +234,22 @@ def lineup_block(m: dict):
                             f"<span style='color:{GOLD}'>{names}</span>", unsafe_allow_html=True)
             elif s.get("had_prior_xi"):
                 st.caption("same starters as last match")
+    # before → after: re-run the model with a bounded availability penalty for missing regulars
+    if flagged and not played:
+        from src.data.lineup_status import lineup_availability
+        hm, am = lineup_availability(m["home"], m["away"], str(m["date"])[:10], cfg=CFG, status=ls)
+        if hm < 1.0 or am < 1.0:
+            base = m["analysis"]["probs"]
+            try:
+                adj = get_predictor().analyze(m["home"], m["away"], neutral=m["neutral"],
+                                              home_avail=hm, away_avail=am)["probs"]
+                st.markdown(
+                    f"**Lineup-adjusted model** (missing regulars, capped 10%): "
+                    f"{m['home']} {base['H']*100:.0f}% → **{adj['H']*100:.0f}%** · "
+                    f"Draw {base['D']*100:.0f}% → **{adj['D']*100:.0f}%** · "
+                    f"{m['away']} {base['A']*100:.0f}% → **{adj['A']*100:.0f}%**")
+            except Exception:  # noqa: BLE001
+                pass
     cap = ("Ratings are each starter's recent **previous-match** form (today's game isn't played "
            "yet); **Avg** = mean of the last 3. " if not played else
            "**Today** = this match's player rating; **Form** = the prior 3 matches. ")
