@@ -34,7 +34,14 @@ _SYSTEM = (
 
 def api_key() -> str | None:
     load_secrets()
-    return os.environ.get("GEMINI_API_KEY") or None
+    k = os.environ.get("GEMINI_API_KEY")
+    if not k:                                   # robust to st.secrets/import-timing on the cloud
+        try:
+            import streamlit as _st
+            k = _st.secrets.get("GEMINI_API_KEY")
+        except Exception:  # noqa: BLE001
+            k = None
+    return k or None
 
 
 def is_available() -> bool:

@@ -736,15 +736,21 @@ def _brief_facts(m: dict) -> dict:
     return f
 
 
-@st.cache_data(ttl=3600, show_spinner="Writing the brief…")
-def get_match_brief(facts_json: str):
-    """Cached grounded brief (one Gemini call per game, reused)."""
+def get_match_brief(facts: dict):
+    """Grounded brief for a match, cached per-session on SUCCESS only (so a transient error or a
+    pre-key failure never sticks). Returns {"text","sources"} | {"error"} | None."""
+    import hashlib
     import json
-    try:
-        from src.ai import match_brief as mb
-        return mb.brief(json.loads(facts_json))
-    except Exception:  # noqa: BLE001
-        return None
+    from src.ai import match_brief as mb
+    fj = json.dumps(facts, sort_keys=True)
+    skey = "brief_cache_" + hashlib.md5(fj.encode()).hexdigest()
+    cached = st.session_state.get(skey)
+    if cached:
+        return cached
+    res = mb.brief(facts)
+    if res and res.get("text"):                 # only persist a real brief; retry on error
+        st.session_state[skey] = res
+    return res
 
 
 def render_match(m: dict, live: dict | None = None, min_ev: float = 0.03,
@@ -815,8 +821,8 @@ def render_match(m: dict, live: dict | None = None, min_ev: float = 0.03,
                              help="A grounded 2–3 sentence preview from this card's data (Gemini)."):
                     st.session_state[bkey] = True
                 if st.session_state.get(bkey):
-                    import json as _json
-                    res = get_match_brief(_json.dumps(_brief_facts(m), sort_keys=True))
+                    with st.spinner("Writing the brief…"):
+                        res = get_match_brief(_brief_facts(m))
                     if res and res.get("text"):
                         theme.callout(res["text"], "info")
                         srcs = res.get("sources") or []
