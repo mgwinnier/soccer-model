@@ -220,6 +220,20 @@ def _book_dec(b, m: dict, book: dict | None):
     return None
 
 
+def _match_not_started(m: dict) -> bool:
+    """True only for fixtures that haven't kicked off — excludes finished AND in-play games.
+    Kalshi signals/prices are shown only for these (settled/live games are hidden)."""
+    if m.get("played"):
+        return False
+    stt = m.get("status")
+    if stt in ("post", "in"):
+        return False
+    if stt == "pre":
+        return True
+    ko = pd.to_datetime(m.get("date"), errors="coerce", utc=True)
+    return ko is not None and not pd.isna(ko) and ko > pd.Timestamp.now(tz="UTC")
+
+
 @st.cache_data(ttl=30, show_spinner=False)
 def get_kalshi_winner(home: str, away: str):
     """Live Kalshi 1X2 (H/D/A bid/ask) for a fixture, or None. Exchange ask ≈ implied % you pay."""
@@ -545,9 +559,9 @@ def market_table(title: str, bets: list, key_note: str | None = None, m: dict | 
                     unsafe_allow_html=True)
     played = bool(m and m.get("played"))
     book = get_book_odds(m["home"], m["away"], str(m.get("date"))[:10]) if m else None
-    # Kalshi has per-match 1X2 only — fetch once for the Match Result table.
+    # Kalshi has per-match 1X2 only, and only for not-yet-started games (settled/live hidden).
     kal = (get_kalshi_winner(m["home"], m["away"])
-           if (m and not played and title == "Match Result") else None)
+           if (m and title == "Match Result" and _match_not_started(m)) else None)
     rows = []
     for b in bets:
         units = b.kelly_used * 100  # 1 unit = 1% of bankroll
@@ -814,7 +828,7 @@ def get_match_brief(facts: dict):
 def _kalshi_alert_block(m: dict):
     """🔔 Fire a Kalshi-value callout when the model's edge at the Kalshi ask clears the threshold
     on a Match Result outcome (the price you could trade on Kalshi right now)."""
-    if m.get("played"):
+    if not _match_not_started(m):
         return
     thr = float(st.session_state.get("kalshi_alert_ev", 0.08))
     kal = get_kalshi_winner(m["home"], m["away"])
@@ -1676,10 +1690,11 @@ def page_kalshi(bankroll=1000, kelly=0.25, upset_temp=1.0):
         res = get_bets(today, 10, bankroll, kelly, upset_temp)
     except Exception:  # noqa: BLE001
         res = {"matches": []}
+
     fixtures = [(m["home"], m["away"], str(m["date"])[:10], (m.get("analysis") or {}).get("probs") or {})
-                for m in res.get("matches", []) if not m.get("played")]
+                for m in res.get("matches", []) if _match_not_started(m)]
     if not fixtures:
-        st.info("No upcoming fixtures with model probabilities right now.")
+        st.info("No upcoming (not-yet-started) fixtures right now — settled and in-play games are hidden.")
         theme.footer()
         return
 
