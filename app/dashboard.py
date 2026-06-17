@@ -179,6 +179,10 @@ def _grade_bet(b, m: dict):
         if not mt:
             return None
         code = ("over" if sel.startswith("Over") else "under", float(mt.group()))
+    elif mk == "BTTS":
+        both = hs > 0 and as_ > 0
+        won = both if "Yes" in sel else (not both)
+        return "win" if won else "loss"
     else:
         return None                      # spreads off by default — skip grading
     try:
@@ -436,8 +440,14 @@ def render_match(m: dict, live: dict | None = None, min_ev: float = 0.03,
                        "goals and the heatmap) · **Fair** = de-vigged market (shown only as a "
                        "reference) · **Break-even** = the offered price's implied %. EV is "
                        "positive only when **Model > Break-even**.")
-            st.markdown(f"**Both Teams To Score** — model **{_pct(a['btts'])}** "
-                        f"(no Vegas line — info only)")
+            if "BTTS" in by_market:
+                book = m.get("btts_book") or "book"
+                market_table("Both Teams To Score", by_market["BTTS"], m=m,
+                             key_note=f"Line: {book} (closing). **Model** = market-independent "
+                                      f"P(both teams score), calibrated to historical results.")
+            else:
+                st.markdown(f"**Both Teams To Score** — model **{_pct(a['btts'])}** "
+                            f"(no line available — info only)")
         with right:
             st.markdown("**Scoreline heatmap**")
             heatmap(a["scoreline_matrix"], m["home"], m["away"])

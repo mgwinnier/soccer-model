@@ -93,6 +93,15 @@ def american_to_decimal(american: float | str | None) -> float | None:
     return 1.0 + 100.0 / abs(a)
 
 
+def decimal_to_american(dec: float | None) -> float | None:
+    """Inverse of ``american_to_decimal`` (for displaying API decimal prices)."""
+    if dec is None or dec <= 1.0:
+        return None
+    if dec >= 2.0:
+        return round((dec - 1.0) * 100.0)
+    return round(-100.0 / (dec - 1.0))
+
+
 def decimal_to_prob(dec: float | None) -> float | None:
     """Raw implied probability (still includes the bookmaker margin)."""
     if dec is None or dec <= 0:

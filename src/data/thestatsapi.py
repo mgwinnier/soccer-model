@@ -138,6 +138,55 @@ def match_odds(match_id: str, ttl: float = 1800.0, cfg=None) -> dict | None:
     return _unwrap(_get(f"/matches/{match_id}/odds", ttl=ttl, cfg=cfg)) or None
 
 
+# Books preferred for *betting* prices, sharpest first (lower vig / closest to true).
+_BOOK_PREF = ("pinnacle", "betfair", "bet365")
+
+
+def _price(node) -> float | None:
+    """A price node is ``{opening, last_seen}`` (decimal strings). Take the closing/current
+    (``last_seen``), falling back to ``opening``. Returns a float decimal or None."""
+    if not isinstance(node, dict):
+        return None
+    for k in ("last_seen", "opening"):
+        v = node.get(k)
+        if v not in (None, "", "0", "0.0"):
+            try:
+                d = float(v)
+                return d if d > 1.0 else None
+            except (TypeError, ValueError):
+                return None
+    return None
+
+
+def _pick_book(payload: dict, market: str) -> dict | None:
+    """Choose one bookmaker that quotes ``market``: a sharp book if present, else the first."""
+    books = (payload or {}).get("bookmakers") or []
+    have = [b for b in books if isinstance(b, dict) and market in (b.get("markets") or {})]
+    if not have:
+        return None
+    for name in _BOOK_PREF:
+        for b in have:
+            if name in str(b.get("bookmaker", "")).lower():
+                return b
+    return have[0]
+
+
+def btts_prices(payload: dict | None) -> dict | None:
+    """Both-Teams-To-Score yes/no decimal prices from an odds payload, or None.
+
+    Single-book (a real, bettable two-sided market — no mixing books across sides) chosen by
+    ``_pick_book``. Returns ``{"book", "yes", "no"}`` with decimal floats, only when *both*
+    sides are present (so de-vig is valid)."""
+    b = _pick_book(payload or {}, "btts")
+    if not b:
+        return None
+    mk = (b.get("markets") or {}).get("btts") or {}
+    yes, no = _price(mk.get("yes")), _price(mk.get("no"))
+    if yes is None or no is None:
+        return None
+    return {"book": b.get("bookmaker"), "yes": yes, "no": no}
+
+
 def match_lineups(match_id: str, ttl: float = 600.0, cfg=None) -> dict | None:
     """Confirmed XI payload (``confirmed``, ``home/away`` with ``formation``,
     ``starting_xi``, ``substitutes``), or None until it's announced (~75 min pre-KO)."""

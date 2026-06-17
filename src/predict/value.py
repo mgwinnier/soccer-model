@@ -38,7 +38,7 @@ def build_bets(start: str, days: int = 3, bankroll: float = 100.0,
                use_cache: bool = True, anchor_w: float | None = None,
                recenter: bool = False, recenter_shrink: float = 0.8,
                league: str = "fifa.world", consensus_ref: bool = True,
-               upset_temp: float = 1.0) -> dict:
+               upset_temp: float = 1.0, api_markets: bool | None = None) -> dict:
     """Return {'matches': [rich per-match dicts], 'bets': DataFrame of all bets}.
 
     The model's probabilities are **pure** — the DC+Elo blend calibrated to historical
@@ -135,6 +135,14 @@ def build_bets(start: str, days: int = 3, bankroll: float = 100.0,
         }
         matches.append(match)
 
+    # Real BTTS market from TheStatsAPI (the model already computes P(BTTS); now it has a line).
+    # Auto-on for the World Cup when a key is present; degrades to a no-op otherwise.
+    if api_markets is None:
+        from ..data import thestatsapi as _ts
+        api_markets = (league == "fifa.world") and _ts.is_available()
+    if api_markets:
+        _attach_btts(matches, bankroll, kelly_fraction, cfg)
+
     if recenter:
         _recenter_matches(matches, bankroll, kelly_fraction, recenter_shrink)
 
@@ -156,6 +164,53 @@ def build_bets(start: str, days: int = 3, bankroll: float = 100.0,
             d["disabled"] = seg in disabled
             ledger.append(d)
     return {"matches": matches, "bets": pd.DataFrame(ledger)}
+
+
+def _attach_btts(matches: list, bankroll: float, kelly_fraction: float,
+                 cfg: dict | None) -> None:
+    """Pair each fixture's model P(BTTS) with the real Both-Teams-To-Score line from
+    TheStatsAPI → Yes/No bets with EV/Kelly. Best-effort: one ``/matches`` pull for the whole
+    window, then per-fixture ``/odds``; any miss (unmatched, no key, no BTTS market) just skips
+    that game. Never fabricates a price."""
+    from ..data import thestatsapi as ts, fixture_map
+    from ..data.odds import decimal_to_prob
+    from .betting import evaluate_bet_decimal
+    if not matches or not ts.is_available():
+        return
+    dates = sorted(str(m["date"])[:10] for m in matches if m.get("date") is not None)
+    if not dates:
+        return
+    try:
+        cands = ts.matches(date_from=dates[0], date_to=dates[-1], cfg=cfg)
+    except Exception:  # noqa: BLE001 — network/parse issue → no BTTS, no crash
+        return
+    if not cands:
+        return
+    for m in matches:
+        try:
+            p_yes = (m.get("analysis") or {}).get("btts")
+            if p_yes is None:
+                continue
+            mid = fixture_map.find_match_id(m["home"], m["away"], str(m["date"])[:10], cands)
+            if not mid:
+                continue
+            pr = ts.btts_prices(ts.match_odds(mid, cfg=cfg))
+            if not pr:
+                continue
+            iy, ino = decimal_to_prob(pr["yes"]), decimal_to_prob(pr["no"])
+            s = (iy or 0.0) + (ino or 0.0)
+            fair_yes = (iy / s) if s else None
+            fair_no = (ino / s) if s else None
+            p_yes = float(p_yes)
+            m["bets"].append(evaluate_bet_decimal(
+                "BTTS", "Both Teams Score: Yes", pr["yes"], p_yes, fair_yes,
+                bankroll, kelly_fraction))
+            m["bets"].append(evaluate_bet_decimal(
+                "BTTS", "Both Teams Score: No", pr["no"], 1.0 - p_yes, fair_no,
+                bankroll, kelly_fraction))
+            m["btts_book"] = pr.get("book")
+        except Exception:  # noqa: BLE001 — one bad game never breaks the slate
+            continue
 
 
 def _cons_code(market: str, selection: str, home: str, away: str):

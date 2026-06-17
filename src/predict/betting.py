@@ -61,6 +61,25 @@ def qualifies(model_p: float, fair_p: float | None, decimal_odds: float | None,
     return True
 
 
+def evaluate_bet_decimal(market: str, selection: str, decimal: float | None,
+                         model_p: float, fair_p: float | None,
+                         bankroll: float = 100.0, fraction: float = 0.5) -> "BetEval":
+    """Like ``evaluate_bet`` but priced from a **decimal** quote (e.g. an API odds feed).
+
+    Keeps the true decimal for EV/Kelly and derives an American price only for display, so
+    no precision is lost round-tripping through American."""
+    from ..data.odds import decimal_to_american
+    ev = expected_value(model_p, decimal) if decimal else 0.0
+    kf = kelly_fraction(model_p, decimal) if decimal else 0.0
+    edge = (model_p - fair_p) if (fair_p is not None) else None
+    return BetEval(
+        market=market, selection=selection, american=decimal_to_american(decimal),
+        decimal=decimal, model_p=model_p, fair_p=fair_p, edge=edge, ev=ev,
+        kelly_full=kf, kelly_used=kf * fraction,
+        stake=round(bankroll * fraction * kf, 2),
+    )
+
+
 @dataclass
 class BetEval:
     market: str          # "Match Result" | "Total Goals" | "Spread"
