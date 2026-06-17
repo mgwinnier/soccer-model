@@ -191,7 +191,14 @@ def _attach_btts(matches: list, bankroll: float, kelly_fraction: float,
             p_yes = (m.get("analysis") or {}).get("btts")
             if p_yes is None:
                 continue
-            mid = fixture_map.find_match_id(m["home"], m["away"], str(m["date"])[:10], cands)
+            m_api = fixture_map.find_match(m["home"], m["away"], str(m["date"])[:10], cands)
+            if not m_api:
+                continue
+            # the listing flags whether a line exists yet — skip the (throttled) odds call
+            # for the many fixtures with no odds posted (e.g. not-yet-priced upcoming games).
+            if m_api.get("odds_available") is False:
+                continue
+            mid = fixture_map.match_id_of(m_api)
             if not mid:
                 continue
             pr = ts.btts_prices(ts.match_odds(mid, cfg=cfg))

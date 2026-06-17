@@ -60,7 +60,7 @@ def test_attach_btts_builds_yes_and_no(monkeypatch):
     monkeypatch.setattr(ts, "is_available", lambda: True)
     monkeypatch.setattr(ts, "matches", lambda **k: [
         {"id": "mt_1", "home_team": {"name": "Brazil"}, "away_team": {"name": "Spain"},
-         "utc_date": "2026-06-20T18:00:00Z"}])
+         "utc_date": "2026-06-20T18:00:00Z", "odds_available": True}])
     monkeypatch.setattr(ts, "match_odds", lambda mid, **k: _payload())
     matches = [{"home": "Brazil", "away": "Spain", "date": "2026-06-20",
                 "analysis": {"btts": 0.62}, "bets": []}]
@@ -74,6 +74,24 @@ def test_attach_btts_builds_yes_and_no(monkeypatch):
     # de-vig: fair_yes + fair_no == 1
     assert abs(yes.fair_p + no.fair_p - 1.0) < 1e-9
     assert matches[0]["btts_book"] == "Bet365"
+
+
+def test_attach_btts_skips_when_no_odds_posted(monkeypatch):
+    # the listing says odds_available=False -> skip the throttled /odds call entirely
+    monkeypatch.setattr(ts, "is_available", lambda: True)
+    monkeypatch.setattr(ts, "matches", lambda **k: [
+        {"id": "mt_1", "home_team": {"name": "Brazil"}, "away_team": {"name": "Spain"},
+         "utc_date": "2026-06-20T18:00:00Z", "odds_available": False}])
+    called = {"odds": False}
+
+    def _boom(*a, **k):
+        called["odds"] = True
+        return _payload()
+    monkeypatch.setattr(ts, "match_odds", _boom)
+    matches = [{"home": "Brazil", "away": "Spain", "date": "2026-06-20",
+                "analysis": {"btts": 0.62}, "bets": []}]
+    value_mod._attach_btts(matches, 1000, 0.25, {})
+    assert matches[0]["bets"] == [] and called["odds"] is False   # no wasted call
 
 
 def test_attach_btts_noop_without_key(monkeypatch):
