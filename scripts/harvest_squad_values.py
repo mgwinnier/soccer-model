@@ -37,9 +37,13 @@ def main() -> int:
             if t.get("id") and t.get("name"):
                 teams[t["id"]] = t["name"]
     print(f"{len(teams)} WC teams to harvest…")
+    import time
     out: dict = {}
     for i, (tid, name) in enumerate(sorted(teams.items(), key=lambda x: x[1]), 1):
         squad = ts.team_squad(tid, ttl=0.0)
+        if not squad:                         # empty is usually a transient 429 — retry once
+            time.sleep(8)
+            squad = ts.team_squad(tid, ttl=0.0)
         players = [{"name": p["name"], "position": p.get("position"),
                     "market_value": p.get("market_value")} for p in squad]
         total = sum(p["market_value"] or 0 for p in players)
@@ -48,6 +52,7 @@ def main() -> int:
         n_mv = sum(1 for p in players if p["market_value"])
         print(f"  [{i}/{len(teams)}] {name}: {len(players)} players, {n_mv} valued, "
               f"total €{total/1e6:.0f}M")
+        time.sleep(1.0)                        # be gentle — avoid the sustained-429 wipeout
     feed = {"generated_at": None, "teams": out}
     p = Path(__file__).resolve().parents[1] / "data" / "feeds" / "wc_squad_values.json"
     p.parent.mkdir(parents=True, exist_ok=True)

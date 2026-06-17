@@ -1338,8 +1338,139 @@
   },
   "Croatia": {
    "team_id": "tm_41754",
-   "players": [],
-   "total_value": 0
+   "players": [
+    {
+     "name": "Andrej Kramarić",
+     "position": "F",
+     "market_value": 4300000
+    },
+    {
+     "name": "Ante Budimir",
+     "position": "F",
+     "market_value": 4700000
+    },
+    {
+     "name": "Dominik Kotarski",
+     "position": "G",
+     "market_value": 8600000
+    },
+    {
+     "name": "Dominik Livaković",
+     "position": "G",
+     "market_value": 9300000
+    },
+    {
+     "name": "Duje Ćaleta-Car",
+     "position": "D",
+     "market_value": 3100000
+    },
+    {
+     "name": "Igor Matanović",
+     "position": "F",
+     "market_value": 4900000
+    },
+    {
+     "name": "Ivan Perišić",
+     "position": "M",
+     "market_value": 1500000
+    },
+    {
+     "name": "Ivor Pandur",
+     "position": "G",
+     "market_value": 2200000
+    },
+    {
+     "name": "Josip Stanišić",
+     "position": "D",
+     "market_value": 27000000
+    },
+    {
+     "name": "Josip Šutalo",
+     "position": "D",
+     "market_value": 26000000
+    },
+    {
+     "name": "Joško Gvardiol",
+     "position": "D",
+     "market_value": 69000000
+    },
+    {
+     "name": "Kristijan Jakić",
+     "position": "M",
+     "market_value": 6100000
+    },
+    {
+     "name": "Luka Modrić",
+     "position": "M",
+     "market_value": 4400000
+    },
+    {
+     "name": "Luka Sučić",
+     "position": "M",
+     "market_value": 16300000
+    },
+    {
+     "name": "Luka Vušković",
+     "position": "D",
+     "market_value": 12800000
+    },
+    {
+     "name": "Marco Pašalić",
+     "position": "M",
+     "market_value": 6600000
+    },
+    {
+     "name": "Marin Pongračić",
+     "position": "D",
+     "market_value": 9100000
+    },
+    {
+     "name": "Mario Pašalić",
+     "position": "M",
+     "market_value": 10300000
+    },
+    {
+     "name": "Martin Baturina",
+     "position": "M",
+     "market_value": 20000000
+    },
+    {
+     "name": "Martin Erlić",
+     "position": "D",
+     "market_value": 3800000
+    },
+    {
+     "name": "Mateo Kovačić",
+     "position": "M",
+     "market_value": 19400000
+    },
+    {
+     "name": "Nikola Moro",
+     "position": "M",
+     "market_value": 4600000
+    },
+    {
+     "name": "Nikola Vlašić",
+     "position": "M",
+     "market_value": 8300000
+    },
+    {
+     "name": "Petar Musa",
+     "position": "F",
+     "market_value": 6500000
+    },
+    {
+     "name": "Petar Sučić",
+     "position": "M",
+     "market_value": 15300000
+    },
+    {
+     "name": "Toni Fruk",
+     "position": "M",
+     "market_value": 10700000
+    }
+   ],
+   "total_value": 314800000
   },
   "Curaçao": {
    "team_id": "tm_338165",
@@ -2865,8 +2996,139 @@
   },
   "Iraq": {
    "team_id": "tm_32842",
-   "players": [],
-   "total_value": 0
+   "players": [
+    {
+     "name": "Ahmed Basil",
+     "position": "G",
+     "market_value": 470000
+    },
+    {
+     "name": "Ahmed Hasan Maknazi",
+     "position": "D",
+     "market_value": 415000
+    },
+    {
+     "name": "Ahmed Qasem",
+     "position": "M",
+     "market_value": 3600000
+    },
+    {
+     "name": "Aimar Sher",
+     "position": "M",
+     "market_value": 1200000
+    },
+    {
+     "name": "Akam Hashem",
+     "position": "D",
+     "market_value": 620000
+    },
+    {
+     "name": "Ali Al-Hamadi",
+     "position": "F",
+     "market_value": 1500000
+    },
+    {
+     "name": "Ali Jasim",
+     "position": "M",
+     "market_value": 570000
+    },
+    {
+     "name": "Ali Yousif",
+     "position": "F",
+     "market_value": 120000
+    },
+    {
+     "name": "Amir Al-Ammari",
+     "position": "M",
+     "market_value": 655000
+    },
+    {
+     "name": "Aymen Hussein",
+     "position": "F",
+     "market_value": 465000
+    },
+    {
+     "name": "Fahad Talib",
+     "position": "G",
+     "market_value": 440000
+    },
+    {
+     "name": "Frans Putros",
+     "position": "D",
+     "market_value": 350000
+    },
+    {
+     "name": "Hussein Ali",
+     "position": "D",
+     "market_value": 275000
+    },
+    {
+     "name": "Ibrahim Bayesh",
+     "position": "M",
+     "market_value": 820000
+    },
+    {
+     "name": "Jalal Hassan",
+     "position": "G",
+     "market_value": 325000
+    },
+    {
+     "name": "Kevin Yakob",
+     "position": "M",
+     "market_value": 910000
+    },
+    {
+     "name": "Manaf Younis",
+     "position": "D",
+     "market_value": 0
+    },
+    {
+     "name": "Marko Farji",
+     "position": "M",
+     "market_value": 1900000
+    },
+    {
+     "name": "Merchas Doski",
+     "position": "D",
+     "market_value": 1100000
+    },
+    {
+     "name": "Mohanad Ali",
+     "position": "F",
+     "market_value": 1300000
+    },
+    {
+     "name": "Mustafa Saadoon",
+     "position": "D",
+     "market_value": 270000
+    },
+    {
+     "name": "Rebin Sulaka",
+     "position": "D",
+     "market_value": 96000
+    },
+    {
+     "name": "Youssef Amyn",
+     "position": "M",
+     "market_value": 580000
+    },
+    {
+     "name": "Zaid Ismail",
+     "position": "M",
+     "market_value": 380000
+    },
+    {
+     "name": "Zaid Tahseen",
+     "position": "D",
+     "market_value": 565000
+    },
+    {
+     "name": "Zidane Iqbal",
+     "position": "M",
+     "market_value": 1000000
+    }
+   ],
+   "total_value": 19926000
   },
   "Japan": {
    "team_id": "tm_17014",
@@ -4402,8 +4664,129 @@
   },
   "Scotland": {
    "team_id": "tm_41641",
-   "players": [],
-   "total_value": 0
+   "players": [
+    {
+     "name": "Aaron Hickey",
+     "position": "D",
+     "market_value": 10300000
+    },
+    {
+     "name": "Andrew Robertson",
+     "position": "D",
+     "market_value": 19200000
+    },
+    {
+     "name": "Angus Gunn",
+     "position": "G",
+     "market_value": 2400000
+    },
+    {
+     "name": "Anthony Ralston",
+     "position": "D",
+     "market_value": 1500000
+    },
+    {
+     "name": "Ben Gannon-Doak",
+     "position": "M",
+     "market_value": 13600000
+    },
+    {
+     "name": "Che Adams",
+     "position": "F",
+     "market_value": 14400000
+    },
+    {
+     "name": "Dominic Hyam",
+     "position": "D",
+     "market_value": 2100000
+    },
+    {
+     "name": "Findlay Curtis",
+     "position": "M",
+     "market_value": 105000
+    },
+    {
+     "name": "George Hirst",
+     "position": "F",
+     "market_value": 4400000
+    },
+    {
+     "name": "Grant Hanley",
+     "position": "D",
+     "market_value": 580000
+    },
+    {
+     "name": "Jack Hendry",
+     "position": "D",
+     "market_value": 2400000
+    },
+    {
+     "name": "John McGinn",
+     "position": "M",
+     "market_value": 15500000
+    },
+    {
+     "name": "Kenny McLean",
+     "position": "M",
+     "market_value": 570000
+    },
+    {
+     "name": "Kieran Tierney",
+     "position": "D",
+     "market_value": 8700000
+    },
+    {
+     "name": "Lawrence Shankland",
+     "position": "F",
+     "market_value": 2700000
+    },
+    {
+     "name": "Lewis Ferguson",
+     "position": "M",
+     "market_value": 26000000
+    },
+    {
+     "name": "Liam Kelly",
+     "position": "G",
+     "market_value": 865000
+    },
+    {
+     "name": "Lyndon Dykes",
+     "position": "F",
+     "market_value": 1300000
+    },
+    {
+     "name": "Nathan Patterson",
+     "position": "D",
+     "market_value": 16300000
+    },
+    {
+     "name": "Ross Stewart",
+     "position": "F",
+     "market_value": 4099999
+    },
+    {
+     "name": "Ryan Christie",
+     "position": "M",
+     "market_value": 10800000
+    },
+    {
+     "name": "Scott McKenna",
+     "position": "D",
+     "market_value": 3700000
+    },
+    {
+     "name": "Scott McTominay",
+     "position": "M",
+     "market_value": 47000000
+    },
+    {
+     "name": "Tyler Fletcher",
+     "position": "M",
+     "market_value": 0
+    }
+   ],
+   "total_value": 208519999
   },
   "Senegal": {
    "team_id": "tm_70995",
