@@ -31,3 +31,5 @@ venv/
 # misc
 *.log
 .DS_Store
+
+data/raw/dst/
