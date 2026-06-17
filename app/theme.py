@@ -134,6 +134,35 @@ section[data-testid="stSidebar"] div[role="radiogroup"] label > div:first-child 
 
 .mcard-head {{ display:flex; align-items:center; gap: 10px; font-family:'Oswald';
     flex-wrap: wrap; justify-content: center; }}
+
+/* ---- professional match card (v17) ---- */
+.mc2 {{ display:flex; align-items:center; justify-content:space-between; gap:10px;
+    padding:6px 2px 12px; }}
+.mc2-team {{ display:flex; align-items:center; gap:9px; font-family:'Oswald';
+    font-size:19px; font-weight:600; color:var(--text); min-width:0; flex:1; }}
+.mc2-team.away {{ justify-content:flex-end; text-align:right; }}
+.mc2-team img {{ width:30px; height:auto; border-radius:3px; box-shadow:0 1px 4px rgba(0,0,0,.4); }}
+.mc2-mid {{ display:flex; flex-direction:column; align-items:center; min-width:96px; gap:3px; }}
+.mc2-score {{ font-family:'Oswald'; font-weight:700; font-size:26px; line-height:1;
+    letter-spacing:1px; color:#fff; }}
+.mc2-vs {{ font-family:'Oswald'; font-size:13px; color:var(--muted); letter-spacing:1px; }}
+.mc2-time {{ font-size:11.5px; color:var(--muted); white-space:nowrap; }}
+
+.keynum {{ display:flex; gap:8px; flex-wrap:wrap; margin:4px 0 10px; }}
+.keynum .kn {{ flex:1; min-width:84px; background:var(--card2); border:1px solid var(--border);
+    border-radius:10px; padding:8px 10px; text-align:center; }}
+.keynum .kn .l {{ color:var(--muted); font-size:10.5px; font-weight:600; text-transform:uppercase;
+    letter-spacing:.5px; }}
+.keynum .kn .v {{ font-family:'Oswald'; font-size:18px; font-weight:700; margin-top:2px;
+    line-height:1.05; }}
+
+.sbrow {{ margin:7px 0; }}
+.sbtop {{ display:flex; justify-content:space-between; align-items:baseline; font-size:12.5px; }}
+.sbtop .sbv {{ font-weight:700; color:var(--text); font-variant-numeric:tabular-nums; }}
+.sbtop .sblab {{ color:var(--muted); font-size:11px; text-transform:uppercase; letter-spacing:.4px; }}
+.sbbar {{ display:flex; height:6px; border-radius:999px; overflow:hidden; margin-top:4px;
+    background:rgba(255,255,255,.05); }}
+.sbbar > span {{ display:block; height:100%; }}
 /* ============ real top navigation bar (desktop pills + mobile hamburger) ============ */
 .topnav {{ display:flex; align-items:center; justify-content:space-between; gap:14px;
     padding:10px 14px; margin:-6px 0 18px; position:sticky; top:0; z-index:1000;
@@ -246,6 +275,42 @@ def prob_bar(p_h: float, p_d: float, p_a: float, home: str, away: str) -> str:
         f'</div>'
         f'<div class="pbar-leg"><span>{home} {h:.0f}%</span>'
         f'<span>Draw {d:.0f}%</span><span>{a:.0f}% {away}</span></div>')
+
+
+def match_header(home_html: str, away_html: str, center: str, sub: str = "") -> str:
+    """Pro card header: home (crest+name) · center score/vs · away. ``center`` is the score
+    or 'vs'; ``sub`` the kickoff time / status."""
+    return (f'<div class="mc2"><div class="mc2-team home">{home_html}</div>'
+            f'<div class="mc2-mid"><div class="mc2-score">{center}</div>'
+            f'<div class="mc2-time">{sub}</div></div>'
+            f'<div class="mc2-team away">{away_html}</div></div>')
+
+
+def key_numbers(items: list[dict]) -> str:
+    """Strip of KPI boxes. items: [{label, value, color?}]."""
+    cells = "".join(
+        f'<div class="kn"><div class="l">{c["label"]}</div>'
+        f'<div class="v" style="color:{c.get("color", TEXT)}">{c["value"]}</div></div>'
+        for c in items)
+    return f'<div class="keynum">{cells}</div>'
+
+
+def stat_bars(rows: list[dict], home_color: str = GREEN, away_color: str = GOLD) -> str:
+    """Comparison bars. rows: [{label, home, away, disp_home?, disp_away?}]. The split bar shows
+    each side's share; values shown at the ends."""
+    out = []
+    for r in rows:
+        h, a = float(r.get("home") or 0), float(r.get("away") or 0)
+        tot = (h + a) or 1.0
+        hp = 100 * h / tot
+        dh = r.get("disp_home", r["home"])
+        da = r.get("disp_away", r["away"])
+        out.append(
+            f'<div class="sbrow"><div class="sbtop"><span class="sbv">{dh}</span>'
+            f'<span class="sblab">{r["label"]}</span><span class="sbv">{da}</span></div>'
+            f'<div class="sbbar"><span style="width:{hp:.0f}%;background:{home_color}"></span>'
+            f'<span style="width:{100 - hp:.0f}%;background:{away_color}"></span></div></div>')
+    return "".join(out)
 
 
 def callout(text: str, tone: str = "info") -> None:

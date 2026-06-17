@@ -123,6 +123,54 @@ def get_fixture_xg(home: str, away: str, date: str):
         return None
 
 
+@st.cache_data(ttl=3600, show_spinner=False)
+def get_match_stats(home: str, away: str, date: str):
+    """Full match-stats overview (possession, shots, xG, …) for a played fixture, or {}.
+    Honest no-op without a key / for unplayed games."""
+    try:
+        from src.data import thestatsapi as _ts
+        if not _ts.is_available():
+            return {}
+        return _ts.stats_for_fixture(home, away, date, cfg=CFG)
+    except Exception:  # noqa: BLE001
+        return {}
+
+
+def match_stats_block(m: dict):
+    """Broadcast-style stat comparison for a played match (real fields only)."""
+    s = get_match_stats(m["home"], m["away"], str(m["date"])[:10])
+    if not s:
+        return
+    def _pa(side):  # pass accuracy %
+        p, ap = (s.get("passes") or {}).get(side), (s.get("accurate_passes") or {}).get(side)
+        return round(100 * ap / p) if p and ap else None
+    rows = []
+    order = [("ball_possession", "Possession", "{}%"), ("expected_goals", "Expected goals", "{}"),
+             ("total_shots", "Shots", "{}"), ("shots_on_target", "On target", "{}"),
+             ("big_chances", "Big chances", "{}"), ("corner_kicks", "Corners", "{}")]
+    for key, label, fmt in order:
+        v = s.get(key)
+        if v:
+            rows.append({"label": label, "home": v["home"], "away": v["away"],
+                         "disp_home": fmt.format(v["home"]), "disp_away": fmt.format(v["away"])})
+    pah, paa = _pa("home"), _pa("away")
+    if pah is not None:
+        rows.append({"label": "Pass accuracy", "home": pah, "away": paa,
+                     "disp_home": f"{pah}%", "disp_away": f"{paa}%"})
+    yc = s.get("yellow_cards"); rc = s.get("red_cards")
+    if yc:
+        def _cards(side):
+            r = (rc or {}).get(side, 0)
+            return f"{yc[side]}Y" + (f" {r}R" if r else "")
+        rows.append({"label": "Cards", "home": yc["home"], "away": yc["away"],
+                     "disp_home": _cards("home"), "disp_away": _cards("away")})
+    if rows:
+        st.markdown(f'<div style="display:flex;justify-content:space-between;font-size:11px;'
+                    f'color:{GREY};margin-bottom:2px"><span style="color:{GREEN}">{m["home"]}</span>'
+                    f'<span style="color:{GOLD}">{m["away"]}</span></div>'
+                    + theme.stat_bars(rows), unsafe_allow_html=True)
+
+
 @st.cache_data(ttl=600, show_spinner=False)
 def get_lineup_status(home: str, away: str, date: str):
     """Confirmed-XI status + 'regular starter missing today' flag, or None.
@@ -155,10 +203,10 @@ def lineup_block(m: dict):
         return
     if not ls.get("posted"):
         if not m.get("played"):
-            st.caption("🚑 Confirmed XI not posted yet (TheStatsAPI posts it ≈75 min before kick).")
+            st.caption("Confirmed XI not posted yet (TheStatsAPI posts it ≈75 min before kick).")
         return
     played = ls.get("played")
-    st.markdown("**🚑 Confirmed lineups**")
+    st.markdown("**Confirmed lineups**")
     c1, c2 = st.columns(2)
     flagged = False
     for col, side, team in ((c1, "home", m["home"]), (c2, "away", m["away"])):
@@ -182,15 +230,15 @@ def lineup_block(m: dict):
                 flagged = True
                 names = ", ".join(f"{x['name']}" + (f" ({x['avg']:.1f})" if x.get("avg") else "")
                                   for x in miss)
-                st.markdown(f"<span style='color:{GOLD}'>⚠️ out vs last XI: {names}</span>",
-                            unsafe_allow_html=True)
+                st.markdown(f"<span style='color:{GOLD};font-weight:600'>Out vs last XI:</span> "
+                            f"<span style='color:{GOLD}'>{names}</span>", unsafe_allow_html=True)
             elif s.get("had_prior_xi"):
                 st.caption("same starters as last match")
     cap = ("Ratings are each starter's recent **previous-match** form (today's game isn't played "
            "yet); **Avg** = mean of the last 3. " if not played else
            "**Today** = this match's player rating; **Form** = the prior 3 matches. ")
-    cap += ("⚠️ = started the **previous** match but isn't in today's XI (injury/suspension/"
-            "rotation)." if flagged else "")
+    cap += ("“Out vs last XI” = started the **previous** match but isn't in today's XI "
+            "(injury/suspension/rotation)." if flagged else "")
     st.caption(cap)
 
 
@@ -363,8 +411,9 @@ def motivation_block(m: dict, live: dict | None):
             st.write(f"{sm['pos_str']}, **{sm['pts']} pts** · GD {sm['gd']:+d} "
                      f"· {sm['played']} GP")
             adv = sm["p_advance"]
-            badge = ("🟢" if adv >= 0.85 else "🟡" if adv >= 0.4 else "🔴")
-            st.write(f"{badge} **{adv*100:.0f}%** to reach knockouts")
+            tone = ("green" if adv >= 0.85 else "gold" if adv >= 0.4 else "red")
+            st.markdown(theme.pill(f"{adv*100:.0f}% to reach knockouts", tone),
+                        unsafe_allow_html=True)
             st.caption(sm["status"])
     st.divider()
 
@@ -384,7 +433,7 @@ def best_bet_block(m: dict, min_ev: float = 0.03, min_prob_edge: float = 0.02):
     probability-edge gate in a non-disabled segment, or an explicit 'pass'."""
     cands = _qualifying_bets(m, min_ev, min_prob_edge)
     if not cands:
-        st.markdown('<div class="bbet"><span class="h">💡 Best bet</span> &nbsp; '
+        st.markdown('<div class="bbet"><span class="h">Best bet</span> &nbsp; '
                     '<span style="color:#8b93a7">no edge here — pass</span></div>',
                     unsafe_allow_html=True)
         return
@@ -393,10 +442,10 @@ def best_bet_block(m: dict, min_ev: float = 0.03, min_prob_edge: float = 0.02):
     cons = (m.get("cons_edge") or {}).get(b.selection)
     cons_txt = ""
     if cons is not None:
-        cons_txt = (f' &nbsp;·&nbsp; {"✅ beats consensus" if cons > 0 else "⚠️ ≤ consensus"} '
+        cons_txt = (f' &nbsp;·&nbsp; {"beats consensus" if cons > 0 else "≤ consensus"} '
                     f'({cons*100:+.0f}%)')
     st.markdown(
-        f'<div class="bbet"><span class="h">💡 Best bet</span> &nbsp; '
+        f'<div class="bbet"><span class="h">Best bet</span> &nbsp; '
         f'<b style="font-size:15px">{b.market}: {b.selection}</b> &nbsp; '
         f'{theme.pill(_am(b.american), "grey")} &nbsp;·&nbsp; '
         f'model {_pct(b.model_p)} vs market {_pct(b.fair_p)} &nbsp;·&nbsp; '
@@ -430,105 +479,102 @@ def render_match(m: dict, live: dict | None = None, min_ev: float = 0.03,
     pick = OUTCOMES[int(np.argmax([probs["H"], probs["D"], probs["A"]]))]
     pick_name = {"H": m["home"], "D": "Draw", "A": m["away"]}[pick]
     n_value = len(_qualifying_bets(m, min_ev, min_prob_edge))
-    if m.get("played"):
+    played = bool(m.get("played"))
+    if played:
         hit = (m["result"] == pick)
-        title = (f"{m['home']} {m['home_score']}–{m['away_score']} {m['away']}   ·   {t}   ·   "
-                 f"{'✅ model called it' if hit else '❌ upset vs model'}")
+        title = (f"{m['home']} {m['home_score']}–{m['away_score']} {m['away']}    ·    {t}    ·    "
+                 f"model {'✓' if hit else '✗'}")
     else:
-        title = (f"{m['home']}  vs  {m['away']}   ·   {t}   ·   "
-                 f"⚽ leans {pick_name}" + (f"   ·   💰 {n_value} value" if n_value else ""))
+        title = (f"{m['home']}   vs   {m['away']}    ·    {t}    ·    leans {pick_name} "
+                 f"{_pct(probs[pick])}" + (f"    ·    {n_value} value" if n_value else ""))
     with st.expander(title, expanded=False):
-        if m.get("played"):
-            res_name = {"H": m["home"], "D": "Draw", "A": m["away"]}[m["result"]]
-            tone = "green" if m["result"] == pick else "red"
-            st.markdown(
-                f'<div style="text-align:center;margin:2px 0 8px">'
-                f'{theme.pill(f"FINAL {m['home_score']}–{m['away_score']} · {res_name}", tone)} '
-                f'{theme.pill(f"model leaned {pick_name} ({_pct(probs[pick])})", "grey")}</div>',
-                unsafe_allow_html=True)
-            # honest xG reality-check: the model's projected goals vs the game's actual xG vs
-            # the final score. Shown only when real xG comes back from the API (no fabrication).
-            axg = get_fixture_xg(m["home"], m["away"], str(m["date"])[:10])
-            if axg is not None:
-                peg = a["expected_goals"]
-                st.caption(
-                    f"📊 xG reality-check — model projected **{peg[0]:.1f}–{peg[1]:.1f}** · "
-                    f"actual xG **{axg[0]:.2f}–{axg[1]:.2f}** · final "
-                    f"**{m['home_score']}–{m['away_score']}**. "
-                    "xG is a display reality-check, not a model input (a 2022-only test put it "
-                    "within noise of goals-form).")
-        # flag-vs-flag header + lean pill + value badge
-        lean_pill = theme.pill(f"model leans {pick_name}", "green")
-        val_pill = theme.pill(f"💰 {n_value} value bet" + ("s" if n_value != 1 else ""),
-                              "gold") if n_value else ""
-        st.markdown(
-            f'<div class="mcard-head" style="font-size:20px;justify-content:center;'
-            f'gap:14px;margin-bottom:2px">{team_with_flag(m["home"], 22, True)}'
-            f'<span style="color:{GREY};font-size:14px">vs</span>'
-            f'{team_with_flag(m["away"], 22, True)}</div>'
-            f'<div style="text-align:center;margin-bottom:8px">{lean_pill} &nbsp; {val_pill}</div>',
-            unsafe_allow_html=True)
+        # ---- header: crests + score/vs + kickoff ----
+        home_h = f'{flag_html(m["home"], 30)} {m["home"]}'
+        away_h = f'{m["away"]} {flag_html(m["away"], 30)}'
+        center = f'{m["home_score"]}–{m["away_score"]}' if played else "vs"
+        sub = (f'FT · {t}' if played else t)
+        st.markdown(theme.match_header(home_h, away_h, center, sub), unsafe_allow_html=True)
         st.markdown(theme.prob_bar(probs["H"], probs["D"], probs["A"], m["home"], m["away"]),
                     unsafe_allow_html=True)
-        move = m.get("home_line_move")
-        move_txt = ""
-        if move is not None and not pd.isna(move) and abs(move) >= 0.015:
-            who = m["home"] if move > 0 else m["away"]
-            move_txt = f" · 📈 line moving toward {who} ({abs(move)*100:.0f}%)"
+        # ---- key numbers strip ----
         eg = a["expected_goals"]
-        st.caption(f"Venue: {'neutral' if m['neutral'] else m['home'] + ' home'} · "
-                   f"expected goals: {m['home']} {eg[0]:.1f}, {m['away']} {eg[1]:.1f} "
-                   f"(**{eg[0] + eg[1]:.1f} total**) · odds: {m['provider'] or 'n/a'}{move_txt}")
-        # variance meters — the upset / high-scoring potential the model already encodes
+        top_s = a["top_scorelines"][0][0] if a.get("top_scorelines") else "—"
+        kn = [{"label": "Model lean", "value": f"{pick_name.split()[0]} {_pct(probs[pick])}",
+               "color": theme.GREEN},
+              {"label": "Exp. goals", "value": f"{eg[0] + eg[1]:.1f}"},
+              {"label": "Likely score", "value": top_s}]
+        if played:
+            kn.append({"label": "Result", "value": "model ✓" if hit else "upset ✗",
+                       "color": theme.GREEN if hit else theme.RED})
+        else:
+            kn.append({"label": "Value bets", "value": str(n_value),
+                       "color": theme.GOLD if n_value else theme.MUTED})
+        st.markdown(theme.key_numbers(kn), unsafe_allow_html=True)
+        # variance signals — meaningful, no decorative emoji
         sig = a.get("signals") or {}
         chips = []
         ur = sig.get("upset_risk")
         if ur is not None:
-            chips.append(theme.pill(f"⚡ Upset risk {ur * 100:.0f}%",
+            chips.append(theme.pill(f"Upset risk {ur * 100:.0f}%",
                                     "gold" if sig.get("high_upset") else "grey"))
         sp, et = sig.get("shootout_potential"), sig.get("expected_total")
         if sp is not None:
-            chips.append(theme.pill(f"🔥 High-scoring {sp * 100:.0f}% · {et:.1f} xG",
+            chips.append(theme.pill(f"High-scoring {sp * 100:.0f}%",
                                     "gold" if sig.get("high_scoring") else "grey"))
         if chips:
-            st.markdown('<div style="text-align:center;margin:2px 0 6px">'
-                        + " &nbsp; ".join(chips) + '</div>', unsafe_allow_html=True)
-            st.caption("⚡ = model's own P(underdog wins) (well-calibrated) · 🔥 = rough P(4+ goals); "
-                       "specific high-scorers are hard to pin even for the model.")
-        motivation_block(m, live)
-        context_strip(m)
-        lineup_block(m)
-        st.divider()
-        left, right = st.columns([3, 2])
-        with left:
-            by_market: dict[str, list] = {}
-            for b in m["bets"]:
-                by_market.setdefault(b.market, []).append(b)
+            st.markdown('<div style="margin:2px 0 8px">' + " ".join(chips) + '</div>',
+                        unsafe_allow_html=True)
+        best_bet_block(m, min_ev, min_prob_edge)
+
+        by_market: dict[str, list] = {}
+        for b in m["bets"]:
+            by_market.setdefault(b.market, []).append(b)
+        tab_insights, tab_markets, tab_scores = st.tabs(["Insights", "Markets", "Scorelines"])
+
+        with tab_insights:
+            if played:
+                axg = get_fixture_xg(m["home"], m["away"], str(m["date"])[:10])
+                if axg is not None:
+                    st.caption(f"**xG reality-check** — model projected {eg[0]:.1f}–{eg[1]:.1f} · "
+                               f"actual xG {axg[0]:.2f}–{axg[1]:.2f} · final "
+                               f"{m['home_score']}–{m['away_score']}. (xG is a reality-check, not "
+                               "a model input.)")
+                match_stats_block(m)
+            else:
+                move = m.get("home_line_move")
+                vtxt = ("neutral site" if m["neutral"] else f"{m['home']} at home")
+                if move is not None and not pd.isna(move) and abs(move) >= 0.015:
+                    who = m["home"] if move > 0 else m["away"]
+                    vtxt += f" · line moving toward {who} ({abs(move) * 100:.0f}%)"
+                st.caption(f"{vtxt} · model expected goals {m['home']} {eg[0]:.1f}, "
+                           f"{m['away']} {eg[1]:.1f}")
+            motivation_block(m, live)
+            context_strip(m)
+            lineup_block(m)
+
+        with tab_markets:
             for mk in ["Match Result", "Total Goals", "Spread"]:
                 if mk in by_market:
                     market_table(mk, by_market[mk], m=m)
-            st.caption("**Model** = our pure probability, calibrated to historical results — "
-                       "**independent of the betting market** (matches the bar, the expected "
-                       "goals and the heatmap) · **Fair** = de-vigged market (shown only as a "
-                       "reference) · **Break-even** = the offered price's implied %. EV is "
-                       "positive only when **Model > Break-even**.")
             if "BTTS" in by_market:
                 book = m.get("btts_book") or "book"
                 src = m.get("btts_source")
                 tag = ("pre-match · best of US books" if src == "actionnetwork"
                        else "settled/closing" if src == "thestatsapi" else "line")
                 market_table("Both Teams To Score", by_market["BTTS"], m=m,
-                             key_note=f"Line: {book} · {tag}. **Model** = market-independent "
-                                      f"P(both teams score), calibrated to historical results.")
-            else:
+                             key_note=f"Line: {book} · {tag}.")
+            elif "Match Result" in by_market or "Total Goals" in by_market:
                 st.markdown(f"**Both Teams To Score** — model **{_pct(a['btts'])}** "
                             f"(no line available — info only)")
-        with right:
-            st.markdown("**Scoreline heatmap**")
+            st.caption("**Model** = our pure probability, calibrated to historical results, "
+                       "**independent of the market** · **Fair** = de-vigged market · "
+                       "**Break-even** = the offered price's implied %. EV is positive only when "
+                       "Model > Break-even.")
+
+        with tab_scores:
             heatmap(a["scoreline_matrix"], m["home"], m["away"])
             tops = " · ".join(f"{s} ({p*100:.0f}%)" for s, p in a["top_scorelines"][:5])
-            st.caption("Most likely: " + tops)
-        best_bet_block(m, min_ev, min_prob_edge)
+            st.caption("Most likely scorelines: " + tops)
 
 
 # --------------------------------------------------------------------- pages

@@ -132,6 +132,22 @@ def match_xg(match_id: str, ttl: float = 86400.0, cfg=None) -> tuple[float, floa
     return (float(h), float(a)) if h is not None and a is not None else None
 
 
+def match_stats(match_id: str, ttl: float = 86400.0, cfg=None) -> dict:
+    """Full match-stats overview as ``{stat_key: {"home": x, "away": y}}`` (numeric only), or {}.
+
+    Real fields from /stats: ball_possession, expected_goals, big_chances, total_shots,
+    shots_on_target, goalkeeper_saves, corner_kicks, fouls, yellow_cards, red_cards, passes,
+    accurate_passes, tackles, free_kicks. Only stats with both home & away present are kept."""
+    d = _unwrap(_get(f"/matches/{match_id}/stats", ttl=ttl, cfg=cfg))
+    ov = d.get("overview") or {}
+    out: dict = {}
+    for key, node in ov.items():
+        allv = node.get("all") if isinstance(node, dict) else None
+        if isinstance(allv, dict) and allv.get("home") is not None and allv.get("away") is not None:
+            out[key] = {"home": allv["home"], "away": allv["away"]}
+    return out
+
+
 def match_odds(match_id: str, ttl: float = 1800.0, cfg=None) -> dict | None:
     """Raw odds payload: ``{bookmakers: [{bookmaker, markets:{match_odds, btts,
     total_goals, asian_handicap, draw_no_bet, ...}}]}`` with opening+last_seen per price."""
@@ -194,15 +210,10 @@ def match_lineups(match_id: str, ttl: float = 600.0, cfg=None) -> dict | None:
     return d if d.get("home") else None
 
 
-def xg_for_fixture(home: str, away: str, date, *, competition_id: str = WC_COMP,
-                   season_id: str | None = None, day_tol: int = 1,
-                   cfg=None) -> tuple[float, float] | None:
-    """(home_xg, away_xg) for a fixture identified by team names + ``date``, or None.
-
-    Resolves the fixture to a TheStatsAPI ``match_id`` (date-windowed ``/matches`` + the
-    shape-tolerant ``fixture_map`` matcher), then pulls ``/stats``. Honest no-op — returns None
-    when there's no key, the match isn't found, or xG isn't published for it. Never fabricates.
-    """
+def match_id_for_fixture(home: str, away: str, date, *, competition_id: str = WC_COMP,
+                         season_id: str | None = None, day_tol: int = 1, cfg=None) -> str | None:
+    """Resolve an (home, away, date) fixture to a TheStatsAPI ``mt_`` id via a date-windowed
+    ``/matches`` pull + the shape-tolerant matcher. None when no key / no match."""
     from . import fixture_map
     from datetime import datetime, timedelta
     ymd = fixture_map._to_ymd(date)
@@ -216,10 +227,24 @@ def xg_for_fixture(home: str, away: str, date, *, competition_id: str = WC_COMP,
     hi = (d0 + timedelta(days=day_tol)).strftime("%Y-%m-%d")
     cands = matches(competition_id=competition_id, season_id=season_id,
                     date_from=lo, date_to=hi, cfg=cfg)
-    mid = fixture_map.find_match_id(home, away, ymd, cands, day_tol=day_tol)
-    if not mid:
-        return None
-    return match_xg(mid, cfg=cfg)
+    return fixture_map.find_match_id(home, away, ymd, cands, day_tol=day_tol)
+
+
+def xg_for_fixture(home: str, away: str, date, *, competition_id: str = WC_COMP,
+                   season_id: str | None = None, day_tol: int = 1,
+                   cfg=None) -> tuple[float, float] | None:
+    """(home_xg, away_xg) for a fixture by team names + ``date``, or None. Honest no-op."""
+    mid = match_id_for_fixture(home, away, date, competition_id=competition_id,
+                               season_id=season_id, day_tol=day_tol, cfg=cfg)
+    return match_xg(mid, cfg=cfg) if mid else None
+
+
+def stats_for_fixture(home: str, away: str, date, *, competition_id: str = WC_COMP,
+                      season_id: str | None = None, day_tol: int = 1, cfg=None) -> dict:
+    """Full match-stats overview for a played fixture by team names + ``date``, or {}."""
+    mid = match_id_for_fixture(home, away, date, competition_id=competition_id,
+                               season_id=season_id, day_tol=day_tol, cfg=cfg)
+    return match_stats(mid, cfg=cfg) if mid else {}
 
 
 def match_player_ratings(match_id: str, ttl: float = 86400.0, cfg=None) -> dict:

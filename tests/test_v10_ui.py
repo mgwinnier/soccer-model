@@ -35,3 +35,15 @@ def test_theme_components_return_html():
     assert theme.GREEN.startswith("#") and theme.GOLD.startswith("#")
     cfg = theme._stadium_theme()
     assert "config" in cfg and cfg["config"]["background"] == "transparent"
+
+
+def test_v17_card_builders():
+    hdr = theme.match_header("Spain", "Brazil", "2–1", "FT")
+    assert "mc2" in hdr and "Spain" in hdr and "2–1" in hdr
+    kn = theme.key_numbers([{"label": "Lean", "value": "Spain 55%"},
+                            {"label": "Goals", "value": "2.7"}])
+    assert "keynum" in kn and "Spain 55%" in kn and "2.7" in kn
+    # stat bars: home 61 / away 39 -> home segment ~61%
+    sb = theme.stat_bars([{"label": "Possession", "home": 61, "away": 39,
+                           "disp_home": "61%", "disp_away": "39%"}])
+    assert "sbrow" in sb and "61%" in sb and "width:61%" in sb
