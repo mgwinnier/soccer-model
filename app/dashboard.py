@@ -274,6 +274,47 @@ def _key_out_flag(team: str, xi_names: list):
                     f"<span style='color:{GOLD}'>{names}</span>", unsafe_allow_html=True)
 
 
+def _xi_strength_line(team: str, names: list):
+    """Per-team 'how loaded is the XI' caption: share of squad market value on the pitch."""
+    try:
+        from src.data import squad_values as sv
+        s, share = sv.xi_value(team, [n for n in names if n])
+        if share is not None:
+            st.caption(f"XI strength: **{share*100:.0f}%** · {_value_str(s)} of "
+                       f"{_value_str(sv.total_value(team))}")
+    except Exception:  # noqa: BLE001
+        pass
+
+
+def _value_gap_and_upset(m: dict, home_names: list, away_names: list):
+    """Matchup value gap + a 'weakened favorite' upset-watch flag (insight only, no model change)."""
+    try:
+        from src.data import squad_values as sv
+    except Exception:  # noqa: BLE001
+        return
+    hv, hs = sv.xi_value(m["home"], [n for n in home_names if n])
+    av, as_ = sv.xi_value(m["away"], [n for n in away_names if n])
+    if hv is None or av is None:
+        return
+    gap = hv - av
+    if abs(gap) >= 50e6:
+        stronger = m["home"] if gap > 0 else m["away"]
+        st.caption(f"XI value gap: **{stronger}** by {_value_str(abs(gap))}")
+    # upset watch: the model's FAVORITE is missing a top-value player (a rested/injured star) —
+    # the classic upset setup. Heuristic context only; validated forward on the Performance page.
+    probs = _display_probs(m)
+    fav_home = probs["H"] >= probs["A"]
+    fav, fav_names, fav_share = ((m["home"], home_names, hs) if fav_home
+                                 else (m["away"], away_names, as_))
+    ko = sv.key_absentees(fav, [n for n in fav_names if n], top_n=3)
+    if ko:
+        outs = ", ".join(x["name"] for x in ko)
+        share_txt = f" ({fav_share*100:.0f}% of value starting)" if fav_share is not None else ""
+        st.markdown(f"<span style='color:{GOLD};font-weight:600'>Upset watch:</span> "
+                    f"{fav} (model favorite) without top player(s) {outs}{share_txt}.",
+                    unsafe_allow_html=True)
+
+
 def _espn_lineup_fallback(m: dict) -> bool:
     """Render the confirmed XI from ESPN (fast source) when TheStatsAPI hasn't posted it.
     Adds market values (static snapshot) + a value-based 'key player out' flag. Returns True
@@ -284,9 +325,11 @@ def _espn_lineup_fallback(m: dict) -> bool:
         return False
     st.markdown("**Confirmed lineups** · ESPN")
     c1, c2 = st.columns(2)
+    xi_names = {}
     for col, side, team in ((c1, "home", m["home"]), (c2, "away", m["away"])):
         s = el.get(side) or {}
         names = [p.get("name") for p in s.get("xi", [])]
+        xi_names[side] = names
         tot = sv.total_value(team)
         with col:
             head = f"**{team_with_flag(team, 16, True)}** · {s.get('formation') or '?'}"
@@ -300,10 +343,12 @@ def _espn_lineup_fallback(m: dict) -> bool:
                              "Value": _value_str(sv.player_value(team, p.get("name")))})
             if rows:
                 st.dataframe(pd.DataFrame(rows), hide_index=True, use_container_width=True)
+            _xi_strength_line(team, names)
             _key_out_flag(team, names)
-    st.caption("Confirmed XI from ESPN · **Value** = player market value (static snapshot) · "
-               "**Key player out** = a top-value squad player not in today's XI. Form ratings "
-               "appear once TheStatsAPI posts its sheet.")
+    _value_gap_and_upset(m, xi_names.get("home", []), xi_names.get("away", []))
+    st.caption("Confirmed XI from ESPN · **Value** = player market value · **XI strength** = share "
+               "of squad value starting · **Key player out** = a top-value player benched. Form "
+               "ratings appear once TheStatsAPI posts its sheet.")
     return True
 
 
@@ -324,6 +369,7 @@ def lineup_block(m: dict):
     st.markdown("**Confirmed lineups**")
     c1, c2 = st.columns(2)
     flagged = False
+    xi_names = {}
     for col, side, team in ((c1, "home", m["home"]), (c2, "away", m["away"])):
         s = ls.get(side) or {}
         form = s.get("formation") or "?"
@@ -345,8 +391,11 @@ def lineup_block(m: dict):
                 rows.append(row)
             if rows:
                 st.dataframe(pd.DataFrame(rows), hide_index=True, use_container_width=True)
+            xi_nm = [p.get("name") for p in s.get("xi", [])]
+            xi_names[side] = xi_nm
+            _xi_strength_line(team, xi_nm)
             # value-based key-player-out flag (works from match 1)
-            _key_out_flag(team, [p.get("name") for p in s.get("xi", [])])
+            _key_out_flag(team, xi_nm)
             # secondary: rotation vs the previous match (ratings-based, matchday 2+)
             miss = s.get("missing_starters") or []
             if miss:
@@ -354,6 +403,7 @@ def lineup_block(m: dict):
                 names = ", ".join(f"{x['name']}" + (f" ({x['avg']:.1f})" if x.get("avg") else "")
                                   for x in miss)
                 st.caption(f"Out vs last XI: {names}")
+    _value_gap_and_upset(m, xi_names.get("home", []), xi_names.get("away", []))
     # before → after: re-run the model with a bounded availability penalty for missing regulars
     if flagged and not played:
         from src.data.lineup_status import lineup_availability
@@ -920,6 +970,33 @@ def page_performance():
         ])
         st.caption("The model's pre-match pick vs what actually happened in 2026, updated live as "
                    "games finish. Small sample — one tournament is noise, not proof.")
+
+    # --- XI value-share forward check (the honest test of the squad-value signal) ---
+    xiv = load_csv("xi_value_2026.csv")
+    if not xiv.empty:
+        from src.backtest.xi_value_2026 import summarize
+        s = summarize(xiv)
+        st.markdown("#### Does the stronger (by market value) starting XI win?")
+        if "value_fav_winrate" in s:
+            theme.kpi_row([
+                {"label": "Higher-value XI won", "value": f"{s['value_fav_winrate']*100:.0f}%",
+                 "sub": f"of {s['n_decisive']} decisive games", "accent": theme.GREEN},
+                {"label": "Model favorite won", "value": f"{s['model_fav_winrate']*100:.0f}%",
+                 "sub": "for reference", "accent": theme.BLUE},
+                {"label": "Games tracked", "value": s["n"], "accent": theme.GOLD},
+            ])
+        buckets = s.get("fav_share_buckets") or []
+        if buckets:
+            bdf = pd.DataFrame([{"Favorite's XI value-share": b["band"],
+                                 "Upset rate": f"{b['upset_rate']*100:.0f}%", "N": b["n"]}
+                                for b in buckets])
+            st.caption("Do **weakened favorites** get upset more? (favorite = model's pick; "
+                       "upset = it didn't win)")
+            st.dataframe(bdf, hide_index=True, use_container_width=True)
+        theme.callout("Market-value XI strength can't be backtested (no historical lineups), so "
+                      "this is a <b>forward, directional</b> check that accrues as the WC plays — "
+                      "<b>not a validated edge</b>, and the model's probabilities don't use it. "
+                      "Team-level squad value already adds 0.0 RPS to the model.", "warn")
 
     # Deployed-model accuracy, walk-forward over 7 World Cups (1998–2022). This is the
     # EXACT live pipeline (market-independent DC+Elo blend + WC goals correction).

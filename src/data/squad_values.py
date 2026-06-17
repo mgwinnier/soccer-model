@@ -72,6 +72,25 @@ def total_value(team: str) -> float | None:
     return t.get("total_value") if t else None
 
 
+def xi_value(team: str, xi_names: list[str]) -> tuple[float | None, float | None]:
+    """(sum of the confirmed XI's market values, its share of the squad total), or (None, None).
+    Measures the strength of who's ACTUALLY starting — the one signal the model doesn't have."""
+    t = _team(team)
+    if not t:
+        return (None, None)
+    idx = _index(t)
+    s = 0.0
+    for n in xi_names:
+        nn = _norm(n)
+        if not nn:
+            continue
+        p = idx["full"].get(nn) or idx["last"].get(nn.split()[-1])
+        if p and p.get("market_value"):
+            s += p["market_value"]
+    tot = t.get("total_value") or 0
+    return (s, (s / tot if tot else None))
+
+
 def key_absentees(team: str, xi_names: list[str], top_n: int = 6) -> list[dict]:
     """Squad's top-``top_n`` players by market value who are NOT in the confirmed XI
     (the value-based 'key player out' flag — works from match 1). [{name, market_value}]."""

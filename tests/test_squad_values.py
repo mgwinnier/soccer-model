@@ -29,6 +29,13 @@ def test_key_absentees(monkeypatch):
     assert out2 == []
 
 
+def test_xi_value(monkeypatch):
+    _patch(monkeypatch)
+    s, share = sv.xi_value("Portugal", ["Joao Neves", "Vitinha"])   # 250M of 255M total
+    assert s == 250_000_000 and abs(share - 250_000_000 / 255_000_000) < 1e-9
+    assert sv.xi_value("Atlantis", ["x"]) == (None, None)
+
+
 def test_unknown_team(monkeypatch):
     _patch(monkeypatch)
     assert sv.player_value("Atlantis", "X") is None
