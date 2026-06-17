@@ -280,7 +280,7 @@ def get_lineup_status(home: str, away: str, date: str):
 
 @st.cache_data(ttl=300, show_spinner=False)
 def get_espn_lineups(game_id):
-    """Confirmed XIs from ESPN (usually posted earlier than TheStatsAPI), or None."""
+    """Confirmed XIs from ESPN, or None."""
     if not game_id:
         return None
     try:
@@ -288,6 +288,26 @@ def get_espn_lineups(game_id):
         return fetch_lineups(str(game_id))
     except Exception:  # noqa: BLE001
         return None
+
+
+@st.cache_data(ttl=60, show_spinner=False)
+def get_fast_lineups(home: str, away: str, date: str = "", game_id=None):
+    """The earliest XI we can get: **FIFA official** first (its own match centre is the source of
+    the team sheet — a *projected* XI hours early, the *confirmed* one the moment it's official),
+    falling back to ESPN. Returns ``{home, away, source, confirmed}`` or None. 60s cache so it
+    refreshes near kickoff instead of waiting on a stale read."""
+    try:
+        from src.data import fifa
+        fl = fifa.lineups(home, away)
+        if fl and fl.get("home") and fl.get("away"):
+            return {"home": fl["home"], "away": fl["away"], "source": "FIFA",
+                    "confirmed": bool(fl.get("confirmed"))}
+    except Exception:  # noqa: BLE001
+        pass
+    el = get_espn_lineups(game_id)
+    if el:                                        # ESPN only posts the confirmed sheet
+        return {"home": el.get("home"), "away": el.get("away"), "source": "ESPN", "confirmed": True}
+    return None
 
 
 def _hours_to_ko(date) -> float | None:
@@ -361,14 +381,18 @@ def _value_gap_and_upset(m: dict, home_names: list, away_names: list):
 
 
 def _espn_lineup_fallback(m: dict) -> bool:
-    """Render the confirmed XI from ESPN (fast source) when TheStatsAPI hasn't posted it.
-    Adds market values (static snapshot) + a value-based 'key player out' flag. Returns True
-    if it rendered something."""
+    """Render the XI from the fastest source (FIFA official, else ESPN) when TheStatsAPI hasn't
+    posted its richer sheet. Labels projected vs confirmed; adds market values + a value-based
+    'key player out' flag. Returns True if it rendered something."""
     from src.data import squad_values as sv
-    el = get_espn_lineups(m.get("game_id"))
+    el = get_fast_lineups(m["home"], m["away"], str(m.get("date"))[:10], m.get("game_id"))
     if not el:
         return False
-    st.markdown("**Confirmed lineups** · ESPN")
+    status = "Confirmed" if el.get("confirmed") else "Projected"
+    src = el.get("source") or "—"
+    tone = GREEN if el.get("confirmed") else GOLD
+    st.markdown(f"**{status} lineups** · <span style='color:{tone}'>{src}"
+                f"{'' if el.get('confirmed') else ' · projected XI'}</span>", unsafe_allow_html=True)
     c1, c2 = st.columns(2)
     xi_names = {}
     for col, side, team in ((c1, "home", m["home"]), (c2, "away", m["away"])):
@@ -391,9 +415,9 @@ def _espn_lineup_fallback(m: dict) -> bool:
             _xi_strength_line(team, names)
             _key_out_flag(team, names)
     _value_gap_and_upset(m, xi_names.get("home", []), xi_names.get("away", []))
-    st.caption("Confirmed XI from ESPN · **Value** = player market value · **XI strength** = share "
-               "of squad value starting · **Key player out** = a top-value player benched. Form "
-               "ratings appear once TheStatsAPI posts its sheet.")
+    st.caption(f"XI from {src} ({status.lower()}) · **Value** = player market value · **XI strength** "
+               "= share of squad value starting · **Key player out** = a top-value player benched. "
+               "Form ratings appear once TheStatsAPI posts its sheet.")
     return True
 
 
@@ -756,7 +780,7 @@ def _brief_facts(m: dict) -> dict:
     if h2h.get("n"):
         f["Head-to-head"] = (f"last {h2h['n']} meetings: {m['home']} {h2h.get('home_wins', 0)}-"
                              f"{h2h.get('draws', 0)}-{h2h.get('away_wins', 0)} {m['away']}")
-    el = get_espn_lineups(m.get("game_id"))
+    el = get_fast_lineups(m["home"], m["away"], str(m.get("date"))[:10], m.get("game_id"))
     if el:
         parts = []
         for side, team in (("home", m["home"]), ("away", m["away"])):
@@ -770,7 +794,9 @@ def _brief_facts(m: dict) -> dict:
             if ko:
                 seg += f", missing {', '.join(x['name'] + ' ' + _value_str(x['market_value']) for x in ko)}"
             parts.append(seg)
-        f["Confirmed lineups"] = " | ".join(parts)
+        _lbl = (f"Lineups ({el.get('source', '')} "
+                f"{'confirmed' if el.get('confirmed') else 'projected'})").strip()
+        f[_lbl] = " | ".join(parts)
     if m.get("played"):
         f["Result"] = (f"FINAL {m['home_score']}-{m['away_score']} "
                        f"({'model called it' if m['result'] == pick else 'upset vs the model'})")
