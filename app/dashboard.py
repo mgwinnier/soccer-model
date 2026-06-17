@@ -923,7 +923,12 @@ NAV = [
 
 
 def main():
-    with st.sidebar:
+    # Nav + controls live in the MAIN column (no sidebar) so mobile can always reach
+    # them — the collapsed-sidebar trap is gone.
+    labels = [f"{icon} {name}" for icon, name, _ in NAV]
+    choice = st.radio("Navigate", labels, horizontal=True, label_visibility="collapsed")
+    page = NAV[labels.index(choice)][2]
+    with st.expander("⚙️  Staking & filters", expanded=False):
         st.markdown(
             '<div style="padding:6px 2px 10px 2px">'
             '<div style="font-family:Oswald;font-size:22px;font-weight:700;line-height:1.05;'
@@ -965,12 +970,6 @@ def main():
         st.caption("⚠ EV/Kelly are only as good as the model's probabilities. The **min-edge "
                    "gate** drops leverage-driven longshot flags. **Not betting advice** · "
                    "independent model, not affiliated with FIFA.")
-
-    # Top-of-page navigation — always visible (works on mobile, where the sidebar is
-    # collapsed). Horizontal radio wraps to multiple rows on narrow screens.
-    labels = [f"{icon} {name}" for icon, name, _ in NAV]
-    choice = st.radio("Navigate", labels, horizontal=True, label_visibility="collapsed")
-    page = NAV[labels.index(choice)][2]
 
     if page == "matches":
         page_matches(bankroll, kelly, min_ev, min_edge, upset_temp)
