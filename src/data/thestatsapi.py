@@ -145,6 +145,34 @@ def match_lineups(match_id: str, ttl: float = 600.0, cfg=None) -> dict | None:
     return d if d.get("home") else None
 
 
+def xg_for_fixture(home: str, away: str, date, *, competition_id: str = WC_COMP,
+                   season_id: str | None = None, day_tol: int = 1,
+                   cfg=None) -> tuple[float, float] | None:
+    """(home_xg, away_xg) for a fixture identified by team names + ``date``, or None.
+
+    Resolves the fixture to a TheStatsAPI ``match_id`` (date-windowed ``/matches`` + the
+    shape-tolerant ``fixture_map`` matcher), then pulls ``/stats``. Honest no-op — returns None
+    when there's no key, the match isn't found, or xG isn't published for it. Never fabricates.
+    """
+    from . import fixture_map
+    from datetime import datetime, timedelta
+    ymd = fixture_map._to_ymd(date)
+    if not ymd:
+        return None
+    try:
+        d0 = datetime.strptime(ymd, "%Y-%m-%d")
+    except ValueError:
+        return None
+    lo = (d0 - timedelta(days=day_tol)).strftime("%Y-%m-%d")
+    hi = (d0 + timedelta(days=day_tol)).strftime("%Y-%m-%d")
+    cands = matches(competition_id=competition_id, season_id=season_id,
+                    date_from=lo, date_to=hi, cfg=cfg)
+    mid = fixture_map.find_match_id(home, away, ymd, cands, day_tol=day_tol)
+    if not mid:
+        return None
+    return match_xg(mid, cfg=cfg)
+
+
 def connectivity_check(cfg=None) -> str:
     """'ok' / 'no_key' / 'unreachable' — for the dashboard status chip."""
     if not api_key():

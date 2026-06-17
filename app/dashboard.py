@@ -107,6 +107,22 @@ def get_bets(day: str, days: int, bankroll: float, kelly: float,
                                 upset_temp=upset_temp)
 
 
+@st.cache_data(ttl=3600, show_spinner=False)
+def get_fixture_xg(home: str, away: str, date: str):
+    """Real (home_xg, away_xg) for a played fixture from TheStatsAPI, or None.
+
+    Honest reality-check only — returns None (and the card simply omits the line) when there's
+    no API key (e.g. local / secret not set), the match isn't matched, or xG isn't published.
+    Never fabricates. Cached so the shared cloud app makes one call per game."""
+    try:
+        from src.data import thestatsapi as _ts
+        if not _ts.is_available():
+            return None
+        return _ts.xg_for_fixture(home, away, date, cfg=CFG)
+    except Exception:  # noqa: BLE001 — any failure degrades to "no xG line"
+        return None
+
+
 @st.cache_data(ttl=300, show_spinner="Grading the 2026 World Cup so far…")
 def get_2026_played() -> list:
     """All played 2026 WC matches with the model's pre-match call (for Performance)."""
@@ -355,6 +371,17 @@ def render_match(m: dict, live: dict | None = None, min_ev: float = 0.03,
                 f'{theme.pill(f"FINAL {m['home_score']}–{m['away_score']} · {res_name}", tone)} '
                 f'{theme.pill(f"model leaned {pick_name} ({_pct(probs[pick])})", "grey")}</div>',
                 unsafe_allow_html=True)
+            # honest xG reality-check: the model's projected goals vs the game's actual xG vs
+            # the final score. Shown only when real xG comes back from the API (no fabrication).
+            axg = get_fixture_xg(m["home"], m["away"], str(m["date"])[:10])
+            if axg is not None:
+                peg = a["expected_goals"]
+                st.caption(
+                    f"📊 xG reality-check — model projected **{peg[0]:.1f}–{peg[1]:.1f}** · "
+                    f"actual xG **{axg[0]:.2f}–{axg[1]:.2f}** · final "
+                    f"**{m['home_score']}–{m['away_score']}**. "
+                    "xG is a display reality-check, not a model input (a 2022-only test put it "
+                    "within noise of goals-form).")
         # flag-vs-flag header + lean pill + value badge
         lean_pill = theme.pill(f"model leans {pick_name}", "green")
         val_pill = theme.pill(f"💰 {n_value} value bet" + ("s" if n_value != 1 else ""),
