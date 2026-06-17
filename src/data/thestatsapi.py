@@ -222,6 +222,20 @@ def xg_for_fixture(home: str, away: str, date, *, competition_id: str = WC_COMP,
     return match_xg(mid, cfg=cfg)
 
 
+_SEASON = [None]
+
+
+def current_season_id(cfg=None) -> str | None:
+    """The competition's current season id (``is_current``), cached for the process."""
+    if _SEASON[0]:
+        return _SEASON[0]
+    for s in competition_seasons(cfg=cfg):
+        if s.get("is_current"):
+            _SEASON[0] = s.get("id")
+            break
+    return _SEASON[0]
+
+
 def connectivity_check(cfg=None) -> str:
     """'ok' / 'no_key' / 'unreachable' — for the dashboard status chip."""
     if not api_key():

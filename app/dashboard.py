@@ -123,6 +123,60 @@ def get_fixture_xg(home: str, away: str, date: str):
         return None
 
 
+@st.cache_data(ttl=600, show_spinner=False)
+def get_lineup_status(home: str, away: str, date: str):
+    """Confirmed-XI status + 'regular starter missing today' flag, or None.
+
+    Honest no-op without a key / before the team sheet posts (~75 min pre-KO). Cached so the
+    shared app makes few calls."""
+    try:
+        from src.data import lineup_status as _ls
+        return _ls.lineup_status(home, away, date, cfg=CFG)
+    except Exception:  # noqa: BLE001
+        return None
+
+
+def _hours_to_ko(date) -> float | None:
+    try:
+        ko = pd.to_datetime(date, utc=True)
+        now = pd.Timestamp.now(tz="UTC")
+        return (ko - now).total_seconds() / 3600.0
+    except Exception:  # noqa: BLE001
+        return None
+
+
+def lineup_block(m: dict):
+    """Confirmed XI + flagged absences — only when the sheet could be posted (played / near KO)."""
+    hrs = _hours_to_ko(m.get("date"))
+    if not (m.get("played") or (hrs is not None and hrs <= 6)):
+        return
+    ls = get_lineup_status(m["home"], m["away"], str(m["date"])[:10])
+    if not ls:
+        return
+    if not ls.get("posted"):
+        if not m.get("played"):
+            st.caption("🚑 Confirmed XI not posted yet (TheStatsAPI posts it ≈75 min before kick).")
+        return
+    c1, c2 = st.columns(2)
+    flagged = False
+    for col, side, team in ((c1, "home", m["home"]), (c2, "away", m["away"])):
+        s = ls.get(side) or {}
+        form = s.get("formation") or "?"
+        miss = s.get("missing_starters") or []
+        with col:
+            if miss:
+                flagged = True
+                st.markdown(f"**{team}** · {form}<br><span style='color:{GOLD}'>⚠️ out vs last XI: "
+                            f"{', '.join(miss)}</span>", unsafe_allow_html=True)
+            elif s.get("had_prior_xi"):
+                st.caption(f"**{team}** · {form} — same starters as last match")
+            else:
+                st.caption(f"**{team}** · {form} — XI confirmed")
+    st.caption("⚠️ = started this team's **previous** match but isn't in today's confirmed XI "
+               "(injury / suspension / rotation)." if flagged else
+               "Confirmed XI posted; no regular starter dropped vs the last match.")
+
+
 @st.cache_data(ttl=300, show_spinner="Grading the 2026 World Cup so far…")
 def get_2026_played() -> list:
     """All played 2026 WC matches with the model's pre-match call (for Performance)."""
@@ -426,6 +480,7 @@ def render_match(m: dict, live: dict | None = None, min_ev: float = 0.03,
                        "specific high-scorers are hard to pin even for the model.")
         motivation_block(m, live)
         context_strip(m)
+        lineup_block(m)
         st.divider()
         left, right = st.columns([3, 2])
         with left:
