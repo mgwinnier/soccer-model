@@ -138,8 +138,11 @@ def build_bets(start: str, days: int = 3, bankroll: float = 100.0,
     # Real BTTS market from TheStatsAPI (the model already computes P(BTTS); now it has a line).
     # Auto-on for the World Cup when a key is present; degrades to a no-op otherwise.
     if api_markets is None:
+        import os as _os
         from ..data import thestatsapi as _ts
-        api_markets = (league == "fifa.world") and _ts.is_available()
+        from ..data import actionnetwork as _an
+        has_an = _an.DEFAULT_FEED.exists() or bool(_os.environ.get("ACTIONNETWORK_FEED_URL"))
+        api_markets = (league == "fifa.world") and (_ts.is_available() or has_an)
     if api_markets:
         _attach_btts(matches, bankroll, kelly_fraction, cfg)
 
@@ -166,58 +169,88 @@ def build_bets(start: str, days: int = 3, bankroll: float = 100.0,
     return {"matches": matches, "bets": pd.DataFrame(ledger)}
 
 
+def _btts_fair(yes_dec, no_dec):
+    """De-vig a two-way BTTS market → (fair_yes, fair_no), or (None, None)."""
+    from ..data.odds import decimal_to_prob
+    iy, ino = decimal_to_prob(yes_dec), decimal_to_prob(no_dec)
+    s = (iy or 0.0) + (ino or 0.0)
+    return ((iy / s, ino / s) if s else (None, None))
+
+
+def _add_btts_bets(m: dict, yes_dec, no_dec, book_label, source,
+                   bankroll: float, kelly_fraction: float) -> bool:
+    """Append Yes/No BTTS bets to a match from a real line. False if no model P(BTTS)/price."""
+    from .betting import evaluate_bet_decimal
+    p_yes = (m.get("analysis") or {}).get("btts")
+    if p_yes is None or yes_dec is None or no_dec is None:
+        return False
+    p_yes = float(p_yes)
+    fair_yes, fair_no = _btts_fair(yes_dec, no_dec)
+    m["bets"].append(evaluate_bet_decimal("BTTS", "Both Teams Score: Yes", yes_dec,
+                                          p_yes, fair_yes, bankroll, kelly_fraction))
+    m["bets"].append(evaluate_bet_decimal("BTTS", "Both Teams Score: No", no_dec,
+                                          1.0 - p_yes, fair_no, bankroll, kelly_fraction))
+    m["btts_book"] = book_label
+    m["btts_source"] = source
+    return True
+
+
 def _attach_btts(matches: list, bankroll: float, kelly_fraction: float,
                  cfg: dict | None) -> None:
-    """Pair each fixture's model P(BTTS) with the real Both-Teams-To-Score line from
-    TheStatsAPI → Yes/No bets with EV/Kelly. Best-effort: one ``/matches`` pull for the whole
-    window, then per-fixture ``/odds``; any miss (unmatched, no key, no BTTS market) just skips
-    that game. Never fabricates a price."""
-    from ..data import thestatsapi as ts, fixture_map
-    from ..data.odds import decimal_to_prob
-    from .betting import evaluate_bet_decimal
-    if not matches or not ts.is_available():
+    """Attach a real Both-Teams-To-Score market to each fixture's model P(BTTS) → Yes/No bets.
+
+    Source priority: **Action Network** pre-match US-book line (the bettable price, harvested on
+    the VPS to ``data/feeds/actionnetwork_btts.json``), then the **TheStatsAPI** settled Bet365
+    line for games AN doesn't cover (e.g. already finished — useful for grading). Best-effort and
+    honest: a miss just leaves the match without a BTTS market. Never fabricates a price."""
+    if not matches:
         return
-    dates = sorted(str(m["date"])[:10] for m in matches if m.get("date") is not None)
-    if not dates:
+    covered = set()
+    # 1) Action Network pre-match (best price across US books)
+    try:
+        from ..data import actionnetwork as an
+        feed = an.load_feed()
+        if feed:
+            idx = an._index(feed)
+            for m in matches:
+                pr = an.btts_prices_for(m["home"], m["away"], str(m.get("date"))[:10], index=idx)
+                if pr and _add_btts_bets(
+                        m, pr["yes"], pr["no"],
+                        f"{pr['yes_book']}/{pr['no_book']} (best of {pr['n_books']})",
+                        "actionnetwork", bankroll, kelly_fraction):
+                    covered.add(id(m))
+    except Exception:  # noqa: BLE001 — feed issue never breaks the slate
+        pass
+    # 2) TheStatsAPI settled fallback for the rest (e.g. finished games for grading)
+    rest = [m for m in matches if id(m) not in covered]
+    if not rest:
         return
     try:
+        from ..data import thestatsapi as ts, fixture_map
+        if not ts.is_available():
+            return
+        dates = sorted(str(m["date"])[:10] for m in rest if m.get("date") is not None)
+        if not dates:
+            return
         cands = ts.matches(date_from=dates[0], date_to=dates[-1], cfg=cfg)
-    except Exception:  # noqa: BLE001 — network/parse issue → no BTTS, no crash
+        if not cands:
+            return
+        for m in rest:
+            try:
+                if (m.get("analysis") or {}).get("btts") is None:
+                    continue
+                m_api = fixture_map.find_match(m["home"], m["away"], str(m["date"])[:10], cands)
+                if not m_api or m_api.get("odds_available") is False:
+                    continue
+                mid = fixture_map.match_id_of(m_api)
+                pr = ts.btts_prices(ts.match_odds(mid, cfg=cfg)) if mid else None
+                if pr:
+                    _add_btts_bets(m, pr["yes"], pr["no"], pr.get("book"),
+                                   "thestatsapi", bankroll, kelly_fraction)
+            except Exception:  # noqa: BLE001
+                continue
+    except Exception:  # noqa: BLE001
         return
-    if not cands:
-        return
-    for m in matches:
-        try:
-            p_yes = (m.get("analysis") or {}).get("btts")
-            if p_yes is None:
-                continue
-            m_api = fixture_map.find_match(m["home"], m["away"], str(m["date"])[:10], cands)
-            if not m_api:
-                continue
-            # the listing flags whether a line exists yet — skip the (throttled) odds call
-            # for the many fixtures with no odds posted (e.g. not-yet-priced upcoming games).
-            if m_api.get("odds_available") is False:
-                continue
-            mid = fixture_map.match_id_of(m_api)
-            if not mid:
-                continue
-            pr = ts.btts_prices(ts.match_odds(mid, cfg=cfg))
-            if not pr:
-                continue
-            iy, ino = decimal_to_prob(pr["yes"]), decimal_to_prob(pr["no"])
-            s = (iy or 0.0) + (ino or 0.0)
-            fair_yes = (iy / s) if s else None
-            fair_no = (ino / s) if s else None
-            p_yes = float(p_yes)
-            m["bets"].append(evaluate_bet_decimal(
-                "BTTS", "Both Teams Score: Yes", pr["yes"], p_yes, fair_yes,
-                bankroll, kelly_fraction))
-            m["bets"].append(evaluate_bet_decimal(
-                "BTTS", "Both Teams Score: No", pr["no"], 1.0 - p_yes, fair_no,
-                bankroll, kelly_fraction))
-            m["btts_book"] = pr.get("book")
-        except Exception:  # noqa: BLE001 — one bad game never breaks the slate
-            continue
 
 
 def _cons_code(market: str, selection: str, home: str, away: str):

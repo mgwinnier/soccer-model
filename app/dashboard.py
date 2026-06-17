@@ -442,8 +442,11 @@ def render_match(m: dict, live: dict | None = None, min_ev: float = 0.03,
                        "positive only when **Model > Break-even**.")
             if "BTTS" in by_market:
                 book = m.get("btts_book") or "book"
+                src = m.get("btts_source")
+                tag = ("pre-match · best of US books" if src == "actionnetwork"
+                       else "settled/closing" if src == "thestatsapi" else "line")
                 market_table("Both Teams To Score", by_market["BTTS"], m=m,
-                             key_note=f"Line: {book} (closing). **Model** = market-independent "
+                             key_note=f"Line: {book} · {tag}. **Model** = market-independent "
                                       f"P(both teams score), calibrated to historical results.")
             else:
                 st.markdown(f"**Both Teams To Score** — model **{_pct(a['btts'])}** "

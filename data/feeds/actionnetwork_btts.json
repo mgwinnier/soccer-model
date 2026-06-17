@@ -1,0 +1,163 @@
+{
+ "source": "actionnetwork",
+ "league": "worldcup",
+ "generated_at": "2026-06-17T14:49:03Z",
+ "games": [
+  {
+   "game_id": 287931,
+   "start_time": "2026-06-17T17:00:00.000Z",
+   "status": "scheduled",
+   "home": "Portugal",
+   "away": "DR Congo",
+   "btts": {
+    "DraftKings": {
+     "yes": 145,
+     "no": -194
+    },
+    "FanDuel": {
+     "yes": 115,
+     "no": -154
+    },
+    "BetMGM": {
+     "yes": 138,
+     "no": -179
+    },
+    "Caesars": {
+     "yes": 145,
+     "no": -185
+    },
+    "PointsBet": {
+     "yes": 128,
+     "no": -164
+    },
+    "Bet365": {
+     "yes": 150,
+     "no": -200
+    }
+   },
+   "btts_best": {
+    "yes": 150,
+    "yes_book": "Bet365",
+    "no": -154,
+    "no_book": "FanDuel"
+   }
+  },
+  {
+   "game_id": 284366,
+   "start_time": "2026-06-17T20:00:00.000Z",
+   "status": "scheduled",
+   "home": "England",
+   "away": "Croatia",
+   "btts": {
+    "DraftKings": {
+     "yes": -104,
+     "no": -123
+    },
+    "FanDuel": {
+     "yes": -108,
+     "no": -127
+    },
+    "BetMGM": {
+     "yes": 104,
+     "no": -132
+    },
+    "Caesars": {
+     "yes": -105,
+     "no": -120
+    },
+    "PointsBet": {
+     "yes": -104,
+     "no": -122
+    },
+    "Bet365": {
+     "yes": 100,
+     "no": -135
+    }
+   },
+   "btts_best": {
+    "yes": 104,
+    "yes_book": "BetMGM",
+    "no": -120,
+    "no_book": "Caesars"
+   }
+  },
+  {
+   "game_id": 284367,
+   "start_time": "2026-06-17T23:00:00.000Z",
+   "status": "scheduled",
+   "home": "Ghana",
+   "away": "Panama",
+   "btts": {
+    "DraftKings": {
+     "yes": -102,
+     "no": -127
+    },
+    "FanDuel": {
+     "yes": -112,
+     "no": -125
+    },
+    "BetMGM": {
+     "yes": 106,
+     "no": -136
+    },
+    "Caesars": {
+     "yes": -105,
+     "no": -120
+    },
+    "PointsBet": {
+     "yes": -102,
+     "no": -124
+    },
+    "Bet365": {
+     "yes": 100,
+     "no": -130
+    }
+   },
+   "btts_best": {
+    "yes": 106,
+    "yes_book": "BetMGM",
+    "no": -120,
+    "no_book": "Caesars"
+   }
+  },
+  {
+   "game_id": 284368,
+   "start_time": "2026-06-18T02:00:00.000Z",
+   "status": "scheduled",
+   "home": "Uzbekistan",
+   "away": "Colombia",
+   "btts": {
+    "DraftKings": {
+     "yes": 123,
+     "no": -162
+    },
+    "FanDuel": {
+     "yes": 115,
+     "no": -152
+    },
+    "BetMGM": {
+     "yes": 126,
+     "no": -162
+    },
+    "Caesars": {
+     "yes": 125,
+     "no": -160
+    },
+    "PointsBet": {
+     "yes": 122,
+     "no": -156
+    },
+    "Bet365": {
+     "yes": 125,
+     "no": -165
+    }
+   },
+   "btts_best": {
+    "yes": 126,
+    "yes_book": "BetMGM",
+    "no": -152,
+    "no_book": "FanDuel"
+   }
+  }
+ ]
+}
