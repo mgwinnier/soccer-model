@@ -156,10 +156,21 @@ def _bootstrap_roi(pnl: np.ndarray, n: int = 2000, seed: int = 0):
     return float(pnl.mean()), float(np.percentile(rois, 2.5)), float(np.percentile(rois, 97.5))
 
 
-def _grade_block(test: pd.DataFrame, bias: MarketBias, min_ev: float):
+def _grade_block(test: pd.DataFrame, bias: MarketBias, min_ev: float,
+                 min_prob_edge: float = 0.0, max_decimal: float | None = None):
     adj = np.array([bias.recenter(t, p) for t, p in zip(test["type"], test["model_p"])])
-    ev = adj * (test["dec"].to_numpy() - 1) - (1 - adj)
-    sel = test[ev >= min_ev].copy()
+    dec = test["dec"].to_numpy()
+    ev = adj * (dec - 1) - (1 - adj)
+    if min_prob_edge or max_decimal:
+        # mirror the deployed bet gate (prob-edge floor + longshot cap)
+        from ..predict.betting import qualifies
+        fair = (test["fair_p"].to_numpy() if "fair_p" in test.columns
+                else np.full(len(test), np.nan))
+        keep = np.array([qualifies(a, (f if f == f else None), d, min_ev, min_prob_edge,
+                                   max_decimal) for a, f, d in zip(adj, fair, dec)])
+    else:
+        keep = ev >= min_ev
+    sel = test[keep].copy()
     if sel.empty:
         return None
     pnl = np.where(sel["result"] == "push", 0.0,
@@ -230,18 +241,20 @@ def wc2022_report(cfg: dict | None = None, min_ev: float = 0.03,
     tournament). OVERALL + by-market ROI with bootstrap CI → reports/wc2022_backtest.csv.
     For the dashboard's Performance page — a WC app should show WC results."""
     cfg = cfg or load_config()
-    preds = build_predictions(cfg, anchor_w=0.5, split=split)
+    # Mirror the DEPLOYED model: market-INDEPENDENT (no anchoring, no market-bias
+    # recentering) + the WC goals correction (applied inside build_predictions for
+    # fifa.world) + the deployed bet gate (prob-edge floor + longshot cap).
+    preds = build_predictions(cfg, anchor_w=1.0, split=split)
     if preds.empty:
         print("[wc2022] no predictions — harvest odds first")
         return {}
-    train = preds[preds["date"] < pd.Timestamp(split)]
-    bias = fit_market_bias(train["type"], train["model_p"], train["fair_p"])
+    bias = MarketBias({})            # no recentering — the model is market-independent
     wc = preds[(preds["league"] == "fifa.world")
                & (preds["date"].dt.year == 2022)
                & (preds["date"] >= pd.Timestamp(split))].copy()
-    out = {"overall": _grade_block(wc, bias, min_ev), "by_market": {}}
+    out = {"overall": _grade_block(wc, bias, min_ev, 0.02, 6.0), "by_market": {}}
     for mk, g in wc.groupby("market"):
-        r = _grade_block(g, bias, min_ev)
+        r = _grade_block(g, bias, min_ev, 0.02, 6.0)
         if r:
             out["by_market"][mk] = r
     if write:
