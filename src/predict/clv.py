@@ -167,6 +167,8 @@ def backfill(start: str = "2026-06-11", end: str | None = None, min_ev: float = 
         if probs is None:
             continue
         lam, mu = pred.dc.expected_goals(home, away, neutral)
+        from ..models.wc_goals import correct as _wc_correct
+        lam, mu = _wc_correct(lam, mu)             # WC goals correction (deployed parity)
         mat = pred.dc.scoreline_matrix(lam, mu)
         hs, as_ = int(ev["home_score"]), int(ev["away_score"])
         mdate = pd.to_datetime(ev["date"])
