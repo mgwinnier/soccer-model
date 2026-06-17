@@ -266,11 +266,18 @@ def wc2022_report(cfg: dict | None = None, min_ev: float = 0.03,
     wc = preds[(preds["league"] == "fifa.world")
                & (preds["date"].dt.year == 2022)
                & (preds["date"] >= pd.Timestamp(split))].copy()
-    out = {"overall": _grade_block(wc, bias, min_ev, 0.02, 6.0, kelly_frac=0.25),
+    # OVERALL reflects only the segments the deployed model actually bets (any in the
+    # gate's disabled set are excluded). Spreads are enabled again, so OVERALL now
+    # includes them. Each row is flagged with whether its segment is live.
+    from ..models.segment_gate import load_gate
+    disabled = load_gate(cfg).disabled_set()
+    bet_rows = wc[~wc["type"].isin(disabled)]
+    out = {"overall": _grade_block(bet_rows, bias, min_ev, 0.02, 6.0, kelly_frac=0.25),
            "by_market": {}}
     for mk, g in wc.groupby("market"):
         r = _grade_block(g, bias, min_ev, 0.02, 6.0, kelly_frac=0.25)
         if r:
+            r["deployed"] = bool((~g["type"].isin(disabled)).any())
             out["by_market"][mk] = r
     if write:
         ensure_dirs(cfg)

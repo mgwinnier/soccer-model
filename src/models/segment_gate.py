@@ -20,11 +20,13 @@ from pathlib import Path
 
 from ..config import load_config, path_for
 
-# Segments off out of the gate, regardless of CLV history.
-DEFAULT_DISABLED = {
-    "SP:home": "spread disabled by default — no demonstrated edge (v5/v6)",
-    "SP:away": "spread disabled by default — no demonstrated edge (v5/v6)",
-}
+# Segments off out of the gate, regardless of CLV history. (Empty by default.)
+# Spreads were disabled under the old market-ANCHORED pipeline (v5/v6). Re-evaluated on
+# the large out-of-sample international set with the current market-INDEPENDENT model +
+# gate, spreads are ~break-even (about -0.3% ROI over ~1,460 bets, 95% CI straddling 0) —
+# not a proven loser — so they're re-enabled. The CLV kill-switch still disables any
+# segment that goes meaningfully negative on a forward sample.
+DEFAULT_DISABLED: dict[str, str] = {}
 
 
 def segment_from_code(code: str) -> str:

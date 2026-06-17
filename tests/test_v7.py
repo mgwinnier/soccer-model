@@ -155,11 +155,20 @@ def test_2018_group_a_needs_are_leak_free(motivation):
 
 
 # ------------------------------------------ Component 3: CLV kill-switches
-def test_spreads_disabled_by_default():
+def test_no_segments_disabled_by_default():
+    # Spreads were re-enabled after re-evaluating them as ~break-even on the large
+    # out-of-sample set under the market-independent model. Nothing is off by default.
     gate = SegmentGate({})
-    assert gate.is_disabled("SP:home") and gate.is_disabled("SP:away")
+    assert not gate.is_disabled("SP:home")
     assert not gate.is_disabled("MR:H")
-    assert {"SP:home", "SP:away"} <= gate.disabled_set()
+    assert gate.disabled_set() == set()
+
+
+def test_kill_switch_disables_a_segment():
+    # the CLV kill-switch mechanism still disables an explicitly-killed segment
+    gate = SegmentGate({"TG:under": {"reason": "neg CLV", "n": 40}})
+    assert gate.is_disabled("TG:under")
+    assert "TG:under" in gate.disabled_set()
 
 
 def test_segment_from_code():
