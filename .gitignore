@@ -14,10 +14,9 @@ data/raw/odds/
 data/raw/thestatsapi/
 data/raw/odds_feed/
 
-# Tracker: COMMIT the settled ledger (the backfilled tournament record persists on
-# the hosted site, which has an ephemeral filesystem). Open/pending tickets stay
-# local — they accumulate live per-session on the site.
-reports/clv_open.csv
+# Tracker: COMMIT both the open tickets and the settled ledger. The scheduled CLV
+# job (.github/workflows/clv-sync.yml) grades + snapshots and commits them every ~2h,
+# so the hosted site (ephemeral filesystem) self-updates without a manual step.
 
 # python
 __pycache__/
