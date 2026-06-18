@@ -1482,6 +1482,41 @@ def _kelly_units(df: pd.DataFrame, frac: float, cap_u: float = 2.0):
     return stake, pnl
 
 
+def _equity_curve(df, kelly: float, height: int = 240):
+    """Clean daily cumulative-units curve for any settled-bet frame (needs ``pnl_u`` + a date col).
+    One point per day so the line steps smoothly; seeded at 0; green up / red down."""
+    if not (len(df) and "pnl_u" in df.columns):
+        return
+    d2 = df.copy()
+    when = d2["match_date"] if "match_date" in d2 else d2.get("graded_time")
+    d2["day"] = pd.to_datetime(when, errors="coerce").dt.normalize()
+    d2 = d2.dropna(subset=["day"])
+    if d2.empty:
+        return
+    daily = (d2.groupby("day", as_index=False)
+             .agg(net=("pnl_u", "sum"), bets=("pnl_u", "size")).sort_values("day"))
+    daily["cum_units"] = daily["net"].cumsum()
+    seed = pd.DataFrame({"day": [daily["day"].iloc[0] - pd.Timedelta(days=1)],
+                         "net": [0.0], "bets": [0], "cum_units": [0.0]})
+    daily = pd.concat([seed, daily], ignore_index=True)
+    col = GREEN if daily["cum_units"].iloc[-1] >= 0 else RED
+    base = alt.Chart(daily).encode(
+        x=alt.X("day:T", title=None, axis=alt.Axis(format="%b %d", grid=False)),
+        y=alt.Y("cum_units:Q", title=f"Cumulative units ({kelly:.2f}× Kelly)",
+                axis=alt.Axis(grid=True)))
+    area = base.mark_area(interpolate="monotone", line=False, opacity=0.16, color=col).encode(
+        y="cum_units:Q")
+    ln = base.mark_line(interpolate="monotone", strokeWidth=2.5, color=col).encode(
+        tooltip=[alt.Tooltip("day:T", title="Date", format="%b %d"),
+                 alt.Tooltip("cum_units:Q", title="Cumulative", format="+.1f"),
+                 alt.Tooltip("net:Q", title="Day net", format="+.1f"),
+                 alt.Tooltip("bets:Q", title="Bets")])
+    pts = base.mark_point(size=34, filled=True, color=col, opacity=0.9).encode(y="cum_units:Q")
+    zero = alt.Chart(pd.DataFrame({"y": [0]})).mark_rule(
+        color=GREY, strokeDash=[4, 4]).encode(y="y")
+    st.altair_chart((zero + area + ln + pts).properties(height=height), use_container_width=True)
+
+
 def page_clv(min_ev=0.03, kelly=0.25):
     theme.hero("Live Tracker", f"Every +EV pick recorded at the offered price, then settled "
                f"vs the result and the closing line. Staked at {kelly:.2f}× Kelly, capped at 2u "
@@ -1538,38 +1573,7 @@ def page_clv(min_ev=0.03, kelly=0.25):
     ])
 
     # cumulative Kelly P&L over time — a clean daily equity curve ("how it's doing" at a glance).
-    # Aggregate to one point per day (many bets settle on the same date) so the line is a smooth
-    # step through time, not the intra-day zig-zag the per-bet version produced.
-    if len(settled) and "pnl_u" in settled.columns:
-        d2 = settled.copy()
-        when = d2["match_date"] if "match_date" in d2 else d2.get("graded_time")
-        d2["day"] = pd.to_datetime(when, errors="coerce").dt.normalize()
-        d2 = d2.dropna(subset=["day"])
-        daily = (d2.groupby("day", as_index=False)
-                 .agg(net=("pnl_u", "sum"), bets=("pnl_u", "size")).sort_values("day"))
-        daily["cum_units"] = daily["net"].cumsum()
-        # seed a zero baseline the day before the first settle so the curve starts at 0
-        seed = pd.DataFrame({"day": [daily["day"].iloc[0] - pd.Timedelta(days=1)],
-                             "net": [0.0], "bets": [0], "cum_units": [0.0]})
-        daily = pd.concat([seed, daily], ignore_index=True)
-        up = daily["cum_units"].iloc[-1] >= 0
-        col = GREEN if up else RED
-        base = alt.Chart(daily).encode(
-            x=alt.X("day:T", title=None, axis=alt.Axis(format="%b %d", grid=False)),
-            y=alt.Y("cum_units:Q", title=f"Cumulative units ({kelly:.2f}× Kelly)",
-                    axis=alt.Axis(grid=True)))
-        area = base.mark_area(interpolate="monotone", line=False, opacity=0.16, color=col).encode(
-            y="cum_units:Q")
-        ln = base.mark_line(interpolate="monotone", strokeWidth=2.5, color=col).encode(
-            tooltip=[alt.Tooltip("day:T", title="Date", format="%b %d"),
-                     alt.Tooltip("cum_units:Q", title="Cumulative", format="+.1f"),
-                     alt.Tooltip("net:Q", title="Day net", format="+.1f"),
-                     alt.Tooltip("bets:Q", title="Bets")])
-        pts = base.mark_point(size=34, filled=True, color=col, opacity=0.9).encode(y="cum_units:Q")
-        zero = alt.Chart(pd.DataFrame({"y": [0]})).mark_rule(
-            color=GREY, strokeDash=[4, 4]).encode(y="y")
-        st.altair_chart((zero + area + ln + pts).properties(height=240),
-                        use_container_width=True)
+    _equity_curve(settled, kelly)
 
     # tracked systems (e.g. the v8 pick'em candidate — forward, observational)
     if not settled.empty and "system" in settled.columns:
@@ -1619,6 +1623,7 @@ def page_clv(min_ev=0.03, kelly=0.25):
                 {"label": "ROI", "value": f"{broi*100:+.1f}%", "accent": bcol,
                  "value_color": bcol},
             ])
+            _equity_curve(bb, kelly, height=200)
             cols = [c for c in ["match_date", "match", "market", "selection", "american",
                                 "model_p", "result", "stake_u", "pnl_u"] if c in bb.columns]
             st.dataframe(bb[cols].iloc[::-1], hide_index=True, use_container_width=True)
