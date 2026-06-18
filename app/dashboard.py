@@ -849,20 +849,34 @@ def _brief_facts(m: dict) -> dict:
     return f
 
 
-def get_match_brief(facts: dict, cache_key: str):
-    """Grounded brief for a match, cached per-session on SUCCESS only. Keyed on the MATCH
-    (``cache_key`` = game_id), NOT on the facts content — so live drift in EV/odds/lineups across
-    reruns and the auto-refresh doesn't keep re-calling Gemini. A transient error/no-key never
-    sticks (retried next time). Returns {"summary"/"text","angles","sources"} | {"error"} | None."""
+class _BriefError(Exception):
+    """Carries a failed/empty brief result out of the cached call WITHOUT letting
+    ``st.cache_data`` store it — raising means the failure isn't cached and we retry next time."""
+    def __init__(self, res):
+        self.res = res
+
+
+@st.cache_data(show_spinner=False)
+def _brief_cached(cache_key: str, _facts: dict):
+    """Run the Gemini brief ONCE per match, cached across ALL sessions/reruns (survives page
+    reloads and other viewers — recomputed only on app reboot). Keyed on ``cache_key`` (game_id)
+    only; ``_facts`` is underscore-prefixed so Streamlit doesn't hash it, so live drift in
+    EV/odds/lineups never busts the cache. Raises ``_BriefError`` on a no-text result so transient
+    errors / missing-key are NOT cached and get retried."""
     from src.ai import match_brief as mb
-    skey = "brief_cache_" + str(cache_key)
-    cached = st.session_state.get(skey)
-    if cached:
-        return cached
-    res = mb.brief(facts)
-    if res and res.get("text"):                 # only persist a real brief; retry on error
-        st.session_state[skey] = res
+    res = mb.brief(_facts)
+    if not (res and res.get("text")):
+        raise _BriefError(res)
     return res
+
+
+def get_match_brief(facts: dict, cache_key: str):
+    """Grounded brief for a match, cached cross-session on SUCCESS only (see ``_brief_cached``).
+    Returns {"summary"/"text","angles","sources"} | {"error"} | None."""
+    try:
+        return _brief_cached(str(cache_key), facts)
+    except _BriefError as e:                     # transient error/no-key — not cached, retried
+        return e.res
 
 
 def _kalshi_alert_block(m: dict):
