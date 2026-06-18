@@ -587,7 +587,7 @@ def market_table(title: str, bets: list, key_note: str | None = None, m: dict | 
     from src.predict.betting import expected_value
     st.markdown(f"**{title}**")
     if angle:
-        tone = {"support": GREEN, "undercut": RED, "neutral": MUTED}.get(angle.get("read"), MUTED)
+        tone = {"support": GREEN, "undercut": RED, "neutral": GREY}.get(angle.get("read"), GREY)
         st.markdown(f'<div class="angle-note">AI · <b style="color:{tone}">'
                     f'{angle.get("read", "neutral")}</b>: {angle.get("why", "")}</div>',
                     unsafe_allow_html=True)
