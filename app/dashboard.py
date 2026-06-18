@@ -824,7 +824,9 @@ def _brief_facts(m: dict) -> dict:
     if sig:
         f["Variance"] = (f"upset risk {sig.get('upset_risk', 0)*100:.0f}%, shootout "
                          f"{sig.get('shootout_potential', 0)*100:.0f}%, expected total "
-                         f"{sig.get('expected_total', eg[0]+eg[1]):.1f}")
+                         f"{sig.get('expected_total', eg[0]+eg[1]):.1f}"
+                         + (f", draw likely {sig.get('draw_risk', 0)*100:.0f}% "
+                            "(these draw ~32% historically)" if sig.get("high_draw") else ""))
     cands = _qualifying_bets(m, min_ev=0.03, min_prob_edge=0.02)
     if cands:
         cands = sorted(cands, key=lambda x: x.ev, reverse=True)
@@ -939,9 +941,16 @@ def render_match(m: dict, live: dict | None = None, min_ev: float = 0.03,
         if sp is not None:
             chips.append(theme.pill(f"High-scoring {sp * 100:.0f}%",
                                     "gold" if sig.get("high_scoring") else "grey"))
+        dr = sig.get("draw_risk")
+        if dr is not None:
+            chips.append(theme.pill(f"Draw likely {dr * 100:.0f}%",
+                                    "gold" if sig.get("high_draw") else "grey"))
         if chips:
             st.markdown('<div style="margin:2px 0 8px">' + " ".join(chips) + '</div>',
                         unsafe_allow_html=True)
+            if sig.get("high_draw"):
+                st.caption("Draws are never the favourite, but this isn't noise: matches the model flags "
+                           "≥28% draw historically drew ~32% (vs a ~23% base). Descriptive, not a bet.")
         best_bet_block(m, min_ev, min_prob_edge)
         _kalshi_alert_block(m)
 

@@ -241,6 +241,9 @@ def _variance_signals(blend, p_over_35, expected_total) -> dict:
         # convenience flags for "show me the wild games"
         "high_upset": bool(underdog_win >= 0.30),
         "high_scoring": bool(sp is not None and sp >= 0.30),
+        # P(draw) is a real monotonic signal: backtested, matches the model flags ≥28% drew
+        # ~31–32% (vs a ~23% base), so a high draw prob genuinely means a draw is more likely.
+        "high_draw": bool(pD >= 0.28),
     }
 
 

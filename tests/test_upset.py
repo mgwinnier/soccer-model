@@ -25,6 +25,13 @@ def test_variance_signals_bounded():
     assert isinstance(s["high_upset"], bool) and isinstance(s["high_scoring"], bool)
 
 
+def test_high_draw_flag():
+    # draw_risk = pD; high_draw fires at >= 0.28 (validated cut)
+    assert _variance_signals(np.array([0.36, 0.30, 0.34]), 0.3, 2.5)["high_draw"] is True
+    assert _variance_signals(np.array([0.60, 0.22, 0.18]), 0.3, 2.5)["high_draw"] is False
+    assert _variance_signals(np.array([0.40, 0.30, 0.30]), 0.3, 2.5)["draw_risk"] == 0.30
+
+
 def test_competitiveness_higher_for_closer_game():
     close = _variance_signals(np.array([0.34, 0.33, 0.33]), 0.3, 2.5)["competitiveness"]
     lop = _variance_signals(np.array([0.85, 0.1, 0.05]), 0.3, 2.5)["competitiveness"]
