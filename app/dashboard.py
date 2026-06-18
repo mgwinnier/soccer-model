@@ -86,6 +86,16 @@ CFG = load_config()
 GREEN, GREY, RED, GOLD = theme.GREEN, theme.MUTED, theme.RED, theme.GOLD
 
 
+def _bet_units(b) -> float:
+    """Recommended stake (units, 1u = 1% bankroll) for a BetEval — disciplined sizing that leaves the
+    well-calibrated bulk as capped quarter-Kelly and down-weights longshots (src/predict/staking.py).
+    The Kelly fraction is recovered from the bet so we don't thread it through every call site."""
+    from src.predict import staking
+    kfull = getattr(b, "kelly_full", 0.0) or 0.0
+    frac = (b.kelly_used / kfull) if kfull else 0.25
+    return staking.recommended_units(b.model_p, getattr(b, "fair_p", None), b.decimal, frac=frac)
+
+
 # ----------------------------------------------------------------- loaders
 @st.cache_resource(show_spinner="Fitting models (one-time)…")
 def get_predictor() -> MatchPredictor:
@@ -588,7 +598,7 @@ def market_table(title: str, bets: list, key_note: str | None = None, m: dict | 
            if (m and _match_not_started(m)) else None)
     rows = []
     for b in bets:
-        units = min(b.kelly_used * 100, 2.0)  # 1 unit = 1% of bankroll; capped at 2u/bet
+        units = _bet_units(b)
         row = {
             "Selection": b.selection,
             "Model": _pct(b.model_p),
@@ -724,8 +734,11 @@ def best_bet_block(m: dict, min_ev: float = 0.03, min_prob_edge: float = 0.02):
                     '<span style="color:#969aa6">no edge here — pass</span></div>',
                     unsafe_allow_html=True)
         return
-    b = max(cands, key=lambda x: x.ev)
-    units = min(b.kelly_used * 100, 2.0)         # capped at 2u/bet (2% of bankroll)
+    # Pick by EDGE (model − market), not raw EV: EV on a long price explodes from a tiny prob gap and
+    # keeps surfacing longshots (39% hit-rate). Edge = the real disagreement → near-even, ~57% picks.
+    b = max(cands, key=lambda x: ((x.edge if x.edge is not None else (x.model_p - (x.fair_p or x.model_p))),
+                                  x.ev))
+    units = _bet_units(b)
     cons = (m.get("cons_edge") or {}).get(b.selection)
     cons_txt = ""
     if cons is not None:
@@ -1082,8 +1095,14 @@ def page_value_board(bankroll, kelly, min_ev, max_exposure, min_prob_edge=0.02, 
         theme.callout("No bets clear the EV threshold for this window.", "info")
         theme.footer()
         return
-    bb = value_mod.cap_exposure(bb, bankroll, max_fraction=max_exposure)
-    bb["units"] = bb["stake"] / (bankroll / 100.0)   # 1 unit = 1% of bankroll
+    # disciplined sizing (longshots down-weighted), then scale to the max-exposure cap
+    from src.predict import staking as _stk
+    from src.data.odds import american_to_decimal as _a2d
+    bb["units"] = bb.apply(lambda r: _stk.recommended_units(
+        r.get("model_p"), r.get("fair_p"), _a2d(r.get("american")), frac=kelly), axis=1)
+    _tot, _cap = bb["units"].sum(), max_exposure * 100.0
+    if _tot > _cap and _tot > 0:
+        bb["units"] = (bb["units"] * _cap / _tot).round(2)
     show = bb.copy()
     show["model"] = (show["model_p"] * 100).round(0).astype(int).astype(str) + "%"
     show["vegas"] = (show["fair_p"] * 100).round(0).astype(int).astype(str) + "%"
@@ -1208,6 +1227,10 @@ def page_tournament():
             if c in show:
                 show[c] = (show[c] * 100).round(1)
         st.dataframe(show, use_container_width=True, hide_index=True)
+        theme.note("Stakes are quarter-Kelly capped at 2u — but <b>longshots (≈4.5+ odds) are "
+                   "down-weighted</b> because the model overrates the tail (5.0+ picks win ~7.8% vs the "
+                   "~11.8% it expects, so they size toward 0). Favourites & pickems are unchanged. "
+                   "Suggestions, not advice.")
     theme.footer()
 
 
@@ -1444,12 +1467,14 @@ def _kelly_units(df: pd.DataFrame, frac: float, cap_u: float = 2.0):
     Stake = min(Kelly_fraction(model_p, decimal) · frac · 100, ``cap_u``). The cap keeps any
     single high-edge/longshot pick from demanding a wild stake — disciplined bankroll management,
     not raw Kelly (which can ask for 8–10% on a big-edge dog)."""
-    from src.predict.betting import kelly_fraction
+    from src.predict import staking
     mp = pd.to_numeric(df["model_p"], errors="coerce").to_numpy()
     dec = pd.to_numeric(df["decimal"], errors="coerce").to_numpy()
-    kf = np.array([kelly_fraction(p, d) if (pd.notna(p) and pd.notna(d) and d > 1) else 0.0
-                   for p, d in zip(mp, dec)])
-    stake = np.minimum(kf * frac * 100.0, cap_u)         # cap per-bet exposure at cap_u units
+    fp = pd.to_numeric(df["fair_p"], errors="coerce").to_numpy() if "fair_p" in df else [None] * len(mp)
+    # disciplined sizing: capped quarter-Kelly, longshots down-weighted (src/predict/staking.py)
+    stake = np.array([staking.recommended_units(
+        p if pd.notna(p) else None, (f if (f is not None and pd.notna(f)) else None),
+        d if pd.notna(d) else None, frac=frac, cap_u=cap_u) for p, f, d in zip(mp, fp, dec)])
     dec_safe = np.nan_to_num(dec, nan=1.0)        # un-priceable rows get stake 0 anyway
     res = df["result"].to_numpy()
     pnl = np.where(res == "push", 0.0,
@@ -1571,9 +1596,11 @@ def page_clv(min_ev=0.03, kelly=0.25):
         s["_q"] = s.apply(lambda r: qualifies(r["model_p"], r["fair_p"], r["decimal"],
                                               0.03, 0.02, 6.0), axis=1)
         bb = s[s["_q"]].copy()
+        bb["_edge"] = bb["model_p"] - bb["fair_p"]       # rank by edge, not raw EV (avoids longshots)
         keycol = "game_id" if "game_id" in bb.columns else "match"
         if not bb.empty:
-            bb = bb.sort_values("ev", ascending=False).drop_duplicates(subset=[keycol], keep="first")
+            bb = (bb.sort_values(["_edge", "ev"], ascending=False)
+                  .drop_duplicates(subset=[keycol], keep="first"))
             bs, bp = _kelly_units(bb, kelly)
             bb = bb.assign(stake_u=bs.round(2), pnl_u=bp.round(2))
             bnet, bst = float(bp.sum()), float(bs.sum())
@@ -1657,7 +1684,7 @@ def _kalshi_signals(matches: list, mk: list, buy_edge: float, sell_edge: float, 
     """Scan every upcoming fixture's model bets (Match Result / Total / Spread / BTTS) against the
     live Kalshi book → BUY rows (model beats the ask) and SELL/fade rows (bid richer than model)."""
     from src.data import kalshi as kal
-    from src.predict.betting import kelly_fraction
+    from src.predict import staking
     buys, sells = [], []
     for m in matches:
         book = kal.match_book(m["home"], m["away"], markets=mk)
@@ -1678,7 +1705,8 @@ def _kalshi_signals(matches: list, mk: list, buy_edge: float, sell_edge: float, 
             sig = kal.signal(p, bid, ask, buy_edge, sell_edge)
             delta = (ask - prev) if (ask is not None and prev is not None) else None
             if sig["action"] == "BUY" and ask:
-                stake = min(kelly_fraction(p, 1.0 / ask) * kelly * 100.0, 2.0)
+                # disciplined sizing on the exchange decimal (1/ask); longshots down-weighted
+                stake = staking.recommended_units(p, None, 1.0 / ask, frac=kelly)
                 buys.append({"Kickoff": ko, "Match": match, "Market": b.market, "Pick": b.selection,
                              "Model": p, "Ask": ask, "Edge": p - ask, "EV": sig["ev_buy"],
                              "Δ": delta, "Stake": stake})
