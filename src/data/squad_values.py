@@ -21,6 +21,7 @@ def _norm(s: str | None) -> str:
     if not s:
         return ""
     s = "".join(c for c in unicodedata.normalize("NFKD", s) if not unicodedata.combining(c))
+    s = s.replace("&", " and ")  # "Bosnia & Herzegovina" == "Bosnia and Herzegovina"
     return " ".join(s.lower().split())
 
 
