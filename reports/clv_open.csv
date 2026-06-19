@@ -41,4 +41,5 @@ game_id,match_date,match,market,code,segment,system,selection,american,decimal,m
 760452,2026-06-22,New Zealand v Egypt,Match Result,H,MR:H,,New Zealand,450.0,5.5,0.2461,0.1743967408335945,0.3535,2026-06-19T05:06:25Z
 760452,2026-06-22,New Zealand v Egypt,Match Result,D,MR:D,,Draw,320.0,4.2,0.2929,0.2283766844249451,0.2302,2026-06-19T05:06:25Z
 760452,2026-06-22,New Zealand v Egypt,Spread,cover_home@0.5,SP:home,,New Zealand +0.5,135.0,2.35,0.5371,0.4032860343539955,0.2622,2026-06-19T05:06:25Z
-760445,2026-06-19,Scotland v Morocco,Spread,cover_home@0.5,SP:home,,Scotland +0.5,+120,2.2,0.4733,0.42785234899328856,0.0413,2026-06-19T10:50:19Z
+760445,2026-06-19,Scotland v Morocco,Spread,cover_home@0.5,SP:home,,Scotland +0.5,120.0,2.2,0.4733,0.4278523489932885,0.0413,2026-06-19T10:50:19Z
+760446,2026-06-21,Ecuador v Curaçao,Match Result,A,MR:A,,Curaçao,+2500,26.0,0.0422,0.036883282771834586,0.0984,2026-06-19T15:35:43Z
