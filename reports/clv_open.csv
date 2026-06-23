@@ -1,12 +1,6 @@
 game_id,match_date,match,market,code,segment,system,selection,american,decimal,model_p,fair_p,ev,snapshot_time
 760443,2026-06-20,Turkey v Paraguay,Match Result,A,MR:A,,Paraguay,320.0,4.2,0.2802,0.2279714790344737,0.1767,2026-06-17T17:00:06Z
 760443,2026-06-20,Turkey v Paraguay,Total Goals,over@2.5,TG:over,,Over 2.5,110.0,2.1,0.533,0.4532304725168756,0.1193,2026-06-17T17:00:06Z
-760461,2026-06-23,Portugal v Uzbekistan,Match Result,D,MR:D,,Draw,600.0,7.0,0.2286,0.1373134328358209,0.6,2026-06-21T05:02:37Z
-760461,2026-06-23,Portugal v Uzbekistan,Match Result,A,MR:A,,Uzbekistan,1300.0,14.0,0.1351,0.0686567164179104,0.8917,2026-06-21T05:02:37Z
-760461,2026-06-23,Portugal v Uzbekistan,Total Goals,under@2.5,TG:under,,Under 2.5,135.0,2.35,0.5154,0.4032860343539955,0.2112,2026-06-21T05:02:37Z
-760461,2026-06-23,Portugal v Uzbekistan,Spread,cover_away@-1.5,SP:away,,Uzbekistan +1.5,120.0,2.2,0.5986,0.4278523489932885,0.3169,2026-06-21T05:02:37Z
-760461,2026-06-23,Portugal v Uzbekistan,BTTS,btts_yes,BTTS:yes,,Both Teams Score: Yes,135.0,2.35,0.4455,0.4210710229754521,0.0469,2026-06-21T05:02:37Z
-760458,2026-06-23,England v Ghana,Total Goals,under@2.5,TG:under,,Under 2.5,125.0,2.25,0.467,0.4223602484472049,0.0508,2026-06-21T05:02:37Z
 760460,2026-06-23,Panama v Croatia,Match Result,H,MR:H,,Panama,550.0,6.5,0.1678,0.1469580254676938,0.0907,2026-06-21T05:02:37Z
 760460,2026-06-23,Panama v Croatia,Total Goals,over@2.5,TG:over,,Over 2.5,-115.0,1.869565217391304,0.6261,0.5052301255230126,0.1705,2026-06-21T05:02:37Z
 760459,2026-06-24,Colombia v DR Congo,BTTS,btts_yes,BTTS:yes,,Both Teams Score: Yes,138.0,2.38,0.4455,0.4012937230474365,0.0603,2026-06-21T05:02:37Z
@@ -31,8 +25,6 @@ game_id,match_date,match,market,code,segment,system,selection,american,decimal,m
 760466,2026-06-25,South Africa v South Korea,Spread,cover_home@0.5,SP:home,,South Africa +0.5,130.0,2.3,0.4733,0.4111714507370054,0.0886,2026-06-22T05:11:23Z
 760460,2026-06-23,Panama v Croatia,Spread,cover_away@1.5,SP:away,,Croatia -1.5,155.0,2.55,0.454,0.372357210476491,0.1577,2026-06-22T12:19:06Z
 760464,2026-06-24,Morocco v Haiti,BTTS,btts_yes,BTTS:yes,,Both Teams Score: Yes,155.0,2.55,0.4057,0.3952569169960474,0.0345,2026-06-22T18:15:31Z
-760461,2026-06-23,Portugal v Uzbekistan,Total Goals,under@3.5,TG:under,,Under 3.5,-170.0,1.5882352941176472,0.7227,0.5967139656460044,0.1478,2026-06-23T04:08:38Z
-760461,2026-06-23,Portugal v Uzbekistan,Spread,cover_away@-2.5,SP:away,,Uzbekistan +2.5,-170.0,1.5882352941176472,0.806,0.5967139656460044,0.2801,2026-06-23T04:08:38Z
 760473,2026-06-25,Curaçao v Ivory Coast,Match Result,H,MR:H,,Curaçao,1700.0,18.0,0.1069,0.0534255185417976,0.9246,2026-06-23T04:08:38Z
 760473,2026-06-25,Curaçao v Ivory Coast,Match Result,D,MR:D,,Draw,750.0,8.5,0.1668,0.1131363922061596,0.4178,2026-06-23T04:08:38Z
 760473,2026-06-25,Curaçao v Ivory Coast,Spread,cover_home@2.5,SP:home,,Curaçao +2.5,-160.0,1.625,0.6479,0.5806451612903226,0.0528,2026-06-23T04:08:38Z
@@ -58,8 +50,8 @@ game_id,match_date,match,market,code,segment,system,selection,american,decimal,m
 760470,2026-06-26,Turkey v United States,Total Goals,over@2.5,TG:over,,Over 2.5,-135.0,1.7407407407407407,0.661,0.5467695274831245,0.1506,2026-06-23T04:08:38Z
 760470,2026-06-26,Turkey v United States,Spread,cover_home@0.5,SP:home,,Turkey +0.5,-115.0,1.869565217391304,0.6852,0.5,0.281,2026-06-23T04:08:38Z
 760462,2026-06-24,Bosnia and Herzegovina v Qatar,BTTS,btts_no,BTTS:no,,Both Teams Score: No,-102.0,1.9803921568627447,0.5237,0.5086353685234736,0.0371,2026-06-23T09:57:14Z
-760458,2026-06-23,England v Ghana,Spread,cover_away@-2.5,SP:away,,Ghana +2.5,-175.0,1.5714285714285714,0.6574,0.599271402550091,0.0331,2026-06-23T12:42:25Z
-760458,2026-06-23,England v Ghana,BTTS,btts_yes,BTTS:yes,,Both Teams Score: Yes,155.0,2.55,0.4057,0.3939962476547843,0.0345,2026-06-23T12:42:25Z
 760466,2026-06-25,South Africa v South Korea,Match Result,A,MR:A,,South Korea,-140.0,1.7142857142857144,0.6019,0.5592446565677526,0.0318,2026-06-23T12:42:25Z
 760469,2026-06-26,Paraguay v Australia,BTTS,btts_yes,BTTS:yes,,Both Teams Score: Yes,144.0,2.44,0.4455,0.425402613187481,0.087,2026-06-23T12:42:25Z
 760460,2026-06-23,Panama v Croatia,BTTS,btts_no,BTTS:no,,Both Teams Score: No,100.0,2.0,0.5237,0.5073891625615764,0.0474,2026-06-23T16:30:25Z
+760458,2026-06-23,England v Ghana,Match Result,D,MR:D,,Draw,650.0,7.5,0.1401,0.12796062749923098,0.0507,2026-06-23T23:13:45Z
+760460,2026-06-23,Panama v Croatia,Match Result,D,MR:D,,Draw,360.0,4.6,0.2313,0.20842240273621207,0.0641,2026-06-23T23:13:45Z
