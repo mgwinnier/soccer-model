@@ -1560,6 +1560,14 @@ def page_clv(min_ev=0.03, kelly=0.25):
     # read FRESH (not via cached load_csv — the tracker writes to these during the session)
     led = _read_fresh(clv._ledger_path(CFG))
     op = _read_fresh(clv._open_path(CFG))
+    # BTTS is suggestion-only — drop any historic/backfilled BTTS rows so it has no
+    # record, equity, best-bets, or pending presence on the tracker (it's shown as a
+    # model angle on the match cards instead).
+    suggest_only = value_mod.SUGGESTION_ONLY_MARKETS
+    if not led.empty and "market" in led.columns:
+        led = led[~led["market"].isin(suggest_only)]
+    if not op.empty and "market" in op.columns:
+        op = op[~op["market"].isin(suggest_only)]
     if not led.empty:                       # only real, priced bets count as tracked
         led = led[pd.to_numeric(led["decimal"], errors="coerce").notna()]
         dedup_keys = [c for c in ["game_id", "market", "selection"] if c in led.columns]

@@ -24,7 +24,7 @@ import pandas as pd
 from ..config import load_config, path_for, ensure_dirs
 from ..data.odds import (fetch_espn_range, fetch_summary_odds, american_to_decimal)
 from ..models.segment_gate import segment_from_code, disabled_set
-from .value import build_bets
+from .value import build_bets, SUGGESTION_ONLY_MARKETS
 
 OPEN_COLS = ["game_id", "match_date", "match", "market", "code", "segment",
              "system", "selection", "american", "decimal", "model_p", "fair_p", "ev",
@@ -89,6 +89,8 @@ def snapshot(start: str | None = None, days: int = 3, min_ev: float = 0.03,
     rows = []
     for m in res["matches"]:
         for b in m["bets"]:
+            if b.market in SUGGESTION_ONLY_MARKETS:
+                continue   # suggestion-only (BTTS) — never logged as a tracked ticket
             if b.ev is None or pd.isna(b.ev) or b.ev < min_ev \
                     or b.decimal is None or pd.isna(b.decimal):
                 continue   # skip un-priced bets (odds nulled once a match kicks off)

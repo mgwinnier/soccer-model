@@ -22,6 +22,11 @@ from .betting import evaluate_bet
 
 VALUE_THRESHOLD = 0.05    # legacy edge flag (model prob − fair prob)
 
+# Markets shown as model *suggestions* on the match cards but never staked,
+# recommended on the Value Board, or recorded on the Live Tracker. BTTS keeps
+# getting smoked while the priced markets do well, so it earns no track record.
+SUGGESTION_ONLY_MARKETS = frozenset({"BTTS"})
+
 
 def _host_neutral(home: str) -> bool:
     from ..simulate.bracket_2026 import HOST_TEAMS
@@ -352,6 +357,8 @@ def best_bets(bets_df: pd.DataFrame, min_ev: float = 0.0,
     if bets_df.empty:
         return bets_df
     keep = bets_df.copy()
+    if "market" in keep.columns:                     # BTTS is suggestion-only, never recommended
+        keep = keep[~keep["market"].isin(SUGGESTION_ONLY_MARKETS)]
     if not include_disabled and "disabled" in keep.columns:
         keep = keep[~keep["disabled"].astype(bool)]
     if {"model_p", "decimal"}.issubset(keep.columns):
