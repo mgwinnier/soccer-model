@@ -592,6 +592,9 @@ def market_table(title: str, bets: list, key_note: str | None = None, m: dict | 
                     f'{angle.get("read", "neutral")}</b>: {angle.get("why", "")}</div>',
                     unsafe_allow_html=True)
     played = bool(m and m.get("played"))
+    # Suggestion-only markets (BTTS) are shown for information — model %, fair, EV vs the
+    # available prices — but never staked, so they carry no Stake column.
+    suggestion_only = bool(bets) and getattr(bets[0], "market", None) in value_mod.SUGGESTION_ONLY_MARKETS
     book = get_book_odds(m["home"], m["away"], str(m.get("date"))[:10]) if m else None
     # Kalshi book (Match Result / Total Goals / Spread / BTTS), only for not-yet-started games.
     kal = (get_kalshi_book(m["home"], m["away"])
@@ -614,7 +617,8 @@ def market_table(title: str, bets: list, key_note: str | None = None, m: dict | 
             kdec = _kalshi_dec(b, m, kal)
             row["Kalshi"] = (f"{1/kdec*100:.0f}¢" if kdec else "—")     # ask in cents ≈ implied %
             row["Kalshi EV"] = f"{expected_value(b.model_p, kdec)*100:+.0f}%" if kdec else "—"
-        row["Stake"] = f"{units:.1f}u" if units > 0.05 else "—"
+        if not suggestion_only:
+            row["Stake"] = f"{units:.1f}u" if units > 0.05 else "—"
         if played:
             row["Result"] = _GRADE_MARK.get(_grade_bet(b, m), "—")
         rows.append(row)
