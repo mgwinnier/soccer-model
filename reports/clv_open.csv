@@ -38,5 +38,7 @@ game_id,match_date,match,market,code,segment,system,selection,american,decimal,m
 760483,2026-06-28,Jordan v Argentina,Total Goals,over@2.5,TG:over,,Over 2.5,-165.0,1.606060606060606,0.6468,0.5940252776713904,0.0388,2026-06-25T04:11:58Z
 760477,2026-06-27,New Zealand v Belgium,Total Goals,under@3.5,TG:under,,Under 3.5,-135.0,1.7407407407407407,0.5926,0.5467695274831245,0.0316,2026-06-25T09:36:09Z
 760483,2026-06-28,Jordan v Argentina,Match Result,D,MR:D,,Draw,650.0,7.5,0.139,0.1282051282051282,0.0423,2026-06-25T09:36:09Z
-760474,2026-06-26,Senegal v Iraq,Total Goals,under@2.5,TG:under,,Under 2.5,+140,2.4,0.5653,0.3956834532374101,0.3567,2026-06-26T04:18:31Z
-760486,2026-06-28,South Africa v Canada,Spread,cover_home@0.5,SP:home,,South Africa +0.5,+120,2.2,0.4872,0.4310344827586206,0.0718,2026-06-26T04:18:31Z
+760474,2026-06-26,Senegal v Iraq,Total Goals,under@2.5,TG:under,,Under 2.5,140.0,2.4,0.5653,0.3956834532374101,0.3567,2026-06-26T04:18:31Z
+760486,2026-06-28,South Africa v Canada,Spread,cover_home@0.5,SP:home,,South Africa +0.5,120.0,2.2,0.4872,0.4310344827586206,0.0718,2026-06-26T04:18:31Z
+760479,2026-06-27,Uruguay v Spain,Spread,cover_home@0.5,SP:home,,Uruguay +0.5,+130,2.3,0.4733,0.40847201210287454,0.0886,2026-06-26T09:41:42Z
+760476,2026-06-27,Egypt v Iran,Total Goals,over@1.5,TG:over,,Over 1.5,-170,1.5882352941176472,0.652,0.6017699115044247,0.0355,2026-06-26T09:41:42Z
