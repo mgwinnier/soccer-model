@@ -264,3 +264,4 @@ game_id,match_date,match,market,code,segment,system,selection,american,decimal,m
 760493,2026-07-01,Belgium v Senegal,Match Result,A,MR:A,,Senegal,265.0,3.65,0.2838,0.2628994905048634,0.0358,2026-06-29T04:46:35Z,3-2,4.1,-0.1098,loss,-1.0,2026-07-01T23:21:42Z,
 760493,2026-07-01,Belgium v Senegal,Total Goals,over@2.5,TG:over,,Over 2.5,115.0,2.15,0.533,0.4400538841490795,0.146,2026-06-29T04:46:35Z,3-2,1.741,0.2351,win,1.15,2026-07-01T23:21:42Z,
 760493,2026-07-01,Belgium v Senegal,Spread,cover_away@-0.5,SP:away,,Senegal +0.5,-115.0,1.869565217391304,0.5688,0.5052301255230126,0.0634,2026-07-01T21:42:25Z,3-2,1.87,-0.0,loss,-1.0,2026-07-01T23:21:42Z,
+760494,2026-07-02,United States v Bosnia and Herzegovina,Total Goals,over@2.5,TG:over,,Over 2.5,-125.0,1.8,0.661,0.5263157894736842,0.1898,2026-06-29T04:46:35Z,2-0,1.625,0.1077,loss,-1.0,2026-07-02T04:08:38Z,

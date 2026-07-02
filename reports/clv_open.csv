@@ -1,7 +1,6 @@
 game_id,match_date,match,market,code,segment,system,selection,american,decimal,model_p,fair_p,ev,snapshot_time
 760443,2026-06-20,Turkey v Paraguay,Match Result,A,MR:A,,Paraguay,320.0,4.2,0.2802,0.2279714790344737,0.1767,2026-06-17T17:00:06Z
 760443,2026-06-20,Turkey v Paraguay,Total Goals,over@2.5,TG:over,,Over 2.5,110.0,2.1,0.533,0.4532304725168756,0.1193,2026-06-17T17:00:06Z
-760494,2026-07-02,United States v Bosnia and Herzegovina,Total Goals,over@2.5,TG:over,,Over 2.5,-125.0,1.8,0.661,0.5263157894736842,0.1898,2026-06-29T04:46:35Z
 760497,2026-07-02,Spain v Austria,Match Result,D,MR:D,,Draw,425.0,5.25,0.2051,0.183066361556064,0.077,2026-06-30T04:13:04Z
 760497,2026-07-02,Spain v Austria,Match Result,A,MR:A,,Austria,900.0,10.0,0.1071,0.0961098398169336,0.0711,2026-06-30T04:13:04Z
 760497,2026-07-02,Spain v Austria,Spread,cover_away@-1.5,SP:away,,Austria +1.5,-120.0,1.8333333333333333,0.6258,0.5157232704402516,0.1473,2026-06-30T04:13:04Z
@@ -16,3 +15,10 @@ game_id,match_date,match,market,code,segment,system,selection,american,decimal,m
 760501,2026-07-04,Colombia v Ghana,Match Result,H,MR:H,,Colombia,-190.0,1.526315789473684,0.7928,0.6288053505535055,0.21,2026-07-01T04:41:31Z
 760501,2026-07-04,Colombia v Ghana,Total Goals,over@2.5,TG:over,,Over 2.5,125.0,2.25,0.652,0.4223602484472049,0.467,2026-07-01T04:41:31Z
 760501,2026-07-04,Colombia v Ghana,Spread,cover_home@-1.5,SP:home,,Colombia -1.5,155.0,2.55,0.5714,0.372357210476491,0.4571,2026-07-01T04:41:31Z
+760502,2026-07-04,Canada v Morocco,Match Result,H,MR:H,,Canada,+390,4.9,0.2555,0.19713261648745517,0.2521,2026-07-02T04:08:38Z
+760502,2026-07-04,Canada v Morocco,Total Goals,under@2.5,TG:under,,Under 2.5,-160,1.625,0.6618,0.5859872611464968,0.0754,2026-07-02T04:08:38Z
+760502,2026-07-04,Canada v Morocco,Spread,cover_home@0.5,SP:home,,Canada +0.5,+105,2.05,0.5371,0.46324269889224573,0.1011,2026-07-02T04:08:38Z
+760503,2026-07-04,Paraguay v France,Match Result,H,MR:H,,Paraguay,+1800,19.0,0.1356,0.05025259239563945,1.5765,2026-07-02T04:08:38Z
+760503,2026-07-04,Paraguay v France,Match Result,D,MR:D,,Draw,600,7.0,0.2309,0.13639989364530708,0.6163,2026-07-02T04:08:38Z
+760503,2026-07-04,Paraguay v France,Total Goals,under@2.5,TG:under,,Under 2.5,+130,2.3,0.4786,0.41401273885350315,0.1008,2026-07-02T04:08:38Z
+760503,2026-07-04,Paraguay v France,Spread,cover_home@1.5,SP:home,,Paraguay +1.5,+135,2.35,0.6382,0.40328603435399557,0.4998,2026-07-02T04:08:38Z
