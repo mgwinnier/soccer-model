@@ -9,3 +9,4 @@ game_id,match_date,match,market,code,segment,system,selection,american,decimal,m
 760509,2026-07-07,Argentina v Egypt,Total Goals,under@2.5,TG:under,,Under 2.5,-125.0,1.8,0.6265,0.5263157894736842,0.1277,2026-07-05T04:06:43Z
 760508,2026-07-07,Switzerland v Colombia,Match Result,A,MR:A,pickem_ml_2_3,Colombia,120.0,2.2,0.474,0.4300740163615115,0.0429,2026-07-05T04:06:43Z
 760508,2026-07-07,Switzerland v Colombia,Total Goals,over@2.5,TG:over,,Over 2.5,140.0,2.4,0.5526,0.3982300884955752,0.3262,2026-07-05T04:06:43Z
+760508,2026-07-07,Switzerland v Colombia,Spread,cover_away@0.5,SP:away,,Colombia -0.5,+130,2.3,0.454,0.41401273885350315,0.0442,2026-07-06T10:52:53Z
