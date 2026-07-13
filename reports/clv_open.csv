@@ -4,3 +4,6 @@ game_id,match_date,match,market,code,segment,system,selection,american,decimal,m
 760514,2026-07-14,France v Spain,Match Result,A,MR:A,,Spain,220.0,3.2,0.4552,0.2988359581336203,0.4567,2026-07-12T03:36:17Z
 760514,2026-07-14,France v Spain,Total Goals,over@2.5,TG:over,,Over 2.5,-110.0,1.9090909090909087,0.5399,0.5,0.0307,2026-07-12T03:36:17Z
 760514,2026-07-14,France v Spain,Spread,cover_away@-0.5,SP:away,,Spain +0.5,-165.0,1.606060606060606,0.7252,0.5888285492629945,0.1647,2026-07-12T03:36:17Z
+760515,2026-07-15,England v Argentina,Match Result,A,MR:A,,Argentina,+205,3.05,0.4505,0.31182030694176244,0.3739,2026-07-13T03:38:34Z
+760515,2026-07-15,England v Argentina,Total Goals,under@2.5,TG:under,,Under 2.5,-160,1.625,0.6851,0.5859872611464968,0.1133,2026-07-13T03:38:34Z
+760515,2026-07-15,England v Argentina,Spread,cover_away@-0.5,SP:away,,Argentina +0.5,-195,1.5128205128205128,0.7252,0.623003194888179,0.0971,2026-07-13T03:38:34Z
